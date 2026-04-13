@@ -4,12 +4,12 @@
 "use client";
 
 /**
- * AngleController - Google Earth 风格 3D 视角控制器
+ * AngleController - Google Earth 风格 3D Viewpoint控制器
  * 
  * 交互升级：
  * - 鼠标拖拽：控制旋转（水平/俯仰）
  * - 鼠标滚轮：控制缩放（景别）
- * - 磁吸效果：接近标准角度时自动吸附，解决"太丝滑"问题
+ * - 磁吸效果：接近Standard角度时自动吸附，解决"太丝滑"问题
  */
 
 import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
@@ -42,7 +42,7 @@ export interface AngleControllerProps {
 }
 
 // ... (保持 CUBE_VERTICES 和 CUBE_EDGES 不变)
-// 立方体頂8个顶点的坐标（归一化）
+// 立方体頂8顶点的坐标（归一化）
 const CUBE_VERTICES = [
   { x: -1, y: -1, z: -1 },
   { x: 1, y: -1, z: -1 },
@@ -75,11 +75,11 @@ export function AngleController({
   const [elevation, setElevation] = useState<ElevationAngle>(initialElevation);
   const [shotSize, setShotSize] = useState<ShotSize>(initialShotSize);
   
-  // 连续的视角参数 (用于渲染动画)
+  // 连续的Viewpoint参数 (用于渲染动画)
   const [theta, setTheta] = useState(45); // 水平 0-360
   const [phi, setPhi] = useState(90);    // 垂直 30-150
   
-  // 图片比例状态
+  // Image比例状态
   const [imgAspectRatio, setImgAspectRatio] = useState(16 / 9); // 默认宽屏
 
   // 交互状态
@@ -120,7 +120,7 @@ export function AngleController({
     };
   }, []);
 
-  // 核心逻辑：吸附到最近的标准角度 (Snapping)
+  // 核心逻辑：吸附到最近的Standard角度 (Snapping)
   const snapToGrid = useCallback((t: number, p: number, sSize: ShotSize) => {
     // 1. 水平方向吸附 (每45度)
     const normalizedTheta = ((t % 360) + 360) % 360;
@@ -132,12 +132,12 @@ export function AngleController({
     let elevIndex = 1; // default eye-level
     let snappedPhi = 90;
 
-    if (p > 110) { elevIndex = 0; snappedPhi = 130; }      // low-angle (仰视 - 摄像机在下)
+    if (p > 110) { elevIndex = 0; snappedPhi = 130; }      // low-angle (Low Angle - 摄像机在下)
     else if (p > 75) { elevIndex = 1; snappedPhi = 90; }   // eye-level
     else if (p > 50) { elevIndex = 2; snappedPhi = 60; }   // elevated
-    else { elevIndex = 3; snappedPhi = 40; }               // high-angle (俯视 - 摄像机在上)
+    else { elevIndex = 3; snappedPhi = 40; }               // high-angle (Bird's Eye View - 摄像机在上)
 
-    // 3. 更新状态 (如果发生变化)
+    // 3. 更新状态 (如果Hair生变化)
     const newDir = HORIZONTAL_DIRECTIONS[dirIndex];
     const newElev = ELEVATION_ANGLES[elevIndex];
 
@@ -146,7 +146,7 @@ export function AngleController({
       setElevation(newElev.id);
       setShotSize(sSize);
       
-      // 触发外部回调
+      // 触Hair外部回调
       const prompt = generateAnglePrompt(newDir.id, newElev.id, sSize);
       const label = getAngleLabel(newDir.id, newElev.id, sSize);
       onAngleChange?.({ 
@@ -158,7 +158,7 @@ export function AngleController({
       });
     }
 
-    // 返回吸附后的视觉坐标(可选：如果想要完全吸附视觉效果，可以使用这个返回值)
+    // Back吸附后的视觉坐标(可选：如果想要完全吸附视觉效果，可以使用这Back值)
     return { theta: snappedTheta, phi: snappedPhi };
   }, [direction, elevation, shotSize, onAngleChange]);
 
@@ -204,7 +204,7 @@ export function AngleController({
     }
   };
 
-  // 使用原生事件监听器绑定 wheel 事件（设置 passive: false）
+  // 使用原生事件监听器Binding wheel 事件（设置 passive: false）
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -217,7 +217,7 @@ export function AngleController({
     };
   }, []);
 
-  // 鼠标事件绑定
+  // 鼠标事件Binding
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -279,7 +279,7 @@ export function AngleController({
   // 计算当前方向索引（用于高亮LED灯）
   const directionIndex = Math.round(((theta % 360) + 360) % 360 / 45) % 8;
 
-  // 计算 3D 卡片的尺寸 (适应图片比例，且不超过最大范围)
+  // 计算 3D 卡片的尺寸 (适应Image比例，且不超过最大范围)
   const maxCardSize = size * 0.7; // 增加一点最大范围
   let cardWidth = maxCardSize;
   let cardHeight = maxCardSize / imgAspectRatio;
@@ -399,7 +399,7 @@ export function AngleController({
           <div className="absolute rounded-full border border-white/10" style={{ width: radius * 2, height: radius * 2 }} />
         </div>
 
-        {/* 8个方向LED灯 */}
+        {/* 8方向LED灯 */}
         <div className="absolute inset-0 pointer-events-none">
           {HORIZONTAL_DIRECTIONS.map((dir, i) => {
             const deg = (i * 45 - 90) * (Math.PI / 180);
@@ -452,7 +452,7 @@ export function AngleController({
           </div>
         </div>
         
-        {/* 加载中覆盖层 */}
+        {/* Loading...覆盖层 */}
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-50">
             <div className="w-8 h-8 border-2 border-[#ccff00] border-t-transparent rounded-full animate-spin" />
@@ -481,7 +481,7 @@ export function AngleController({
       
       {!compact && (
         <div className="text-[9px] text-zinc-500 font-mono">
-          [拖拽] 旋转 · [滚轮] 缩放
+          [Drag] Rotate · [Scroll] Zoom
         </div>
       )}
     </div>

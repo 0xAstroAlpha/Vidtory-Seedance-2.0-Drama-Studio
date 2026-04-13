@@ -31,51 +31,38 @@ export interface IProvider {
 
 /**
  * Default provider templates
- * 默认供应商模板
  * 
- * 核心供应商：
- * 1. 魔因API (memefast) - 全功能 AI 中转（推荐），支持文本/图片/视频/识图
- * 2. RunningHub - 视角切换/多角度生成
+ * Core Providers:
+ * 1. Gemini (Google AI) - Text/Image/Video generation
+ * 2. Custom - OpenAI-compatible API endpoint
  */
 export const DEFAULT_PROVIDERS: Omit<IProvider, 'id' | 'apiKey'>[] = [
   {
-    platform: 'memefast',
-    name: '魔因API',
-    baseUrl: 'https://memefast.top',
+    platform: 'gemini',
+    name: 'Google Gemini',
+    baseUrl: '',
     model: [
-      'deepseek-v3.2',
-      'glm-4.7',
+      'gemini-2.5-flash',
+      'gemini-2.5-pro',
+      'gemini-2.0-flash',
       'gemini-3-pro-preview',
-      'gemini-3-pro-image-preview',
-      'gpt-image-1.5',
-      'doubao-seedance-1-5-pro-251215',
-      'veo3.1',
-      'sora-2-all',
-      'wan2.6-i2v',
-      'grok-video-3-10s',
-      'claude-haiku-4-5-20251001',
+      'gemini-3-flash-preview',
+      'imagen-4',
     ],
     capabilities: ['text', 'vision', 'image_generation', 'video_generation'],
-  },
-  {
-    platform: 'runninghub',
-    name: 'RunningHub',
-    baseUrl: 'https://www.runninghub.cn/openapi/v2',
-    model: ['2009613632530812930'],
-    capabilities: ['image_generation', 'vision'],
   },
 ];
 
 // ==================== Model Classification ====================
 
 /**
- * 根据模型名称模式推断模型能力
- * 用于动态同步的 552+ 模型自动分类
+ * 根据Model名称模式推断Model能力
+ * 用于动态同步的 552+ Model自动分类
  */
 export function classifyModelByName(modelName: string): ModelCapability[] {
   const name = modelName.toLowerCase();
 
-  // ---- 视频生成模型 ----
+  // ---- Video GenerationModel ----
   const videoPatterns = [
     'veo', 'sora', 'wan', 'kling', 'runway', 'luma', 'seedance',
     'cogvideo', 'hunyuan-video', 'minimax-video', 'hailuo', 'pika',
@@ -85,7 +72,7 @@ export function classifyModelByName(modelName: string): ModelCapability[] {
   if (/grok[- ]?video/.test(name)) return ['video_generation'];
   if (videoPatterns.some(p => name.includes(p))) return ['video_generation'];
 
-  // ---- 图片生成模型 ----
+  // ---- Image GenerationModel ----
   const imageGenPatterns = [
     'dall-e', 'dalle', 'flux', 'midjourney', 'niji', 'imagen', 'cogview',
     'gpt-image', 'ideogram', 'sd3', 'stable-diffusion', 'sdxl',
@@ -95,36 +82,36 @@ export function classifyModelByName(modelName: string): ModelCapability[] {
   // "xxx-image-preview" 类（如 gemini-3-pro-image-preview）
   if (/image[- ]?preview/.test(name)) return ['image_generation'];
 
-  // ---- 视觉/识图模型 ----
+  // ---- 视觉/识图Model ----
   if (/vision/.test(name)) return ['text', 'vision'];
 
-  // ---- TTS / Audio 模型（不归入任何主分类）----
+  // ---- TTS / Audio Model（不归入任何主分类）----
   if (/tts|whisper|audio/.test(name)) return ['text'];
 
-  // ---- Embedding 模型 ----
+  // ---- Embedding Model ----
   if (/embed/.test(name)) return ['embedding'];
 
-  // ---- 推理/思考模型（仍归入 text）----
+  // ---- 推理/思考Model（仍归入 text）----
   if (/[- ](r1|thinking|reasoner|reason)/.test(name) || /^o[1-9]/.test(name)) return ['text', 'reasoning'];
 
-  // ---- 默认：对话模型 ----
+  // ---- 默认：对话Model ----
   return ['text'];
 }
 
 // ==================== Endpoint Routing ====================
 
 /**
- * 模型 API 调用格式
- * 基于 MemeFast 等平台 /v1/models 返回的 supported_endpoint_types 字段
+ * Model API 调用格式
+ * 基于 MemeFast 等Platform /v1/models Back的 supported_endpoint_types 字段
  */
 export type ModelApiFormat =
-  | 'openai_chat'        // /v1/chat/completions （文本/对话，也用于 Gemini 图片生成）
-  | 'openai_images'      // /v1/images/generations （标准图片生成）
-  | 'openai_video'       // /v1/videos/generations （标准视频生成）
+  | 'openai_chat'        // /v1/chat/completions （文本/对话，也用于 Gemini Image Generation）
+  | 'openai_images'      // /v1/images/generations （StandardImage Generation）
+  | 'openai_video'       // /v1/videos/generations （StandardVideo Generation）
   | 'kling_image'        // /kling/v1/images/generations 或 /kling/v1/images/omni-image
   | 'unsupported';       // 不支持的端点格式
 
-// MemeFast supported_endpoint_types 值 → 我们的图片 API 格式
+// MemeFast supported_endpoint_types 值 → 我们的Image API 格式
 const IMAGE_ENDPOINT_MAP: Record<string, ModelApiFormat> = {
   'image-generation': 'openai_images',
   'dall-e-3': 'openai_images',  // z-image-turbo, qwen-image-max 等走 /v1/images/generations
@@ -132,46 +119,32 @@ const IMAGE_ENDPOINT_MAP: Record<string, ModelApiFormat> = {
   'openai': 'openai_chat',  // 如 gpt-image-1-all 通过 chat completions 生图
 };
 
-// MemeFast supported_endpoint_types 值 → 我们的视频 API 格式能力分类
-// 注意：这里统一映射为 'openai_video' 仅表示「视频生成能力」，实际 API 路由由 use-video-generation.ts 中的 VIDEO_FORMAT_MAP 决定
+// Endpoint types → Video API format mapping
 const VIDEO_ENDPOINT_MAP: Record<string, ModelApiFormat> = {
-  '视频统一格式': 'openai_video',
-  'openAI视频格式': 'openai_video',
-  'openAI官方视频格式': 'openai_video',
-  '异步': 'openai_video',            // wan 系列
-  '豆包视频异步': 'openai_video',    // doubao-seedance 系列
-  'grok视频': 'openai_video',          // grok-video
-  '文生视频': 'openai_video',          // kling 文生视频
-  '图生视频': 'openai_video',          // kling 图生视频
-  '视频延长': 'openai_video',          // kling 视频延长
-  '海螺视频生成': 'openai_video',    // MiniMax-Hailuo
-  'luma视频生成': 'openai_video',     // luma_video_api
-  'luma视频扩展': 'openai_video',     // luma_video_extend
-  'runway图生视频': 'openai_video',   // runwayml
-  'aigc-video': 'openai_video',       // aigc-video-hailuo/kling/vidu
-  'minimax/video-01异步': 'openai_video', // minimax/video-01
-  'openai-response': 'openai_video',  // veo3-pro 等
+  'openai_video': 'openai_video',
+  'openai-response': 'openai_video',
+  'aigc-video': 'openai_video',
 };
 
 /**
- * 根据模型的 supported_endpoint_types 确定图片生成应用的 API 格式
- * 当端点元数据不可用时，根据模型名称推断
+ * 根据Model的 supported_endpoint_types ConfirmImage Generation应用的 API 格式
+ * 当端点元数据不可用时，根据Model名称推断
  */
 export function resolveImageApiFormat(endpointTypes: string[] | undefined, modelName?: string): ModelApiFormat {
-  // 1. 使用 API 返回的端点元数据
+  // 1. 使用 API Back的端点元数据
   if (endpointTypes && endpointTypes.length > 0) {
     // 优先使用 image-generation 端点
     for (const t of endpointTypes) {
       if (IMAGE_ENDPOINT_MAP[t] === 'openai_images') return 'openai_images';
     }
-    // 其次尝试 chat completions （Gemini 多模态图片）
+    // 其次尝试 chat completions （Gemini 多模态Image）
     for (const t of endpointTypes) {
       if (IMAGE_ENDPOINT_MAP[t] === 'openai_chat') return 'openai_chat';
     }
     return 'unsupported';
   }
 
-  // 2. Fallback: 根据模型名称推断 API 格式
+  // 2. Fallback: 根据Model名称推断 API 格式
   if (modelName) {
     const name = modelName.toLowerCase();
     // Kling image models → native /kling/v1/images/* endpoint
@@ -196,7 +169,7 @@ export function resolveImageApiFormat(endpointTypes: string[] | undefined, model
 }
 
 /**
- * 根据模型的 supported_endpoint_types 确定视频生成应用的 API 格式
+ * 根据Model的 supported_endpoint_types ConfirmVideo Generation应用的 API 格式
  */
 export function resolveVideoApiFormat(endpointTypes: string[] | undefined): ModelApiFormat {
   if (!endpointTypes || endpointTypes.length === 0) return 'openai_video'; // fallback
@@ -204,7 +177,7 @@ export function resolveVideoApiFormat(endpointTypes: string[] | undefined): Mode
     const mapped = VIDEO_ENDPOINT_MAP[t];
     if (mapped) return mapped;
   }
-  // 如果有 openai 类型，也试用视频端点
+  // 如果有 openai 类型，也试用Video端点
   if (endpointTypes.includes('openai')) return 'openai_video';
   return 'unsupported';
 }
@@ -270,19 +243,16 @@ function isModelIncompatibleError(errorText?: string): boolean {
 }
 
 /**
- * 检测 HTTP 500 响应体中是否包含上游负载饱和相关关键词。
- * MemeFast 有时用 500 而非 503/529 返回负载饱和错误。
+ * Detect upstream overload errors in HTTP 500 response bodies.
  */
 function isUpstreamOverloadError(errorText?: string): boolean {
   if (!errorText) return false;
   const text = errorText.toLowerCase();
   return (
-    text.includes('上游负载') ||
-    text.includes('负载已饱和') ||
-    text.includes('负载饱和') ||
     text.includes('overloaded') ||
-    text.includes('无可用渠道') ||
-    text.includes('no available channel')
+    text.includes('no available channel') ||
+    text.includes('resource exhausted') ||
+    text.includes('quota exceeded')
   );
 }
 
@@ -378,7 +348,7 @@ export class ApiKeyManager {
       this.markCurrentKeyFailed('auth');
       return true;
     }
-    // 所有 5xx 服务端错误均触发 key 轮转（memefast 等中转站 500 多为临时性故障）
+    // 所有 5xx 服务端Error均触Hair key 轮转（memefast 等中转站 500 多为临时性故障）
     if (statusCode >= 500) {
       this.markCurrentKeyFailed('service_unavailable');
       return true;

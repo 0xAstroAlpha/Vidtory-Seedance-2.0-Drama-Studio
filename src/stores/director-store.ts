@@ -548,9 +548,9 @@ const defaultConfig: GenerationConfig = {
   videoSize: '480p',
   sceneCount: 5,
   concurrency: 1,
-  imageProvider: 'memefast',
-  videoProvider: 'memefast',
-  chatProvider: 'memefast',
+  imageProvider: 'gemini',
+  videoProvider: 'gemini',
+  chatProvider: 'gemini',
 };
 
 // ==================== Default Project Data ====================
@@ -1614,7 +1614,7 @@ export const useDirectorStore = create<DirectorStore>()(
     console.log('[DirectorStore] Added', newScenes.length, 'scenes from script, total:', splitScenes.length + newScenes.length);
   },
 
-  // 添加空白分镜（用户手动创建，自行上传图片/填写提示词/生成）
+  // Add空白Shot（用户手动Create，自行UploadImage/填写Prompt/生成）
   addBlankSplitScene: () => {
     const { activeProjectId, projects } = get();
     if (!activeProjectId) return;
@@ -1624,7 +1624,7 @@ export const useDirectorStore = create<DirectorStore>()(
 
     const blankScene: SplitScene = {
       id: newId,
-      sceneName: `空白分镜 ${newId + 1}`,
+      sceneName: `空白Shot ${newId + 1}`,
       sceneLocation: '',
       imageDataUrl: '',
       imageHttpUrl: null,

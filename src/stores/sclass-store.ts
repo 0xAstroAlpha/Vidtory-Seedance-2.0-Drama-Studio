@@ -5,12 +5,12 @@
  * S级 Store — Seedance 2.0 多模态创作板块状态管理
  *
  * 核心概念：
- * - ShotGroup：将 director-store 中的 SplitScene 按组合并，用于多镜头叙事视频生成
- * - AssetRef：@引用资产（图片/视频/音频），在提示词中以 @Image1 @Video1 @Audio1 形式引用
- * - 双模式：分镜模式（从剧本流水线导入）+ 自由模式（纯素材上传）
+ * - ShotGroup：将 director-store 中的 SplitScene 按组合并，用于多Shot叙事Video Generation
+ * - AssetRef：@引用资产（Image/Video/Audio），在Prompt中以 @Image1 @Video1 @Audio1 形式引用
+ * - 双模式：Shot模式（从剧本流水线Import）+ 自由模式（纯素材Upload）
  *
  * Seedance 2.0 限制：
- * - 输入：≤9图片 + ≤3视频(≤15s) + ≤3音频(MP3,≤15s) + 文本(5000字符) ，总文件≤12
+ * - 输入：≤9Image + ≤3Video(≤15s) + ≤3Audio(MP3,≤15s) + 文本(5000字符) ，总文件≤12
  * - 输出：4-15s，480p/720p/1080p，16:9/9:16/4:3/3:4/21:9/1:1
  */
 
@@ -26,31 +26,31 @@ export type AssetType = 'image' | 'video' | 'audio';
 /** 素材用途（Seedance 2.0 @素材用途精确标注） */
 export type AssetPurpose =
   | 'character_ref'     // 角色参考
-  | 'scene_ref'         // 场景参考
-  | 'first_frame'       // 首帧
+  | 'scene_ref'         // Scene参考
+  | 'first_frame'       // First Frame
   | 'grid_image'        // 格子图
   | 'camera_replicate'  // 运镜复刻
   | 'action_replicate'  // 动作复刻
   | 'effect_replicate'  // 特效复刻
   | 'beat_sync'         // 音乐卡点
-  | 'bgm'              // 背景音乐
+  | 'bgm'              // Background Music
   | 'voice_ref'        // 语音参考
   | 'prev_video'       // 前组延长
-  | 'video_extend'     // 被延长的视频
-  | 'video_edit_src'   // 被编辑的源视频
+  | 'video_extend'     // 被延长的Video
+  | 'video_edit_src'   // 被Edit的源Video
   | 'general'          // 通用参考
 ;
 
-/** 视频生成状态 */
+/** Video Generation状态 */
 export type VideoGenStatus = 'idle' | 'generating' | 'completed' | 'failed';
 
-/** 输出视频画幅比 */
+/** 输出Video画幅比 */
 export type SClassAspectRatio = '16:9' | '9:16' | '4:3' | '3:4' | '21:9' | '1:1';
 
-/** 输出视频分辨率 */
+/** 输出Video分辨率 */
 export type SClassResolution = '480p' | '720p' | '1080p';
 
-/** 输出视频时长（秒） */
+/** 输出Video Duration（sec） */
 export type SClassDuration = 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
 
 /** 创作模式 */
@@ -62,14 +62,14 @@ export type GroupGenerationType = 'new' | 'extend' | 'edit';
 /** 延长方向 */
 export type ExtendDirection = 'forward' | 'backward';
 
-/** 编辑类型 */
+/** Edit类型 */
 export type EditType = 'plot_change' | 'character_swap' | 'attribute_modify' | 'element_add';
 
 // ==================== Interfaces ====================
 
 /**
  * @引用资产
- * 在提示词中以 @Image1, @Video1, @Audio1 方式引用
+ * 在Prompt中以 @Image1, @Video1, @Audio1 方式引用
  */
 export interface AssetRef {
   id: string;
@@ -78,20 +78,20 @@ export interface AssetRef {
   tag: string;
   /** 本地文件路径或 data URL */
   localUrl: string;
-  /** HTTP URL（上传到 API 后获得） */
+  /** HTTP URL（Upload到 API 后获得） */
   httpUrl: string | null;
-  /** 文件名（用于显示） */
+  /** Filename（用于显示） */
   fileName: string;
-  /** 文件大小（字节） */
+  /** File Size（字节） */
   fileSize: number;
-  /** 视频/音频时长（秒），图片为 null */
+  /** Video/AudioDuration（sec），Image为 null */
   duration: number | null;
   /** 素材用途（Seedance 2.0 @素材用途精确标注） */
   purpose?: AssetPurpose;
 }
 
 /**
- * 生成历史记录
+ * 生成History
  */
 export interface GenerationRecord {
   id: string;
@@ -111,83 +111,83 @@ export interface GenerationRecord {
 }
 
 /**
- * 镜头组 — S级核心数据结构
+ * Shot组 — S级核心数据结构
  *
- * 将 director-store 中的多个 SplitScene 编为一组，
- * 合并它们的首帧图片、提示词，生成一段多镜头叙事视频。
+ * 将 director-store 中的多 SplitScene 编为一组，
+ * 合并它们的First FrameImage、Prompt，生成一段多Shot叙事Video。
  */
 export interface ShotGroup {
   id: string;
-  /** 组名（自动生成或用户自定义） */
+  /** 组名（Auto Generate或用户Custom） */
   name: string;
   /** 引用 director-store 中 SplitScene.id 列表 */
   sceneIds: number[];
-  /** 组内总时长限制（≤15s） */
+  /** 组内总Duration限制（≤15s） */
   totalDuration: SClassDuration;
-  /** @图片引用 */
+  /** @Image引用 */
   imageRefs: AssetRef[];
-  /** @视频引用 */
+  /** @Video引用 */
   videoRefs: AssetRef[];
-  /** @音频引用 */
+  /** @Audio引用 */
   audioRefs: AssetRef[];
-  /** 合并后的提示词（用户可编辑） */
+  /** 合并后的Prompt（用户可Edit） */
   mergedPrompt: string;
-  /** 生成的视频 URL */
+  /** 生成的Video URL */
   videoUrl: string | null;
-  /** 视频媒体库 ID（用于拖拽到时间线） */
+  /** Video媒体库 ID（用于拖拽到时间线） */
   videoMediaId: string | null;
-  /** 视频生成状态 */
+  /** Video Generation状态 */
   videoStatus: VideoGenStatus;
-  /** 生成进度 0-100 */
+  /** 生成Progress 0-100 */
   videoProgress: number;
-  /** 错误信息 */
+  /** Error信息 */
   videoError: string | null;
   /** 生成历史 */
   history: GenerationRecord[];
   /** 排序索引 */
   sortIndex: number;
-  /** 合并格子图 dataUrl（视频生成时构建，用于预览/下载） */
+  /** 合并格子图 dataUrl（Video Generation时构建，用于预览/Download） */
   gridImageUrl: string | null;
-  /** 最近一次生成使用的完整 prompt（用于复制核对） */
+  /** 最近一次生成使用的完整 prompt（用于Copy核对） */
   lastPrompt: string | null;
 
   // ---- 组级 AI 校准 ----
   /** 组级叙事弧线（AI 校准产物） */
   narrativeArc?: string;
-  /** 镜头间过渡指令，长度 = sceneIds.length - 1 */
+  /** Shot间过渡指令，长度 = sceneIds.length - 1 */
   transitions?: string[];
-  /** 组级音频设计（整段 15s 规划） */
+  /** 组级Audio设计（整段 15s 规划） */
   groupAudioDesign?: string;
   /** AI 校准后的组级 prompt（优先级：mergedPrompt > calibratedPrompt > 自动拼接） */
   calibratedPrompt?: string;
   /** 校准状态 */
   calibrationStatus?: 'idle' | 'calibrating' | 'done' | 'failed';
-  /** 校准错误信息 */
+  /** 校准Error信息 */
   calibrationError?: string | null;
 
-  // ---- 视频延长 & 视频编辑 ----
-  /** 组生成类型：new=全新生成, extend=延长, edit=编辑 */
+  // ---- Video延长 & VideoEdit ----
+  /** 组生成类型：new=全新生成, extend=延长, edit=Edit */
   generationType?: GroupGenerationType;
   /** 延长方向（仅 extend 时有效） */
   extendDirection?: ExtendDirection;
-  /** 编辑类型（仅 edit 时有效） */
+  /** Edit类型（仅 edit 时有效） */
   editType?: EditType;
-  /** 来源组 ID（延长/编辑的原始视频组） */
+  /** 来源组 ID（延长/Edit的原始Video组） */
   sourceGroupId?: string;
-  /** 来源视频 URL（冗余存储，避免原组被删后找不到） */
+  /** 来源Video URL（冗余存储，避免原组被删后找不到） */
   sourceVideoUrl?: string;
 }
 
 /**
- * 单镜生成记录（保留单镜头独立生成能力）
+ * 单镜生成记录（保留单Shot独立生成能力）
  */
 export interface SingleShotOverride {
   sceneId: number;
-  /** 单镜头独立提示词（覆盖分镜原始提示词） */
+  /** 单Shot独立Prompt（覆盖Shot原始Prompt） */
   prompt: string;
   /** @引用资产 */
   assetRefs: AssetRef[];
-  /** 生成的视频 URL */
+  /** 生成的Video URL */
   videoUrl: string | null;
   videoMediaId: string | null;
   videoStatus: VideoGenStatus;
@@ -200,7 +200,7 @@ export interface SingleShotOverride {
 
 /** S级项目级数据 */
 export interface SClassProjectData {
-  /** 镜头组列表 */
+  /** Shot组列表 */
   shotGroups: ShotGroup[];
   /** 单镜生成覆盖表 (sceneId -> override) */
   singleShotOverrides: Record<number, SingleShotOverride>;
@@ -212,17 +212,17 @@ export interface SClassProjectData {
   mode: SClassMode;
   /** 是否已从 director 数据自动分组过 */
   hasAutoGrouped: boolean;
-  /** 最近一次九宫格生成的原始大图 URL（用于视频生成时复用，避免重新合并） */
+  /** 最近一次九宫格生成的原始大图 URL（用于Video Generation时复用，避免重新合并） */
   lastGridImageUrl: string | null;
-  /** lastGridImageUrl 对应的分镜 ID 列表（用于判断是否可复用） */
+  /** lastGridImageUrl 对应的Shot ID 列表（用于判断是否可复用） */
   lastGridSceneIds: number[] | null;
   editorPrefs: SClassEditorPrefs;
 }
 
-/** S级生成配置（共享配置 aspectRatio/resolution 已统一由 director-store 管理） */
+/** S级生成配置（Total享配置 aspectRatio/resolution 已统一由 director-store 管理） */
 export interface SClassConfig {
   defaultDuration: SClassDuration;
-  /** 生成并发数 */
+  /** 生成并Hair数 */
   concurrency: number;
 }
 
@@ -252,19 +252,19 @@ interface SClassActions {
   ensureProject: (projectId: string) => void;
   getProjectData: (projectId: string) => SClassProjectData;
 
-  // 镜头组 CRUD
+  // Shot组 CRUD
   addShotGroup: (group: ShotGroup) => void;
   updateShotGroup: (groupId: string, updates: Partial<ShotGroup>) => void;
   removeShotGroup: (groupId: string) => void;
   setShotGroups: (groups: ShotGroup[]) => void;
   reorderShotGroups: (groupIds: string[]) => void;
 
-  // 镜头组内场景管理
+  // Shot组内Scene管理
   addSceneToGroup: (groupId: string, sceneId: number) => void;
   removeSceneFromGroup: (groupId: string, sceneId: number) => void;
   moveSceneBetweenGroups: (fromGroupId: string, toGroupId: string, sceneId: number) => void;
 
-  // 镜头组视频生成
+  // Shot组Video Generation
   updateGroupVideoStatus: (groupId: string, updates: Partial<Pick<ShotGroup, 'videoStatus' | 'videoProgress' | 'videoUrl' | 'videoError' | 'videoMediaId'>>) => void;
   addGroupHistory: (groupId: string, record: GenerationRecord) => void;
 
@@ -290,7 +290,7 @@ interface SClassActions {
   setMode: (mode: SClassMode) => void;
   setHasAutoGrouped: (value: boolean) => void;
 
-  // 重置
+  // Reset
   reset: () => void;
 }
 
@@ -384,7 +384,7 @@ export const useSClassStore = create<SClassStore>()(
         return projects[projectId] || defaultProjectData();
       },
 
-      // ========== 镜头组 CRUD ==========
+      // ========== Shot组 CRUD ==========
 
       addShotGroup: (group) => {
         const { activeProjectId, projects } = get();
@@ -470,7 +470,7 @@ export const useSClassStore = create<SClassStore>()(
         });
       },
 
-      // ========== 镜头组内场景管理 ==========
+      // ========== Shot组内Scene管理 ==========
 
       addSceneToGroup: (groupId, sceneId) => {
         const { activeProjectId, projects } = get();
@@ -533,7 +533,7 @@ export const useSClassStore = create<SClassStore>()(
         });
       },
 
-      // ========== 镜头组视频生成 ==========
+      // ========== Shot组Video Generation ==========
 
       updateGroupVideoStatus: (groupId, updates) => {
         const { activeProjectId, projects } = get();
@@ -635,7 +635,7 @@ export const useSClassStore = create<SClassStore>()(
         const project = projects[activeProjectId];
 
         if (groupId) {
-          // 添加到指定组
+          // Add到指定组
           set({
             projects: {
               ...projects,
@@ -659,7 +659,7 @@ export const useSClassStore = create<SClassStore>()(
             },
           });
         } else {
-          // 添加到全局（自由模式）
+          // Add到全局（自由模式）
           set({
             projects: {
               ...projects,
@@ -792,7 +792,7 @@ export const useSClassStore = create<SClassStore>()(
         });
       },
 
-      // ========== 重置 ==========
+      // ========== Reset ==========
 
       reset: () => set(initialState),
     }),
@@ -867,7 +867,7 @@ export const useActiveSClassProject = (): SClassProjectData | null => {
   });
 };
 
-/** 获取当前项目的镜头组列表 */
+/** 获取当前项目的Shot组列表 */
 export const useShotGroups = (): ShotGroup[] => {
   return useSClassStore((state) => {
     if (!state.activeProjectId) return [];
@@ -876,7 +876,7 @@ export const useShotGroups = (): ShotGroup[] => {
   });
 };
 
-/** 获取指定镜头组 */
+/** 获取指定Shot组 */
 export const useShotGroup = (groupId: string): ShotGroup | null => {
   return useSClassStore((state) => {
     if (!state.activeProjectId) return null;

@@ -12,9 +12,9 @@
  * 2. Only fall back to Vision API when scene has NO text descriptions.
  * 
  * Three-tier prompt system:
- * 1. Image Prompt (首帧提示词) - Static description for first frame image generation
- * 2. End Frame Prompt (尾帧提示词) - Static description for end frame (if needed)
- * 3. Video Prompt (视频提示词) - Dynamic action description for video generation
+ * 1. Image Prompt (First FramePrompt) - Static description for first frame image generation
+ * 2. End Frame Prompt (Tail FramePrompt) - Static description for end frame (if needed)
+ * 3. Video Prompt (VideoPrompt) - Dynamic action description for video generation
  * 
  * Also determines whether each scene needs an end frame based on:
  * - Large position changes (walk in/out, transformation)
@@ -52,19 +52,19 @@ export interface ScenePromptRequest {
 export interface GeneratedPrompt {
   id: number;
   
-  // === 首帧提示词 (First Frame - Static) ===
+  // === First FramePrompt (First Frame - Static) ===
   // For image generation: composition, lighting, character appearance, starting pose
   imagePrompt: string;      // English
   imagePromptZh: string;    // Chinese
   
-  // === 尾帧提示词 (End Frame - Static) ===
+  // === Tail FramePrompt (End Frame - Static) ===
   // For image generation: ending pose, position after movement
   needsEndFrame: boolean;   // Whether this scene needs an end frame
   endFramePrompt: string;   // English (empty if not needed)
   endFramePromptZh: string; // Chinese (empty if not needed)
   endFrameReason?: string;  // Why end frame is needed (for debugging)
   
-  // === 视频提示词 (Video Action - Dynamic) ===
+  // === VideoPrompt (Video Action - Dynamic) ===
   // For video generation: action process, camera movement, atmosphere change
   videoPrompt: string;      // English
   videoPromptZh: string;    // Chinese
@@ -115,7 +115,7 @@ function inferNeedsEndFrame(scene: ScenePromptRequest['scenes'][0]): { needs: bo
   
   for (const kw of cameraKeywords) {
     if (camera.includes(kw)) {
-      return { needs: true, reason: `镜头运动: ${kw}` };
+      return { needs: true, reason: `Shot运动: ${kw}` };
     }
   }
   
@@ -130,7 +130,7 @@ function generatePromptFromText(scene: ScenePromptRequest['scenes'][0], storyCon
   const camera = scene.cameraMovement || '';
   const dialogue = scene.dialogue || '';
   const sceneDesc = scene.sceneDescription || '';
-  const sceneName = scene.sceneName || `场景 ${scene.id}`;
+  const sceneName = scene.sceneName || `Scene ${scene.id}`;
   
   // Build image prompt (static first frame description)
   const imagePromptParts: string[] = [];
@@ -141,7 +141,7 @@ function generatePromptFromText(scene: ScenePromptRequest['scenes'][0], storyCon
   // Build video prompt (dynamic action)
   const videoPromptParts: string[] = [];
   if (action) videoPromptParts.push(action);
-  if (camera) videoPromptParts.push(`镜头: ${camera}`);
+  if (camera) videoPromptParts.push(`Shot: ${camera}`);
   if (dialogue) videoPromptParts.push(`对白: "${dialogue.substring(0, 50)}"`);
   const videoPromptZh = videoPromptParts.join('。') || `${sceneName} 的动态画面`;
   
@@ -222,15 +222,15 @@ export async function generateScenePrompts(
       console.warn('[ScenePromptGenerator] No Vision API configured, using placeholder for scenes without text');
       const placeholderResults = scenesWithoutText.map(s => ({
         id: s.id,
-        imagePrompt: `场景 ${s.id}`,
-        imagePromptZh: `场景 ${s.id}`,
+        imagePrompt: `Scene ${s.id}`,
+        imagePromptZh: `Scene ${s.id}`,
         needsEndFrame: false,
         endFramePrompt: '',
         endFramePromptZh: '',
-        videoPrompt: `场景 ${s.id} 的动态画面`,
-        videoPromptZh: `场景 ${s.id} 的动态画面`,
-        prompt: `场景 ${s.id} 的动态画面`,
-        promptZh: `场景 ${s.id} 的动态画面`,
+        videoPrompt: `Scene ${s.id} 的动态画面`,
+        videoPromptZh: `Scene ${s.id} 的动态画面`,
+        prompt: `Scene ${s.id} 的动态画面`,
+        promptZh: `Scene ${s.id} 的动态画面`,
       }));
       return [...textResults, ...placeholderResults].sort((a, b) => a.id - b.id);
     }
@@ -239,15 +239,15 @@ export async function generateScenePrompts(
       console.warn('[ScenePromptGenerator] No Vision model configured, using placeholder for scenes without text');
       const placeholderResults = scenesWithoutText.map(s => ({
         id: s.id,
-        imagePrompt: `场景 ${s.id}`,
-        imagePromptZh: `场景 ${s.id}`,
+        imagePrompt: `Scene ${s.id}`,
+        imagePromptZh: `Scene ${s.id}`,
         needsEndFrame: false,
         endFramePrompt: '',
         endFramePromptZh: '',
-        videoPrompt: `场景 ${s.id} 的动态画面`,
-        videoPromptZh: `场景 ${s.id} 的动态画面`,
-        prompt: `场景 ${s.id} 的动态画面`,
-        promptZh: `场景 ${s.id} 的动态画面`,
+        videoPrompt: `Scene ${s.id} 的动态画面`,
+        videoPromptZh: `Scene ${s.id} 的动态画面`,
+        prompt: `Scene ${s.id} 的动态画面`,
+        promptZh: `Scene ${s.id} 的动态画面`,
       }));
       return [...textResults, ...placeholderResults].sort((a, b) => a.id - b.id);
     }
@@ -268,15 +268,15 @@ export async function generateScenePrompts(
       console.error('[ScenePromptGenerator] Vision API failed, using placeholders:', error);
       const placeholderResults = scenesWithoutText.map(s => ({
         id: s.id,
-        imagePrompt: `场景 ${s.id}`,
-        imagePromptZh: `场景 ${s.id}`,
+        imagePrompt: `Scene ${s.id}`,
+        imagePromptZh: `Scene ${s.id}`,
         needsEndFrame: false,
         endFramePrompt: '',
         endFramePromptZh: '',
-        videoPrompt: `场景 ${s.id} 的动态画面`,
-        videoPromptZh: `场景 ${s.id} 的动态画面`,
-        prompt: `场景 ${s.id} 的动态画面`,
-        promptZh: `场景 ${s.id} 的动态画面`,
+        videoPrompt: `Scene ${s.id} 的动态画面`,
+        videoPromptZh: `Scene ${s.id} 的动态画面`,
+        prompt: `Scene ${s.id} 的动态画面`,
+        promptZh: `Scene ${s.id} 的动态画面`,
       }));
       return [...textResults, ...placeholderResults].sort((a, b) => a.id - b.id);
     }
@@ -324,9 +324,9 @@ Your Expertise:
 - **Storytelling Through Camera**: Understand how each shot serves the overall narrative
 
 You understand the THREE-TIER PROMPT SYSTEM for video generation:
-1. **First Frame Prompt** (首帧提示词): STATIC description for generating the starting image
-2. **End Frame Prompt** (尾帧提示词): STATIC description for generating the ending image (only if needed)
-3. **Video Prompt** (视频提示词): DYNAMIC description for the motion/action between frames
+1. **First Frame Prompt** (First FramePrompt): STATIC description for generating the starting image
+2. **End Frame Prompt** (Tail FramePrompt): STATIC description for generating the ending image (only if needed)
+3. **Video Prompt** (VideoPrompt): DYNAMIC description for the motion/action between frames
 
 # Context
 - Input: A storyboard contact sheet containing multiple frames arranged in a grid.
@@ -375,10 +375,10 @@ Return a RAW JSON array (no markdown code block). BILINGUAL output required.
   {
     "id": 1,
     "imagePrompt": "English static first frame description...",
-    "imagePromptZh": "中文首帧静态描述...",
+    "imagePromptZh": "中文First Frame静态描述...",
     "needsEndFrame": true,
     "endFramePrompt": "English static end frame description...",
-    "endFramePromptZh": "中文尾帧静态描述...",
+    "endFramePromptZh": "中文Tail Frame静态描述...",
     "endFrameReason": "Character walks into room - position change",
     "videoPrompt": "English action/motion description...",
     "videoPromptZh": "中文动作/运动描述..."
@@ -407,18 +407,18 @@ Return a RAW JSON array (no markdown code block). BILINGUAL output required.
         id: s.id,
         // First frame (static)
         imagePrompt: `(Mock) A character in scene ${s.id}, composition based on "${storyPrompt}".`,
-        imagePromptZh: `(测试) 场景 ${s.id} 的角色，基于“${storyPrompt}”的构图。`,
+        imagePromptZh: `(测试) Scene ${s.id} 的角色，基于“${storyPrompt}”的构图。`,
         // End frame (static, only if needed)
         needsEndFrame,
         endFramePrompt: needsEndFrame ? `(Mock) Same character after action, new position in scene ${s.id}.` : '',
-        endFramePromptZh: needsEndFrame ? `(测试) 动作后的同一角色，场景 ${s.id} 中的新位置。` : '',
+        endFramePromptZh: needsEndFrame ? `(测试) 动作后的同一角色，Scene ${s.id} 中的新位置。` : '',
         endFrameReason: needsEndFrame ? 'Mock: position change' : undefined,
         // Video action (dynamic)
         videoPrompt: `(Mock) Slow zoom in. Scene ${s.id} action based on "${storyPrompt}".`,
-        videoPromptZh: `(测试) 缓慢推进。场景 ${s.id} 基于“${storyPrompt}”的动作。`,
+        videoPromptZh: `(测试) 缓慢推进。Scene ${s.id} 基于“${storyPrompt}”的动作。`,
         // Legacy compatibility
         prompt: `(Mock) Slow zoom in. Scene ${s.id} action based on "${storyPrompt}".`,
-        promptZh: `(测试) 缓慢推进。场景 ${s.id} 基于“${storyPrompt}”的动作。`,
+        promptZh: `(测试) 缓慢推进。Scene ${s.id} 基于“${storyPrompt}”的动作。`,
         action: 'Mock action',
         camera: 'Zoom In'
       };
@@ -468,7 +468,7 @@ Return a RAW JSON array (no markdown code block). BILINGUAL output required.
       }
       
       if (response.status === 401 || response.status === 403) {
-        throw new Error('API Key 无效或已过期');
+        throw new Error('API Key None效或已过期');
       }
       throw new Error(errorMessage);
     }

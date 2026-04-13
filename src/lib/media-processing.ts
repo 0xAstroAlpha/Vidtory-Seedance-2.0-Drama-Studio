@@ -77,7 +77,7 @@ export async function processMediaFiles(
       }
     } catch (error) {
       console.error("Error processing file:", file.name, error);
-      toast.error(`处理失败: ${file.name}`);
+      toast.error(`处理Failed: ${file.name}`);
       URL.revokeObjectURL(url);
     }
   }

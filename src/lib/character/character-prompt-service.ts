@@ -4,15 +4,15 @@
 /**
  * Character Prompt Generation Service
  * 
- * 专业角色设计服务，与现有角色库(character-library-store)对齐。
+ * 专业角色设计服务，与现有Character Library(character-library-store)对齐。
  * 
- * 功能：
+ * Feature：
  * 1. 读取剧本元数据，理解角色成长弧线
- * 2. 根据剧情阶段生成不同的角色形象
- * 3. 生成的阶段可转换为角色库的 CharacterVariation
+ * 2. 根据Plot阶段生成不同的角色形象
+ * 3. 生成的阶段可转换为Character Library的 CharacterVariation
  * 4. 使用世界级专业人设提升 AI 生成质量
  * 
- * 注意：这是一个辅助服务，不修改现有角色库的任何功能。
+ * 注意：这是一辅助服务，不修改现有Character Library的任何Feature。
  */
 
 import { useScriptStore } from '@/stores/script-store';
@@ -23,17 +23,17 @@ import type { CharacterVariation } from '@/stores/character-library-store';
 
 /**
  * 角色阶段形象
- * 一个角色在不同剧情阶段可能有不同的外观/状态
+ * 一角色在不同Plot阶段可能有不同的外观/状态
  */
 export interface CharacterStageAppearance {
   stageId: string;           // 阶段ID
   stageName: string;         // 阶段名称（如"少年时期"、"成为大亨后"）
-  episodeRange: string;      // 集数范围（如"1-5"、"10-20"）
-  description: string;       // 该阶段的角色描述
-  visualPromptEn: string;    // 英文视觉提示词
-  visualPromptZh: string;    // 中文视觉提示词
-  ageDescription?: string;   // 年龄描述
-  clothingStyle?: string;    // 服装风格
+  episodeRange: string;      // Episodes范围（如"1-5"、"10-20"）
+  description: string;       // 该阶段的Character Description
+  visualPromptEn: string;    // 英文视觉Prompt
+  visualPromptZh: string;    // 中文视觉Prompt
+  ageDescription?: string;   // Age描述
+  clothingStyle?: string;    // Costume风格
   keyChanges?: string;       // 与上一阶段的关键变化
 }
 
@@ -44,15 +44,15 @@ export interface CharacterDesign {
   characterId: string;
   characterName: string;
   // 基础信息
-  baseDescription: string;      // 基础角色描述
-  baseVisualPromptEn: string;   // 基础英文提示词
-  baseVisualPromptZh: string;   // 基础中文提示词
+  baseDescription: string;      // 基础Character Description
+  baseVisualPromptEn: string;   // 基础英文Prompt
+  baseVisualPromptZh: string;   // 基础中文Prompt
   // 多阶段形象
   stages: CharacterStageAppearance[];
-  // 一致性元素（所有阶段共享）
+  // 一致性元素（所有阶段Total享）
   consistencyElements: {
     facialFeatures: string;     // 面部特征（不变）
-    bodyType: string;           // 体型
+    bodyType: string;           // Body type
     uniqueMarks: string;        // 独特标记（胎记、疤痕等）
   };
   // 元数据
@@ -71,7 +71,7 @@ export interface CharacterDesignOptions {
 // ==================== AI 角色设计服务 ====================
 
 /**
- * 为剧本角色生成专业的多阶段角色设计
+ * 为剧本Character Generation专业的多阶段角色设计
  * 
  * @param characterId 剧本中的角色ID
  * @param projectId 项目ID
@@ -100,7 +100,7 @@ export async function generateCharacterDesign(
     throw new Error('角色不存在');
   }
   
-  // 收集角色相关的上下文信息
+  // 收Episode角色相关的上下文信息
   const context = buildCharacterContext(project, character);
   
   // 调用 AI 生成角色设计
@@ -134,7 +134,7 @@ function buildCharacterContext(project: any, character: any): {
   const episodes = project.episodeRawScripts || [];
   const shots = project.shots || [];
   
-  // 收集角色在各集中的出场信息
+  // 收Episode角色在各Episode中的出场信息
   const characterAppearances: Array<{
     episodeIndex: number;
     episodeTitle: string;
@@ -171,8 +171,8 @@ function buildCharacterContext(project: any, character: any): {
   // 构建角色传记
   const characterBio = [
     character.name,
-    character.gender ? `性别：${character.gender}` : '',
-    character.age ? `年龄：${character.age}` : '',
+    character.gender ? `Gender：${character.gender}` : '',
+    character.age ? `Age：${character.age}` : '',
     character.personality ? `性格：${character.personality}` : '',
     character.role ? `身份：${character.role}` : '',
     character.traits ? `特质：${character.traits}` : '',
@@ -182,7 +182,7 @@ function buildCharacterContext(project: any, character: any): {
   ].filter(Boolean).join('\n');
   
   return {
-    projectTitle: background?.title || project.scriptData?.title || '未命名剧本',
+    projectTitle: background?.title || project.scriptData?.title || 'Untitled剧本',
     genre: background?.genre || '',
     era: background?.era || '',
     outline: background?.outline || '',
@@ -200,13 +200,13 @@ async function callAIForCharacterDesign(
   context: any
 ): Promise<CharacterDesign> {
   
-  const systemPrompt = `你是好莱坞顶级角色设计大师，曾为漫威、迪士尼、皮克斯设计过无数经典角色。
+  const systemPrompt = `你是好莱坞顶级角色设计大师，曾为漫威、迪士尼、皮克斯设计过None数经典角色。
 
 你的专业能力：
-- **角色视觉设计**：能准确捕捉角色的外在形象、服装风格、肢体语言
-- **角色成长弧线**：理解角色在不同剧情阶段的形象变化（从少年到成年、从普通人到英雄等）
-- **AI图像生成经验**：深谙 Midjourney、DALL-E、Stable Diffusion 等 AI 绘图模型的工作原理，能写出高质量的提示词
-- **一致性保持**：知道如何描述面部特征、体型等不变元素，确保角色在不同阶段仍可辨认
+- **角色视觉设计**：能准确捕捉角色的外在形象、Costume风格、肢体语言
+- **角色成长弧线**：理解角色在不同Plot阶段的形象变化（从少年到成年、从普通人到英雄等）
+- **AIImage Generation经验**：深谙 Midjourney、DALL-E、Stable Diffusion 等 AI 绘图Model的工作原理，能写出高质量的Prompt
+- **一致性保持**：知道如何描述面部特征、Body type等不变元素，确保角色在不同阶段仍可辨认
 
 你的任务是根据剧本信息，为角色设计**多阶段视觉形象**。
 
@@ -214,62 +214,62 @@ async function callAIForCharacterDesign(
 剧名：《${context.projectTitle}》
 类型：${context.genre || '未知'}
 时代：${context.era || '现代'}
-总集数：${context.totalEpisodes}集
+总Episodes：${context.totalEpisodes}Episode
 
 【故事大纲】
-${context.outline?.slice(0, 800) || '无'}
+${context.outline?.slice(0, 800) || 'None'}
 
-【角色信息】
+【Character Info】
 ${context.characterBio}
 
 【角色出场统计】
 ${context.characterAppearances.length > 0 
   ? context.characterAppearances.map((a: any) => 
-      `第${a.episodeIndex}集「${a.episodeTitle}」: 出场${a.actions.length}次`
+      `第${a.episodeIndex}Episode「${a.episodeTitle}」: 出场${a.actions.length}次`
     ).join('\n')
-  : '暂无出场数据'
+  : 'None出Scene Count据'
 }
 
 【任务要求】
-1. **分析角色成长弧线**：根据剧情判断角色是否有明显的阶段变化
-   - 年龄变化：小孩→少年→成年→老年
+1. **分析角色成长弧线**：根据Plot判断角色是否有明显的阶段变化
+   - Age变化：小孩→少年→成年→老年
    - 身份变化：普通人→商业大亨、学徒→武林高手
    - 状态变化：健康→受伤、普通→修仙后形态
    
-2. **设计多阶段形象**：为每个阶段生成独立的视觉提示词
-   - 如果角色没有明显阶段变化，只需设计1个阶段
-   - 如果有变化，设计2-4个阶段
+2. **设计多阶段形象**：为每阶段生成独立的视觉Prompt
+   - 如果角色没有明显阶段变化，只需设计1阶段
+   - 如果有变化，设计2-4阶段
 
 3. **保持一致性元素**：识别角色的不变特征
    - 面部特征（眼睛形状、五官比例）
-   - 体型特征（身高、体格）
+   - Body type特征（身高、体格）
    - 独特标记（胎记、疤痕、标志性特征）
 
-4. **提示词要求**：
-   - 英文提示词：40-60词，适合AI图像生成
-   - 中文提示词：详细描述，包含细节
+4. **Prompt要求**：
+   - 英文Prompt：40-60词，适合AIImage Generation
+   - 中文Prompt：详细描述，包含细节
 
-请以JSON格式返回：
+请以JSON格式Back：
 {
   "characterName": "角色名",
   "baseDescription": "角色基础描述（一句话）",
-  "baseVisualPromptEn": "基础英文提示词",
-  "baseVisualPromptZh": "基础中文提示词",
+  "baseVisualPromptEn": "基础英文Prompt",
+  "baseVisualPromptZh": "基础中文Prompt",
   "consistencyElements": {
     "facialFeatures": "面部特征描述（英文）",
-    "bodyType": "体型描述（英文）",
-    "uniqueMarks": "独特标记描述（英文，如无则为空）"
+    "bodyType": "Body type描述（英文）",
+    "uniqueMarks": "独特标记描述（英文，如None则为空）"
   },
   "stages": [
     {
       "stageId": "stage_1",
       "stageName": "阶段名称（如：少年时期）",
       "episodeRange": "1-5",
-      "description": "该阶段角色状态描述",
-      "visualPromptEn": "该阶段英文视觉提示词",
-      "visualPromptZh": "该阶段中文视觉提示词",
-      "ageDescription": "年龄描述",
-      "clothingStyle": "服装风格",
+      "description": "该阶段Character Status描述",
+      "visualPromptEn": "该阶段英文视觉Prompt",
+      "visualPromptZh": "该阶段中文视觉Prompt",
+      "ageDescription": "Age描述",
+      "clothingStyle": "Costume风格",
       "keyChanges": "与上一阶段的变化（第一阶段为空）"
     }
   ]
@@ -308,15 +308,15 @@ ${context.characterAppearances.length > 0
     };
   } catch (e) {
     console.error('[CharacterDesign] Failed to parse AI response:', result);
-    throw new Error('解析角色设计失败');
+    throw new Error('解析角色设计Failed');
   }
 }
 
 /**
- * 根据集数获取角色当前阶段的提示词
+ * 根据Episodes获取角色当前阶段的Prompt
  * 
  * @param design 角色设计
- * @param episodeIndex 当前集数
+ * @param episodeIndex 当前Episodes
  */
 export function getCharacterPromptForEpisode(
   design: CharacterDesign,
@@ -326,7 +326,7 @@ export function getCharacterPromptForEpisode(
   for (const stage of design.stages) {
     const [start, end] = stage.episodeRange.split('-').map(Number);
     if (episodeIndex >= start && episodeIndex <= end) {
-      // 组合一致性元素和阶段提示词
+      // 组合一致性元素和阶段Prompt
       const consistencyPrefix = [
         design.consistencyElements.facialFeatures,
         design.consistencyElements.bodyType,
@@ -343,7 +343,7 @@ export function getCharacterPromptForEpisode(
     }
   }
   
-  // 默认返回基础提示词
+  // 默认Back基础Prompt
   return {
     promptEn: design.baseVisualPromptEn,
     promptZh: design.baseVisualPromptZh,
@@ -352,16 +352,16 @@ export function getCharacterPromptForEpisode(
 }
 
 /**
- * 将角色设计转换为角色库的变体格式 (CharacterVariation)
+ * 将角色设计转换为Character Library的变体格式 (CharacterVariation)
  * 可直接用于 addVariation() 方法
  * 
  * @param design 角色设计
- * @returns 可直接添加到角色库的变体数组
+ * @returns 可直接Add到Character Library的变体数组
  */
 export function convertDesignToVariations(design: CharacterDesign): Array<Omit<CharacterVariation, 'id'>> {
   return design.stages.map(stage => ({
     name: stage.stageName,
-    // 组合一致性元素 + 阶段提示词
+    // 组合一致性元素 + 阶段Prompt
     visualPrompt: [
       design.consistencyElements.facialFeatures,
       design.consistencyElements.bodyType,
@@ -375,7 +375,7 @@ export function convertDesignToVariations(design: CharacterDesign): Array<Omit<C
 }
 
 /**
- * 为角色库中的角色生成变体（Wardrobe System）
+ * 为Character Library中的Character Generation变体（Wardrobe System）
  * 基于角色设计的不同阶段
  * 
  * @deprecated 使用 convertDesignToVariations 代替
@@ -391,7 +391,7 @@ export function generateVariationsFromDesign(design: CharacterDesign): Array<{
 }
 
 /**
- * 为角色库的角色更新基础描述和视觉特征
+ * 为Character Library的角色更新基础描述和视觉特征
  * 
  * @param design 角色设计
  * @returns 可用于 updateCharacter() 的更新对象

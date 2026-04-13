@@ -1,36 +1,36 @@
 /**
- * 模型友好名映射表
+ * Model友好名映射表
  * API ID → 用户可读的显示名
  *
- * 数据来源: https://memefast.top/api/pricing_new (2026-02-19)
- * 不在此表中的模型直接显示原始 ID
+ * 数据来源: https://ai.google.dev/api/pricing_new (2026-02-19)
+ * 不在此表中的Model直接显示原始 ID
  */
 
 export const MODEL_DISPLAY_NAMES: Record<string, string> = {
-  // ==================== 图像模型 ====================
+  // ==================== 图像Model ====================
 
   // --- Google / Gemini ---
   'gemini-3.1-pro-image-preview': 'Nano Banana 2 (Gemini 3.1 Pro)',
   'gemini-3-pro-image-preview': 'Nano Banana Pro (Gemini 3 Pro)',
   'gemini-2.5-flash-image': 'Nano Banana (Gemini 2.5 Flash)',
   'gemini-2.5-flash-image-preview': 'Nano Banana Preview (Gemini 2.5 Flash)',
-  'aigc-image-gem': 'AIGC Gemini 绘图',
-  'aigc-image-qwen': 'AIGC Qwen 绘图',
+  'aigc-image-gem': 'AIGC Gemini Image',
+  'aigc-image-qwen': 'AIGC Qwen Image',
 
   // --- OpenAI / GPT ---
   'gpt-image-1.5': 'GPT Image 1.5',
-  'gpt-image-1.5-all': 'GPT Image 1.5 (逆向)',
+  'gpt-image-1.5-all': 'GPT Image 1.5 (Reverse)',
   'gpt-image-1': 'GPT Image 1',
-  'gpt-image-1-all': 'GPT Image 1 (逆向)',
+  'gpt-image-1-all': 'GPT Image 1 (Reverse)',
   'gpt-image-1-mini': 'GPT Image 1 Mini',
   'gpt-4o-image-vip': 'GPT-4o Image VIP',
-  'sora_image': 'Sora 图片生成',
+  'sora_image': 'Sora Image Generation',
 
   // --- Qwen / 通义千问 ---
-  'qwen-image-edit-2509': 'Qwen 图像编辑',
-  'qwen-image-max': '通义万相 Max',
-  'qwen-image-max-2025-12-30': '通义万相 Max (2025-12-30)',
-  'qwen-image-plus': '通义万相 Plus',
+  'qwen-image-edit-2509': 'Qwen Image Edit',
+  'qwen-image-max': 'Qwen Image Max',
+  'qwen-image-max-2025-12-30': 'Qwen Image Max (2025-12-30)',
+  'qwen-image-plus': 'Qwen Image Plus',
   'z-image-turbo': 'Z-Image Turbo',
 
   // --- Flux ---
@@ -47,7 +47,7 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'flux-kontext-dev': 'Flux Kontext Dev',
   'flux-kontext-dev-lora': 'Flux Kontext Dev LoRA',
   'flux-dev-lora': 'Flux Dev LoRA',
-  'flux-redux': 'Flux Redux (风格迁移)',
+  'flux-redux': 'Flux Redux (Style Transfer)',
   'flux-2-dev': 'Flux 2 Dev',
   'flux-2-pro': 'Flux 2 Pro',
 
@@ -59,7 +59,7 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'fal-ai/flux-pro/kontext/max': 'Flux Kontext Max (fal)',
   'fal-ai/flux-pro/kontext/max/text-to-image': 'Flux Kontext Max T2I (fal)',
   'fal-ai/flux-pro/v1.1-ultra': 'Flux 1.1 Pro Ultra (fal)',
-  'fal-ai/flux-pro/v1.1-ultra-finetuned': 'Flux 1.1 Pro Ultra 微调 (fal)',
+  'fal-ai/flux-pro/v1.1-ultra-finetuned': 'Flux 1.1 Pro Ultra Finetuned (fal)',
   'fal-ai/flux-pro/new': 'Flux Pro New (fal)',
   'fal-ai/flux-realism': 'Flux Realism (fal)',
   'fal-ai/recraft-v3': 'Recraft V3 (fal)',
@@ -75,37 +75,37 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'fal-ai/nano-banana': 'Nano Banana (fal)',
 
   // --- Midjourney ---
-  'midjourney': 'Midjourney 绘图',
-  'niji-6': 'Niji 6 绘图',
+  'midjourney': 'Midjourney Image',
+  'niji-6': 'Niji 6 Image',
   'mj-chat': 'Midjourney Chat',
-  'mj-video': 'Midjourney 视频',
-  'mj-video-extend': 'Midjourney 视频延长',
-  'mj-video-upscale': 'Midjourney 视频放大',
-  'mj-editor': 'Midjourney 编辑',
-  'mj-inpaint': 'Midjourney 局部重绘',
-  'mj-outpaint': 'Midjourney 外扩',
-  'mj-pan': 'Midjourney 平移扩展',
-  'mj-upscale': 'Midjourney 放大',
-  'mj-variation': 'Midjourney 变体',
-  'mj-zoom': 'Midjourney 缩放',
-  'mj_imagine': 'Midjourney 绘图',
-  'mj_blend': 'Midjourney 混合模式',
-  'mj_describe': 'Midjourney 图片描述',
-  'mj_shorten': 'Midjourney 提示词精简',
-  'mj_uploads': 'Midjourney 图片上传',
-  'mj_action': 'Midjourney 动作',
-  'mj_modal': 'Midjourney 弹窗提交',
-  'mj_fetch': 'Midjourney 任务查询',
-  'mj_notify': 'Midjourney 回调通知',
+  'mj-video': 'Midjourney Video',
+  'mj-video-extend': 'Midjourney Video Extend',
+  'mj-video-upscale': 'Midjourney Video Upscale',
+  'mj-editor': 'Midjourney Edit',
+  'mj-inpaint': 'Midjourney Inpaint',
+  'mj-outpaint': 'Midjourney Outpaint',
+  'mj-pan': 'Midjourney Pan',
+  'mj-upscale': 'Midjourney Upscale',
+  'mj-variation': 'Midjourney Variation',
+  'mj-zoom': 'Midjourney Zoom',
+  'mj_imagine': 'Midjourney Image',
+  'mj_blend': 'Midjourney Blend',
+  'mj_describe': 'Midjourney Describe',
+  'mj_shorten': 'Midjourney Shorten',
+  'mj_uploads': 'Midjourney ImageUpload',
+  'mj_action': 'Midjourney Action',
+  'mj_modal': 'Midjourney Modal Submit',
+  'mj_fetch': 'Midjourney Task Query',
+  'mj_notify': 'Midjourney Notify',
 
   // --- Ideogram ---
   'ideogram_generate_V_1': 'Ideogram V1',
   'ideogram_generate_V_1_TURBO': 'Ideogram V1 Turbo',
   'ideogram_generate_V_2': 'Ideogram V2',
   'ideogram_generate_V_3_TURBO': 'Ideogram V3 Turbo',
-  'ideogram_edit_V_3_DEFAULT': 'Ideogram V3 编辑',
-  'ideogram_edit_V_3_QUALITY': 'Ideogram V3 编辑 Quality',
-  'ideogram_edit_V_3_TURBO': 'Ideogram V3 编辑 Turbo',
+  'ideogram_edit_V_3_DEFAULT': 'Ideogram V3 Edit',
+  'ideogram_edit_V_3_QUALITY': 'Ideogram V3 Edit Quality',
+  'ideogram_edit_V_3_TURBO': 'Ideogram V3 Edit Turbo',
   'ideogram_remix_V_1': 'Ideogram V1 Remix',
   'ideogram_remix_V_1_TURBO': 'Ideogram V1 Remix Turbo',
   'ideogram_remix_V_2': 'Ideogram V2 Remix',
@@ -116,11 +116,11 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'ideogram_reframe_V_3_DEFAULT': 'Ideogram V3 Reframe',
   'ideogram_reframe_V_3_QUALITY': 'Ideogram V3 Reframe Quality',
   'ideogram_reframe_V_3_TURBO': 'Ideogram V3 Reframe Turbo',
-  'ideogram_replace_background_V_3_DEFAULT': 'Ideogram V3 背景替换',
-  'ideogram_replace_background_V_3_QUALITY': 'Ideogram V3 背景替换 Quality',
-  'ideogram_replace_background_V_3_TURBO': 'Ideogram V3 背景替换 Turbo',
-  'ideogram_describe': 'Ideogram 图生文',
-  'ideogram_upscale': 'Ideogram 放大',
+  'ideogram_replace_background_V_3_DEFAULT': 'Ideogram V3 Background Replace',
+  'ideogram_replace_background_V_3_QUALITY': 'Ideogram V3 Background Replace Quality',
+  'ideogram_replace_background_V_3_TURBO': 'Ideogram V3 Background Replace Turbo',
+  'ideogram_describe': 'Ideogram Describe',
+  'ideogram_upscale': 'Ideogram Upscale',
   'ideogram_generate_V_3_DEFAULT': 'Ideogram V3',
   'ideogram_generate_V_3_QUALITY': 'Ideogram V3 Quality',
   'ideogram_generate_V_3_SPEED': 'Ideogram V3 Speed',
@@ -133,18 +133,18 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'doubao-seedream-4-0-250828': 'Seedream 4.0',
   'doubao-seedream-4-5-251128': 'Seedream 4.5',
   'doubao-seedream-3-0-t2i-250415': 'Seedream 3.0',
-  'doubao-seededit-3-0-i2i-250628': 'SeedEdit 3.0 (图生图)',
+  'doubao-seededit-3-0-i2i-250628': 'SeedEdit 3.0 (I2I)',
 
   // --- Kling / 可灵 ---
-  'kling-image': 'Kling 图片生成',
-  'kling-omni-image': 'Kling Omni 图片',
-  'kling-image-recognize': 'Kling 图像识别',
-  // Kling 图片模型版本 (MemeFast model_version)
-  'kling-image-v1': 'Kling 图片 V1',
-  'kling-image-v1-5': 'Kling 图片 V1.5',
-  'kling-image-v2': 'Kling 图片 V2',
-  'kling-image-v2-new': 'Kling 图片 V2 New',
-  'kling-image-v2-1': 'Kling 图片 V2.1',
+  'kling-image': 'Kling Image Generation',
+  'kling-omni-image': 'Kling Omni Image',
+  'kling-image-recognize': 'Kling Image Recognition',
+  // Kling ImageModel版本 (Gemini model_version)
+  'kling-image-v1': 'Kling Image V1',
+  'kling-image-v1-5': 'Kling Image V1.5',
+  'kling-image-v2': 'Kling Image V2',
+  'kling-image-v2-new': 'Kling Image V2 New',
+  'kling-image-v2-1': 'Kling Image V2.1',
 
   // --- Grok / xAI ---
   'grok-3-image': 'Grok 3 Image',
@@ -164,7 +164,7 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'hidream-i1-fast': 'HiDream I1 Fast',
 
   // --- Leonardo ---
-  'leonardo-image': 'Leonardo 图片生成',
+  'leonardo-image': 'Leonardo Image Generation',
 
   // --- DeepSeek ---
   'deepseek-ocr': 'DeepSeek OCR',
@@ -173,14 +173,14 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'recraftv3': 'Recraft V3 (dall-e-3)',
 
   // --- Kolors ---
-  'kolors': 'Kolors 可图',
+  'kolors': 'Kolors',
 
   // --- SiliconFlow ---
   'SiliconFlow-flux-1-schnell': 'Flux Schnell (SiliconFlow)',
   'SiliconFlow-flux-1-dev': 'Flux Dev (SiliconFlow)',
   'SiliconFlow-sd-3-5-large': 'SD 3.5 Large (SiliconFlow)',
   'SiliconFlow-sd-3-5-large-turbo': 'SD 3.5 Large Turbo (SiliconFlow)',
-  'SiliconFlow-kolors': 'Kolors 可图 (SiliconFlow)',
+  'SiliconFlow-kolors': 'Kolors (SiliconFlow)',
 
   // --- Replicate ---
   'replicate-flux-1.1-pro': 'Flux 1.1 Pro (Replicate)',
@@ -188,7 +188,7 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'replicate-flux-dev': 'Flux Dev (Replicate)',
   'replicate-flux-schnell': 'Flux Schnell (Replicate)',
 
-  // ==================== 音视频模型 ====================
+  // ==================== 音VideoModel ====================
 
   // --- Google / Veo ---
   'veo3.1': 'Veo 3.1',
@@ -196,30 +196,30 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'veo3.1-pro': 'Veo 3.1 Pro',
   'veo3.1-pro-4k': 'Veo 3.1 Pro 4K',
   'veo3.1-fast': 'Veo 3.1 Fast',
-  'veo3.1-components': 'Veo 3.1 素材合成',
-  'veo3.1-components-4k': 'Veo 3.1 素材合成 4K',
-  'veo3.1-fast-components': 'Veo 3.1 Fast 素材合成',
+  'veo3.1-components': 'Veo 3.1 Composite',
+  'veo3.1-components-4k': 'Veo 3.1 Composite 4K',
+  'veo3.1-fast-components': 'Veo 3.1 Fast Composite',
   'veo3': 'Veo 3',
   'veo3-fast': 'Veo 3 Fast',
   'veo3-pro': 'Veo 3 Pro',
-  'veo3-fast-frames': 'Veo 3 Fast 首尾帧',
-  'veo3-frames': 'Veo 3 首尾帧',
-  'veo3-pro-frames': 'Veo 3 Pro 首尾帧',
+  'veo3-fast-frames': 'Veo 3 Fast First-Tail Frame',
+  'veo3-frames': 'Veo 3 First-Tail Frame',
+  'veo3-pro-frames': 'Veo 3 Pro First-Tail Frame',
   'veo2': 'Veo 2',
   'veo2-fast': 'Veo 2 Fast',
-  'veo2-fast-components': 'Veo 2 Fast 素材合成',
-  'veo2-fast-frames': 'Veo 2 Fast 首尾帧',
+  'veo2-fast-components': 'Veo 2 Fast Composite',
+  'veo2-fast-frames': 'Veo 2 Fast First-Tail Frame',
   'veo2-pro': 'Veo 2 Pro',
-  'veo2-pro-components': 'Veo 2 Pro 素材合成',
-  // veo_ 下划线格式（同模型不同端点）
-  'veo_3_1': 'Veo 3.1 (异步)',
-  'veo_3_1-4K': 'Veo 3.1 4K (异步)',
-  'veo_3_1-fast': 'Veo 3.1 Fast (异步)',
-  'veo_3_1-fast-4K': 'Veo 3.1 Fast 4K (异步)',
-  'veo_3_1-components': 'Veo 3.1 素材合成 (异步)',
-  'veo_3_1-components-4K': 'Veo 3.1 素材合成 4K (异步)',
-  'veo_3_1-fast-components': 'Veo 3.1 Fast 素材合成 (异步)',
-  'veo_3_1-fast-components-4K': 'Veo 3.1 Fast 素材合成 4K (异步)',
+  'veo2-pro-components': 'Veo 2 Pro Composite',
+  // veo_ 下划线格式（同Model不同端点）
+  'veo_3_1': 'Veo 3.1 (Async)',
+  'veo_3_1-4K': 'Veo 3.1 4K (Async)',
+  'veo_3_1-fast': 'Veo 3.1 Fast (Async)',
+  'veo_3_1-fast-4K': 'Veo 3.1 Fast 4K (Async)',
+  'veo_3_1-components': 'Veo 3.1 Composite (异步)',
+  'veo_3_1-components-4K': 'Veo 3.1 Composite 4K (异步)',
+  'veo_3_1-fast-components': 'Veo 3.1 Fast Composite (异步)',
+  'veo_3_1-fast-components-4K': 'Veo 3.1 Fast Composite 4K (异步)',
 
   // --- Google TTS ---
   'gemini-2.5-flash-preview-tts': 'Gemini 2.5 Flash TTS',
@@ -228,14 +228,14 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   // --- OpenAI / Sora ---
   'sora-2': 'Sora 2',
   'sora-2-pro': 'Sora 2 Pro',
-  'sora-2-all': 'Sora 2 (逆向)',
-  'sora-2-pro-all': 'Sora 2 Pro (逆向)',
-  'sora-2-vip-all': 'Sora 2 VIP (逆向)',
+  'sora-2-all': 'Sora 2 (Reverse)',
+  'sora-2-pro-all': 'Sora 2 Pro (Reverse)',
+  'sora-2-vip-all': 'Sora 2 VIP (Reverse)',
 
   // --- Wan / 万相 ---
-  'wan2.5-i2v-preview': '万相 2.5 图生视频（预览）',
-  'wan2.6-i2v': '万相 2.6 图生视频',
-  'wan2.6-i2v-flash': '万相 2.6 图生视频 Flash',
+  'wan2.5-i2v-preview': 'Wan 2.5 I2V (Preview)',
+  'wan2.6-i2v': 'Wan 2.6 I2V',
+  'wan2.6-i2v-flash': 'Wan 2.6 I2V Flash',
 
   // --- Grok Video ---
   'grok-video-3': 'Grok Video 3',
@@ -243,18 +243,18 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'grok-video-3-15s': 'Grok Video 3 (15s)',
 
   // --- Kling / 可灵 ---
-  'kling-video': 'Kling 文生视频',
-  'kling-omni-video': 'Kling Omni 视频',
-  'kling-video-extend': 'Kling 视频延长',
-  'kling-motion-control': 'Kling 动作控制',
-  'kling-multi-elements': 'Kling 多元素合成',
-  'kling-avatar-image2video': 'Kling Avatar 图生视频',
-  'kling-advanced-lip-sync': 'Kling 高级口型同步',
-  'kling-effects': 'Kling 特效',
-  'kling-audio': 'Kling 音频生成',
-  'kling-custom-voices': 'Kling 自定义音色',
-  'kling-custom-elements': 'Kling 自定义主体',
-  // Kling 视频模型版本 (MemeFast model_version)
+  'kling-video': 'Kling T2V',
+  'kling-omni-video': 'Kling Omni Video',
+  'kling-video-extend': 'Kling Video Extend',
+  'kling-motion-control': 'Kling Motion Control',
+  'kling-multi-elements': 'Kling Multi-Elements Compose',
+  'kling-avatar-image2video': 'Kling Avatar I2V',
+  'kling-advanced-lip-sync': 'Kling Advanced Lip Sync',
+  'kling-effects': 'Kling Effects',
+  'kling-audio': 'Kling Audio Gen',
+  'kling-custom-voices': 'Kling Custom Voice',
+  'kling-custom-elements': 'Kling Custom Element',
+  // Kling VideoModel版本 (Gemini model_version)
   'kling-v1': 'Kling V1',
   'kling-v1-5': 'Kling V1.5',
   'kling-v1-6': 'Kling V1.6',
@@ -274,7 +274,7 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'doubao-seedance-1-0-lite-250428': 'Seedance 1.0 Lite',
   'doubao-seedance-1-0-pro-250428': 'Seedance 1.0 Pro',
   'doubao-seedance-1-5-lite-251215': 'Seedance 1.5 Lite',
-  'doubao-seedance-1-5-pro-i2v-251215': 'Seedance 1.5 Pro 图生视频',
+  'doubao-seedance-1-5-pro-i2v-251215': 'Seedance 1.5 Pro I2V',
 
   // --- Vidu ---
   'vidu2.0': 'Vidu 2.0',
@@ -284,28 +284,28 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'viduq2-pro': 'Vidu Q2 Pro',
   'viduq2-turbo': 'Vidu Q2 Turbo',
   'viduq3-pro': 'Vidu Q3 Pro',
-  'aigc-video-vidu': 'Vidu（AIGC 聚合）',
-  'vidu-video': 'Vidu 视频生成',
-  'vidu-video-ref': 'Vidu 参考视频',
-  'vidu-video-character': 'Vidu 角色视频',
-  'vidu-video-character-ref': 'Vidu 角色参考视频',
-  'vidu-video-scene': 'Vidu 场景视频',
-  'vidu-video-scene-ref': 'Vidu 场景参考视频',
-  'vidu-video-lip-sync': 'Vidu 口型同步',
+  'aigc-video-vidu': 'Vidu (AIGC)',
+  'vidu-video': 'Vidu Video Generation',
+  'vidu-video-ref': 'Vidu Ref Video',
+  'vidu-video-character': 'Vidu Character Video',
+  'vidu-video-character-ref': 'Vidu Character Ref Video',
+  'vidu-video-scene': 'Vidu SceneVideo',
+  'vidu-video-scene-ref': 'Vidu Scene Ref Video',
+  'vidu-video-lip-sync': 'Vidu Lip Sync',
 
   // --- MiniMax / Hailuo ---
   'MiniMax-Hailuo-02': 'Hailuo 02',
   'MiniMax-Hailuo-2.3': 'Hailuo 2.3',
   'MiniMax-Hailuo-2.3-Fast': 'Hailuo 2.3 Fast',
-  'aigc-video-hailuo': 'Hailuo（AIGC 聚合）',
+  'aigc-video-hailuo': 'Hailuo (AIGC)',
   'minimax/video-01': 'MiniMax Video-01',
   'minimax/video-01-live': 'MiniMax Video-01 Live',
   'MiniMax-Hailuo-02-standard': 'Hailuo 02 Standard',
-  'MiniMax-Hailuo-02-standard-i2v': 'Hailuo 02 Standard 图生视频',
+  'MiniMax-Hailuo-02-standard-i2v': 'Hailuo 02 Standard I2V',
   'MiniMax-Hailuo-02-director': 'Hailuo 02 Director',
-  'MiniMax-Hailuo-02-director-i2v': 'Hailuo 02 Director 图生视频',
+  'MiniMax-Hailuo-02-director-i2v': 'Hailuo 02 Director I2V',
   'MiniMax-Hailuo-02-live': 'Hailuo 02 Live',
-  'MiniMax-Hailuo-02-live-i2v': 'Hailuo 02 Live 图生视频',
+  'MiniMax-Hailuo-02-live-i2v': 'Hailuo 02 Live I2V',
 
   // --- Runway ---
   'runwayml-gen3a_turbo-5': 'Runway Gen-3A Turbo 5s',
@@ -313,33 +313,33 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'runwayml-gen4_turbo-5': 'Runway Gen-4 Turbo 5s',
   'runwayml-gen4_turbo-10': 'Runway Gen-4 Turbo 10s',
   'runway-gen4-turbo': 'Runway Gen-4 Turbo',
-  'runway-gen4-turbo-i2v': 'Runway Gen-4 Turbo 图生视频',
+  'runway-gen4-turbo-i2v': 'Runway Gen-4 Turbo I2V',
   'runway-gen3a-turbo': 'Runway Gen-3α Turbo',
-  'runway-gen3a-turbo-i2v': 'Runway Gen-3α Turbo 图生视频',
+  'runway-gen3a-turbo-i2v': 'Runway Gen-3a Turbo I2V',
 
   // --- PixVerse ---
   'pixverse-v4': 'PixVerse V4',
-  'pixverse-v4-i2v': 'PixVerse V4 图生视频',
+  'pixverse-v4-i2v': 'PixVerse V4 I2V',
   'pixverse-v3.5': 'PixVerse V3.5',
-  'pixverse-v3.5-i2v': 'PixVerse V3.5 图生视频',
+  'pixverse-v3.5-i2v': 'PixVerse V3.5 I2V',
 
   // --- LTX ---
   'ltx-video': 'LTX Video',
-  'ltx-video-i2v': 'LTX Video 图生视频',
+  'ltx-video-i2v': 'LTX Video I2V',
 
   // --- Luma ---
-  'luma_video_api': 'Luma 视频生成',
-  'luma_video_extend_api': 'Luma 视频延长',
-  'luma-video': 'Luma 视频生成',
+  'luma_video_api': 'Luma Video Generation',
+  'luma_video_extend_api': 'Luma Video Extend',
+  'luma-video': 'Luma Video Generation',
   'luma-video-ray2': 'Luma Ray 2',
   'luma-video-ray2-flash': 'Luma Ray 2 Flash',
 
   // --- Pika ---
-  'pika-video': 'Pika 视频生成',
+  'pika-video': 'Pika Video Generation',
   'pika-video-2.2': 'Pika 2.2',
 
   // --- Hunyuan / 混元 ---
-  'hunyuan-video': '混元视频',
+  'hunyuan-video': 'Hunyuan Video',
 
   // --- CogVideoX ---
   'cogvideox': 'CogVideoX',
@@ -356,21 +356,21 @@ export const MODEL_DISPLAY_NAMES: Record<string, string> = {
   'tts-1-1106': 'TTS-1 (1106)',
   'tts-1-hd': 'TTS-1 HD',
   'tts-1-hd-1106': 'TTS-1 HD (1106)',
-  'audio1.0': 'Audio 1.0 语音合成',
+  'audio1.0': 'Audio 1.0 TTS',
 
   // --- Whisper ---
-  'whisper-1': 'Whisper 语音转文字',
+  'whisper-1': 'Whisper STT',
 
   // --- SunoAI ---
-  'suno_music': 'Suno 音乐生成',
-  'suno_lyrics': 'Suno 歌词生成',
-  'suno_upload': 'Suno 音频上传',
-  'suno_fetch': 'Suno 任务查询',
+  'suno_music': 'Suno Music Gen',
+  'suno_lyrics': 'Suno Lyrics Gen',
+  'suno_upload': 'Suno AudioUpload',
+  'suno_fetch': 'Suno Task Query',
 };
 
 /**
- * 获取模型的友好显示名
- * 优先查映射表，查不到返回原始 ID
+ * 获取Model的友好显示名
+ * 优先查映射表，查不到Back原始 ID
  */
 export function getModelDisplayName(modelId: string): string {
   return MODEL_DISPLAY_NAMES[modelId] ?? modelId;

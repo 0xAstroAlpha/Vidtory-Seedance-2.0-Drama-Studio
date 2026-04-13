@@ -4,14 +4,14 @@
 /**
  * AI Scene Calibrator
  * 
- * 使用 AI 智能校准从剧本中提取的场景列表
+ * 使用 AI 智能校准从剧本中提取的Scene列表
  * 
- * 功能：
- * 1. 统计每个场景的出场次数、出现集数
- * 2. AI 分析识别重要场景 vs 过渡场景
- * 3. AI 合并相同地点的变体（张家客厅 = 张明家客厅）
- * 4. AI 补充场景信息（建筑风格、光影、道具等）
- * 5. 大师级场景视觉设计（专业提示词生成）
+ * Feature：
+ * 1. 统计每Scene的出场次数、出现Episodes
+ * 2. AI 分析识别重要Scene vs 过渡Scene
+ * 3. AI 合并相同Location的变体（张家客厅 = 张明家客厅）
+ * 4. AI 补充Scene信息（建筑风格、光影、道具等）
+ * 5. 大师级Scene视觉设计（专业Prompt生成）
  */
 
 import type { ScriptScene, ProjectBackground, EpisodeRawScript, SceneRawContent, PromptLanguage } from '@/types/script';
@@ -24,9 +24,9 @@ import { buildSeriesContextSummary } from './series-meta-sync';
 // ==================== 类型定义 ====================
 
 export interface SceneCalibrationResult {
-  /** 校准后的场景列表 */
+  /** 校准后的Scene列表 */
   scenes: CalibratedScene[];
-  /** 被合并的场景记录 */
+  /** 被合并的Scene记录 */
   mergeRecords: SceneMergeRecord[];
   /** AI 分析说明 */
   analysisNotes: string;
@@ -38,9 +38,9 @@ export interface CalibratedScene {
   location: string;
   time: string;
   atmosphere: string;
-  /** 场景重要性 */
+  /** Scene重要性 */
   importance: 'main' | 'secondary' | 'transition';
-  /** 出现的集数 */
+  /** 出现的Episodes */
   episodeNumbers: number[];
   /** 出场次数 */
   appearanceCount: number;
@@ -56,7 +56,7 @@ export interface CalibratedScene {
   spatialLayout?: string;
   /** 时代特征 */
   eraDetails?: string;
-  /** 英文视觉提示词 */
+  /** 英文视觉Prompt */
   visualPromptEn?: string;
   /** 中文视觉描述 */
   visualPromptZh?: string;
@@ -78,17 +78,17 @@ export interface SceneStats {
   location: string;
   /** 出场次数 */
   appearanceCount: number;
-  /** 出现的集数 */
+  /** 出现的Episodes */
   episodeNumbers: number[];
-  /** 场景内容样本 */
+  /** Scene内容样本 */
   contentSamples: string[];
   /** 出场角色 */
   characters: string[];
   /** 时间设定 */
   times: string[];
-  /** 动作描写样本（用于推断场景道具/布局） */
+  /** 动作描写样本（用于推断Scene道具/布局） */
   actionSamples: string[];
-  /** 对白样本（用于理解场景用途） */
+  /** 对白样本（用于理解Scene用途） */
   dialogueSamples: string[];
 }
 
@@ -103,7 +103,7 @@ export interface CalibrationOptions {
 // ==================== 统计函数 ====================
 
 /**
- * 从分集剧本中统计所有场景的出场数据
+ * 从分Episode剧本中统计所有Scene的出Scene Count据
  */
 export function collectSceneStats(
   episodeScripts: EpisodeRawScript[]
@@ -111,7 +111,7 @@ export function collectSceneStats(
   const stats = new Map<string, SceneStats>();
   
   if (!episodeScripts || !Array.isArray(episodeScripts)) {
-    console.warn('[collectSceneStats] episodeScripts 无效');
+    console.warn('[collectSceneStats] episodeScripts None效');
     return stats;
   }
   
@@ -122,7 +122,7 @@ export function collectSceneStats(
     for (const scene of ep.scenes) {
       if (!scene || !scene.sceneHeader) continue;
       
-      // 解析场景头获取地点
+      // 解析Scene头获取Location
       const location = extractLocationFromHeader(scene.sceneHeader);
       const key = normalizeLocation(location);
       
@@ -147,27 +147,27 @@ export function collectSceneStats(
         stat.episodeNumbers.push(epIndex);
       }
       
-      // 收集内容样本
+      // 收Episode内容样本
       if (stat.contentSamples.length < 5) {
         const sample = scene.content?.slice(0, 150) || scene.sceneHeader;
-        stat.contentSamples.push(`第${epIndex}集: ${sample}`);
+        stat.contentSamples.push(`第${epIndex}Episode: ${sample}`);
       }
       
-      // 收集动作描写（用于推断道具和场景布局）
+      // 收Episode动作描写（用于推断道具和Scene布局）
       if (scene.actions && scene.actions.length > 0 && stat.actionSamples.length < 8) {
         // 使用解析出的动作描写（△开头）
         for (const action of scene.actions.slice(0, 3)) {
           if (action && stat.actionSamples.length < 8) {
-            stat.actionSamples.push(`第${epIndex}集: ${action.slice(0, 100)}`);
+            stat.actionSamples.push(`第${epIndex}Episode: ${action.slice(0, 100)}`);
           }
         }
       } else if (scene.content && stat.actionSamples.length < 8) {
-        // 如果没有△动作，使用场景内容的前200字作为动作样本
+        // 如果没有△动作，使用Scene内容的前200字作为动作样本
         const contentSample = scene.content.slice(0, 200).replace(/\n/g, ' ');
-        stat.actionSamples.push(`第${epIndex}集: ${contentSample}`);
+        stat.actionSamples.push(`第${epIndex}Episode: ${contentSample}`);
       }
       
-      // 收集对白样本（用于理解场景中发生了什么）
+      // 收Episode对白样本（用于理解Scene中Hair生了什么）
       if (scene.dialogues && stat.dialogueSamples.length < 5) {
         for (const d of scene.dialogues.slice(0, 2)) {
           if (d && stat.dialogueSamples.length < 5) {
@@ -176,14 +176,14 @@ export function collectSceneStats(
         }
       }
       
-      // 收集角色
+      // 收Episode角色
       for (const char of (scene.characters || [])) {
         if (!stat.characters.includes(char)) {
           stat.characters.push(char);
         }
       }
       
-      // 收集时间
+      // 收Episode时间
       const time = extractTimeFromHeader(scene.sceneHeader);
       if (time && !stat.times.includes(time)) {
         stat.times.push(time);
@@ -195,31 +195,31 @@ export function collectSceneStats(
 }
 
 /**
- * 从场景头提取地点
+ * 从Scene头提取Location
  * 如 "1-1 日 内 沪上 张家" → "沪上 张家"
  */
 function extractLocationFromHeader(header: string): string {
-  // 去除场景编号和时间/内外标记
+  // 去除Scene编号和时间/内外标记
   const parts = header.split(/\s+/);
   // 跳过 "1-1", "日/夜", "内/外"
   const locationParts = parts.filter(p => 
     !p.match(/^\d+-\d+$/) && 
-    !p.match(/^(日|夜|晨|暮|黄昏|黎明)$/) &&
+    !p.match(/^(日|夜|晨|暮|Dusk|黎明)$/) &&
     !p.match(/^(内|外|内\/外)$/)
   );
   return locationParts.join(' ') || header;
 }
 
 /**
- * 从场景头提取时间
+ * 从Scene头提取时间
  */
 function extractTimeFromHeader(header: string): string {
-  const timeMatch = header.match(/(日|夜|晨|暮|黄昏|黎明|清晨|傍晚)/);
+  const timeMatch = header.match(/(日|夜|晨|暮|Dusk|黎明|清晨|傍晚)/);
   return timeMatch ? timeMatch[1] : '日';
 }
 
 /**
- * 标准化地点名称用于匹配
+ * Standard化Location名称用于匹配
  */
 function normalizeLocation(location: string): string {
   return cleanLocationString(location)
@@ -229,7 +229,7 @@ function normalizeLocation(location: string): string {
 }
 
 /**
- * 清理场景地点字符串，移除人物信息等无关内容
+ * 清理SceneLocation字符串，移除人物信息等None关内容
  */
 function cleanLocationString(location: string): string {
   if (!location) return '';
@@ -246,12 +246,12 @@ function cleanLocationString(location: string): string {
 // ==================== 核心校准函数 ====================
 
 /**
- * AI 校准所有场景（轻量级模式）
+ * AI 校准所有Scene（轻量级模式）
  * 
- * 【重要】此函数只补充现有场景的美术设计信息，不改变：
- * - 场景列表（不新增、不删除、不合并）
- * - 场景顺序
- * - viewpoints（多视角联合图数据）
+ * 【重要】此函数只补充现有Scene的美术设计信息，不改变：
+ * - Scene列表（不新增、不Delete、不合并）
+ * - Scene顺序
+ * - viewpoints（多Viewpoint联合图数据）
  * - sceneIds、shotIds 等关联数据
  */
 export async function calibrateScenes(
@@ -263,20 +263,20 @@ export async function calibrateScenes(
   
   // 【轻量级模式】直接使用 currentScenes，不重新统计
   if (!currentScenes || currentScenes.length === 0) {
-    console.warn('[calibrateScenes] currentScenes 为空，无法校准');
+    console.warn('[calibrateScenes] currentScenes 为空，None法校准');
     return {
       scenes: [],
       mergeRecords: [],
-      analysisNotes: '场景列表为空',
+      analysisNotes: 'Scene列表为空',
     };
   }
   
-  console.log('[calibrateScenes] 轻量级模式：为', currentScenes.length, '个现有场景补充美术设计');
+  console.log('[calibrateScenes] 轻量级模式：为', currentScenes.length, '现有Scene补充美术设计');
   
-  // 1. 收集场景的动作描写样本（用于推断道具）
+  // 1. 收EpisodeScene的动作描写样本（用于推断道具）
   const stats = collectSceneStats(episodeScripts);
   
-  // 2. 准备场景批处理 items（每个场景带上统计信息）
+  // 2. 准备Scene批处理 items（每Scene带上统计信息）
   const batchItems = currentScenes.map((scene) => {
     const normalizedLoc = scene.location?.replace(/\s+/g, '').toLowerCase() || '';
     let sceneStat: SceneStats | undefined;
@@ -306,31 +306,31 @@ export async function calibrateScenes(
   const seriesCtx = buildSeriesContextSummary(seriesMeta || null);
   const seriesCtxBlock = seriesCtx ? `\n\n${seriesCtx}\n` : '';
 
-  // 3. 构建共享的 system prompt
-  const systemPrompt = `你是专业的影视美术指导和场景设计师，擅长为现有场景补充专业的视觉设计方案。${seriesCtxBlock}
+  // 3. 构建Total享的 system prompt
+  const systemPrompt = `你是专业的影视美术指导和Scene设计师，擅长为现有Scene补充专业的视觉设计方案。${seriesCtxBlock}
 
 【核心任务】
-为以下场景补充美术设计信息，用于生成场景概念图。
+为以下Scene补充美术设计信息，用于生成Scene概念图。
 
 【重要约束】
-1. **不新增场景** - 只处理列表中的场景
-2. **不删除场景** - 即使是过渡场景也保留
-3. **不合并场景** - 只记录“合并建议”，不自行合并
-4. **保持原始 sceneId** - 必须原样返回
+1. **不新增Scene** - 只处理列表中的Scene
+2. **不DeleteScene** - 即使是过渡Scene也保留
+3. **不合并Scene** - 只记录“合并建议”，不自行合并
+4. **保持原始 sceneId** - 必须原样Back
 
-【场景设计要素 - 必须基于动作描写推断】
-为每个场景补充：
+【Scene设计要素 - 必须基于动作描写推断】
+为每Scene补充：
 - 建筑风格、光影设计、色彩基调
 - **关键道具**：必须根据「动作描写」推断
 - 空间布局、时代特征、importance 分类
 
-请以JSON格式返回分析结果。`;
+请以JSON格式Back分析结果。`;
 
-  // 共享的背景上下文
+  // Total享的背景上下文
   const outlineContext = safeTruncate(background.outline || '', 1500);
 
   try {
-    // 闭包收集跨批次的聚合字段
+    // 闭包收Episode跨批次的聚合字段
     const allMergeRecords: SceneMergeRecord[] = [];
     const allAnalysisNotes: string[] = [];
     
@@ -348,7 +348,7 @@ export async function calibrateScenes(
           const dialogueInfo = s.dialogueSamples.length
             ? `\n   对白样本: ${s.dialogueSamples.join('; ')}`
             : '';
-          return `${i + 1}. [sceneId: ${s.sceneId}] ${s.name}\n   地点: ${s.location} [出场${s.appearCount}次, 集数${s.episodes}]\n   角色: ${s.characters}${actionInfo}${dialogueInfo}`;
+          return `${i + 1}. [sceneId: ${s.sceneId}] ${s.name}\n   Location: ${s.location} [出场${s.appearCount}次, Episodes${s.episodes}]\n   角色: ${s.characters}${actionInfo}${dialogueInfo}`;
         }).join('\n\n');
         
         const user = `【剧本信息】
@@ -358,26 +358,26 @@ ${background.era ? `时代：${background.era}` : ''}
 ${background.storyStartYear ? `故事年份：${background.storyStartYear}年${background.storyEndYear && background.storyEndYear !== background.storyStartYear ? ` - ${background.storyEndYear}年` : ''}` : ''}
 ${background.timelineSetting ? `时间线：${background.timelineSetting}` : ''}
 ${background.worldSetting ? `世界观：${safeTruncate(background.worldSetting, 200)}` : ''}
-总集数：${episodeScripts.length}集
+总Episodes：${episodeScripts.length}Episode
 
 【故事大纲】
-${outlineContext || '无'}
+${outlineContext || 'None'}
 
-【现有场景列表 - 请为每个场景补充美术设计】（共${batch.length}个）
+【现有Scene列表 - 请为每Scene补充美术设计】（Total${batch.length}）
 ${sceneList}
 
 【输出规则】
-1. 必须返回每个场景的 sceneId（与输入完全一致）
+1. 必须Back每Scene的 sceneId（与输入完全一致）
 2. keyProps 必须从动作描写中提取
 3. 合并建议放在 mergeRecords
 
-请返回JSON格式：
+请BackJSON格式：
 {
   "scenes": [
     {
-      "sceneId": "原始场景ID",
-      "name": "场景名称",
-      "location": "具体地点",
+      "sceneId": "原始SceneID",
+      "name": "Scene名称",
+      "location": "具体Location",
       "importance": "main/secondary/transition",
       "architectureStyle": "建筑风格",
       "lightingDesign": "光影设计",
@@ -406,7 +406,7 @@ ${sceneList}
         try {
           batchParsed = JSON.parse(cleaned);
         } catch (parseErr) {
-          console.warn('[calibrateScenes] 批次JSON解析失败，尝试部分解析...');
+          console.warn('[calibrateScenes] 批次JSONParsing failed，尝试部分解析...');
           const partialScenes: any[] = [];
           const scenePattern = /\{\s*"sceneId"\s*:\s*"([^"]+)"[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g;
           let match;
@@ -423,11 +423,11 @@ ${sceneList}
           }
         }
         
-        // 收集聚合字段
+        // 收Episode聚合字段
         allMergeRecords.push(...(batchParsed.mergeRecords || []));
         if (batchParsed.analysisNotes) allAnalysisNotes.push(batchParsed.analysisNotes);
         
-        // 返回 Map<sceneId, 场景数据>
+        // Back Map<sceneId, Scene数据>
         const map = new Map<string, any>();
         for (const s of (batchParsed.scenes || [])) {
           if (s.sceneId) {
@@ -447,10 +447,10 @@ ${sceneList}
     });
     
     if (failedBatches > 0) {
-      console.warn(`[SceneCalibrator] ${failedBatches} 批次失败，使用部分结果`);
+      console.warn(`[SceneCalibrator] ${failedBatches} 批次Failed，使用部分结果`);
     }
     
-    console.log('[calibrateScenes] AI 返回', sceneResults.size, '个场景结果');
+    console.log('[calibrateScenes] AI Back', sceneResults.size, 'Scene结果');
     
     // 【关键】按原始顺序遍历 currentScenes，只更新美术字段
     const scenes: CalibratedScene[] = currentScenes.map((orig, i) => {
@@ -459,7 +459,7 @@ ${sceneList}
       if (!aiData) aiData = sceneResults.get('loc:' + normalizeLocation(orig.name || ''));
       
       const matched = !!aiData;
-      console.log(`[calibrateScenes] 场景 #${i + 1} "${orig.name || orig.location}" (${orig.id}) -> AI 匹配: ${matched ? '✓' : '✗'}`);
+      console.log(`[calibrateScenes] Scene #${i + 1} "${orig.name || orig.location}" (${orig.id}) -> AI 匹配: ${matched ? '✓' : '✗'}`);
       
       return {
         id: orig.id,
@@ -480,7 +480,7 @@ ${sceneList}
       };
     });
     
-    // 为主要场景生成专业视觉提示词
+    // 为主要Scene生成专业视觉Prompt
     const enrichedScenes = await enrichScenesWithVisualPrompts(
       scenes,
       background,
@@ -493,7 +493,7 @@ ${sceneList}
       analysisNotes: allAnalysisNotes.join('; ') || '',
     };
   } catch (error) {
-    console.error('[SceneCalibrator] AI校准失败:', error);
+    console.error('[SceneCalibrator] AI校准Failed:', error);
     const fallbackScenes: CalibratedScene[] = Array.from(stats.values())
       .sort((a, b) => b.appearanceCount - a.appearanceCount)
       .map((s, i) => ({
@@ -512,13 +512,13 @@ ${sceneList}
     return {
       scenes: fallbackScenes,
       mergeRecords: [],
-      analysisNotes: 'AI校准失败，返回基于统计的结果',
+      analysisNotes: 'AI校准Failed，Back基于统计的结果',
     };
   }
 }
 
 /**
- * AI 校准单集场景
+ * AI 校准单EpisodeScene
  */
 export async function calibrateEpisodeScenes(
   episodeIndex: number,
@@ -527,30 +527,30 @@ export async function calibrateEpisodeScenes(
   episodeScripts: EpisodeRawScript[],
   options: CalibrationOptions
 ): Promise<SceneCalibrationResult> {
-  // 找到该集的剧本
+  // 找到该Episode的剧本
   const episodeScript = episodeScripts.find(ep => ep.episodeIndex === episodeIndex);
   if (!episodeScript) {
-    throw new Error(`找不到第 ${episodeIndex} 集的剧本`);
+    throw new Error(`找不到第 ${episodeIndex} Episode的剧本`);
   }
   
-  // 只校准该集的场景
+  // 只校准该Episode的Scene
   const singleEpisodeScripts = [episodeScript];
   
-  // 复用全局校准逻辑，但只传入单集数据
+  // 复用全局校准逻辑，但只传入单Episodes据
   return calibrateScenes(currentScenes, background, singleEpisodeScripts, options);
 }
 
 // ==================== 专业视觉设计 ====================
 
 /**
- * 为主要场景生成专业的视觉提示词
+ * 为主要Scene生成专业的视觉Prompt
  */
 async function enrichScenesWithVisualPrompts(
   scenes: CalibratedScene[],
   background: ProjectBackground,
   promptLanguage: PromptLanguage = 'zh+en'
 ): Promise<CalibratedScene[]> {
-  // 只为主要场景和次要场景生成详细提示词
+  // 只为主要Scene和次要Scene生成详细Prompt
   const keyScenes = scenes.filter(s => 
     s.importance === 'main' || s.importance === 'secondary'
   );
@@ -559,15 +559,15 @@ async function enrichScenesWithVisualPrompts(
     return scenes;
   }
   
-  console.log(`[enrichScenesWithVisualPrompts] 为 ${keyScenes.length} 个关键场景生成专业提示词...`);
+  console.log(`[enrichScenesWithVisualPrompts] 为 ${keyScenes.length} 关键Scene生成专业Prompt...`);
   
-  const systemPrompt = `你是好莱坞顶级美术指导，曾为《盗梦空间》《布达佩斯大饭店》等电影设计场景。
+  const systemPrompt = `你是好莱坞顶级美术指导，曾为《盗梦空间》《布达佩斯大饭店》等电影设计Scene。
 
 你的专业能力：
-- **空间美学**：懂得如何用构图、光影、色彩传达情绪
-- **时代还原**：准确把握不同年代的建筑和室内装饰特征
-- **AI图像生成**：深谙 Midjourney、DALL-E 等 AI 绘图模型的最佳提示词写法
-- **电影语言**：理解场景如何为叙事服务
+- **空间美学**：懂得如何用构图、光影、色彩传达Mood
+- **时代还原**：准确把握不同年代的建筑和Indoor装饰特征
+- **AIImage Generation**：深谙 Midjourney、DALL-E 等 AI 绘图Model的最佳Prompt写法
+- **电影语言**：理解Scene如何为叙事服务
 
 【剧本信息】
 剧名：《${background.title}》
@@ -575,13 +575,13 @@ async function enrichScenesWithVisualPrompts(
 时代：${background.era || '未知'}
 
 【故事大纲】
-${background.outline?.slice(0, 1000) || '无'}
+${background.outline?.slice(0, 1000) || 'None'}
 
 【任务】
-为以下场景生成专业的视觉提示词：
+为以下Scene生成专业的视觉Prompt：
 
 ${keyScenes.map((s, i) => `${i+1}. ${s.name}
-   - 重要性：${s.importance === 'main' ? '主场景' : '次要场景'}
+   - 重要性：${s.importance === 'main' ? '主Scene' : '次要Scene'}
    - 建筑风格：${s.architectureStyle || '未知'}
    - 光影：${s.lightingDesign || '未知'}
    - 色彩：${s.colorPalette || '未知'}
@@ -589,22 +589,22 @@ ${keyScenes.map((s, i) => `${i+1}. ${s.name}
    - 时代：${s.eraDetails || '未知'}`).join('\n\n')}
 
 【输出要求】
-为每个场景生成：
+为每Scene生成：
 ${promptLanguage !== 'en' ? '- 中文视觉描述（100-150字，包含空间感、氛围、细节）' : ''}
-${promptLanguage !== 'zh' ? '- 英文视觉提示词（50-80词，适合AI图像生成，包含风格、光影、构图）' : ''}
+${promptLanguage !== 'zh' ? '- 英文视觉Prompt（50-80词，适合AIImage Generation，包含风格、光影、构图）' : ''}
 
-请返回JSON格式：
+请BackJSON格式：
 {
   "scenes": [
     {
-      "name": "场景名"${promptLanguage !== 'en' ? ',\n      "visualPromptZh": "中文视觉描述"' : ''}${promptLanguage !== 'zh' ? ',\n      "visualPromptEn": "English visual prompt for AI image generation"' : ''}
+      "name": "Scene名"${promptLanguage !== 'en' ? ',\n      "visualPromptZh": "中文视觉描述"' : ''}${promptLanguage !== 'zh' ? ',\n      "visualPromptEn": "English visual prompt for AI image generation"' : ''}
     }
   ]
 }`;
 
   try {
     // 统一从服务映射获取配置
-    const result = await callFeatureAPI('script_analysis', systemPrompt, '请为以上场景生成专业视觉提示词');
+    const result = await callFeatureAPI('script_analysis', systemPrompt, '请为以上Scene生成专业视觉Prompt');
     
     // 解析结果
     let cleaned = result.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
@@ -620,7 +620,7 @@ ${promptLanguage !== 'zh' ? '- 英文视觉提示词（50-80词，适合AI图像
       designMap.set(s.name, s);
     }
     
-    // 合并到场景数据
+    // 合并到Scene数据
     return scenes.map(s => {
       const design = designMap.get(s.name);
       if (design) {
@@ -633,7 +633,7 @@ ${promptLanguage !== 'zh' ? '- 英文视觉提示词（50-80词，适合AI图像
       return s;
     });
   } catch (error) {
-    console.error('[enrichScenesWithVisualPrompts] 生成失败:', error);
+    console.error('[enrichScenesWithVisualPrompts] Generation failed:', error);
     return scenes;
   }
 }
@@ -649,14 +649,14 @@ export function convertToScriptScenes(
   promptLanguage: PromptLanguage = 'zh+en',
 ): ScriptScene[] {
   return calibrated.map(c => {
-    // 查找原始场景数据
+    // 查找原始Scene数据
     const original = originalScenes?.find(orig => 
       orig.name === c.name || 
       orig.location === c.location ||
       normalizeLocation(orig.location) === normalizeLocation(c.location)
     );
     
-    // 清理地点字符串
+    // 清理Location字符串
     const cleanedLocation = cleanLocationString(c.location);
     const nextVisualPromptZh = c.visualPromptZh || original?.visualPrompt;
     const nextVisualPromptEn = c.visualPromptEn || original?.visualPromptEn;
@@ -670,7 +670,7 @@ export function convertToScriptScenes(
       location: cleanedLocation,
       time: c.time,
       atmosphere: c.atmosphere,
-      // 专业场景设计字段
+      // 专业Scene设计字段
       visualPrompt: promptLanguage === 'en' ? undefined : nextVisualPromptZh,
       visualPromptEn: promptLanguage === 'zh' ? undefined : nextVisualPromptEn,
       architectureStyle: c.architectureStyle,
@@ -689,14 +689,14 @@ export function convertToScriptScenes(
         `出场${c.appearanceCount}次`,
         ...(c.keyProps || []).slice(0, 3),
       ],
-      // 【修复】保留原始场景的 viewpoints 数据（AI视角分析结果）
+      // 【修复】保留原始Scene的 viewpoints 数据（AIViewpoint分析结果）
       viewpoints: original?.viewpoints,
     };
   });
 }
 
 /**
- * 按重要性排序场景
+ * 按重要性排序Scene
  */
 export function sortByImportance(scenes: CalibratedScene[]): CalibratedScene[] {
   const order = { main: 0, secondary: 1, transition: 2 };

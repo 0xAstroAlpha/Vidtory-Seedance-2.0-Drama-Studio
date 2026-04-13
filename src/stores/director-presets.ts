@@ -5,75 +5,71 @@
  * Director Presets — 导演面板预设常量
  *
  * 从 director-store.ts 中抽离的所有预设常量和派生类型。
- * 供 split-scenes.tsx、split-scene-card.tsx、prompt-builder.ts 等模块导入。
+ * 供 split-scenes.tsx、split-scene-card.tsx、prompt-builder.ts 等模块Import。
  */
 
 // ==================== 景别预设 (Shot Size) ====================
 
 export const SHOT_SIZE_PRESETS = [
-  { id: 'ws', label: '远景', labelEn: 'Wide Shot', abbr: 'WS', promptToken: 'wide shot, establishing shot, distant view' },
-  { id: 'ls', label: '全景', labelEn: 'Long Shot', abbr: 'LS', promptToken: 'long shot, full body shot' },
-  { id: 'mls', label: '中远景', labelEn: 'Medium Long Shot', abbr: 'MLS', promptToken: 'medium long shot, knee shot' },
-  { id: 'ms', label: '中景', labelEn: 'Medium Shot', abbr: 'MS', promptToken: 'medium shot, waist shot' },
-  { id: 'mcu', label: '中近景', labelEn: 'Medium Close-Up', abbr: 'MCU', promptToken: 'medium close-up, chest shot' },
-  { id: 'cu', label: '近景', labelEn: 'Close-Up', abbr: 'CU', promptToken: 'close-up, face shot' },
-  { id: 'ecu', label: '特写', labelEn: 'Extreme Close-Up', abbr: 'ECU', promptToken: 'extreme close-up, detail shot' },
-  { id: 'pov', label: '主观镜头', labelEn: 'POV Shot', abbr: 'POV', promptToken: 'point of view shot, first person perspective' },
+  { id: 'ws', label: 'Wide Shot', labelEn: 'Wide Shot', abbr: 'WS', promptToken: 'wide shot, establishing shot, distant view' },
+  { id: 'ls', label: 'Long Shot', labelEn: 'Long Shot', abbr: 'LS', promptToken: 'long shot, full body shot' },
+  { id: 'mls', label: 'Medium Long Shot', labelEn: 'Medium Long Shot', abbr: 'MLS', promptToken: 'medium long shot, knee shot' },
+  { id: 'ms', label: 'Medium Shot', labelEn: 'Medium Shot', abbr: 'MS', promptToken: 'medium shot, waist shot' },
+  { id: 'mcu', label: 'Medium Close-Up', labelEn: 'Medium Close-Up', abbr: 'MCU', promptToken: 'medium close-up, chest shot' },
+  { id: 'cu', label: 'Close-Up', labelEn: 'Close-Up', abbr: 'CU', promptToken: 'close-up, face shot' },
+  { id: 'ecu', label: 'Extreme Close-Up', labelEn: 'Extreme Close-Up', abbr: 'ECU', promptToken: 'extreme close-up, detail shot' },
+  { id: 'pov', label: 'POV Shot', labelEn: 'POV Shot', abbr: 'POV', promptToken: 'point of view shot, first person perspective' },
 ] as const;
 
 export type ShotSizeType = typeof SHOT_SIZE_PRESETS[number]['id'];
 
-// ==================== 时长预设 (Duration) ====================
+// ==================== Duration预设 (Duration) ====================
 
 export const DURATION_PRESETS = [
-  { id: 4, label: '4秒', value: 4 },
-  { id: 5, label: '5秒', value: 5 },
-  { id: 6, label: '6秒', value: 6 },
-  { id: 7, label: '7秒', value: 7 },
-  { id: 8, label: '8秒', value: 8 },
-  { id: 9, label: '9秒', value: 9 },
-  { id: 10, label: '10秒', value: 10 },
-  { id: 11, label: '11秒', value: 11 },
-  { id: 12, label: '12秒', value: 12 },
+  { id: 4, label: '4s', value: 4 },
+  { id: 5, label: '5s', value: 5 },
+  { id: 6, label: '6s', value: 6 },
+  { id: 7, label: '7s', value: 7 },
+  { id: 8, label: '8s', value: 8 },
+  { id: 9, label: '9s', value: 9 },
+  { id: 10, label: '10s', value: 10 },
+  { id: 11, label: '11s', value: 11 },
+  { id: 12, label: '12s', value: 12 },
 ] as const;
 
-// 时长类型: 4-12 秒
+// Duration类型: 4-12 sec
 export type DurationType = number;
 
-// ==================== 音效标签预设 (Sound Effects) ====================
+// ==================== Sound Effect标签预设 (Sound Effects) ====================
 
 export const SOUND_EFFECT_PRESETS = {
-  // 自然环境
   nature: [
-    { id: 'wind', label: '风声', promptToken: 'wind blowing sound' },
-    { id: 'rain', label: '雨声', promptToken: 'rain falling sound' },
-    { id: 'thunder', label: '雷声', promptToken: 'thunder rumbling' },
-    { id: 'birds', label: '鸟鸣', promptToken: 'birds chirping' },
-    { id: 'water', label: '流水', promptToken: 'water flowing sound' },
-    { id: 'waves', label: '海浪', promptToken: 'ocean waves crashing' },
+    { id: 'wind', label: 'Wind', promptToken: 'wind blowing sound' },
+    { id: 'rain', label: 'Rain', promptToken: 'rain falling sound' },
+    { id: 'thunder', label: 'Thunder', promptToken: 'thunder rumbling' },
+    { id: 'birds', label: 'Birds', promptToken: 'birds chirping' },
+    { id: 'water', label: 'Water', promptToken: 'water flowing sound' },
+    { id: 'waves', label: 'Waves', promptToken: 'ocean waves crashing' },
   ],
-  // 人物动作
   action: [
-    { id: 'footsteps', label: '脚步声', promptToken: 'footsteps sound' },
-    { id: 'breathing', label: '呼吸声', promptToken: 'heavy breathing' },
-    { id: 'heartbeat', label: '心跳声', promptToken: 'heartbeat pounding' },
-    { id: 'fighting', label: '打斗声', promptToken: 'fighting impact sounds' },
-    { id: 'running', label: '奔跑声', promptToken: 'running footsteps' },
+    { id: 'footsteps', label: 'Footsteps', promptToken: 'footsteps sound' },
+    { id: 'breathing', label: 'Breathing', promptToken: 'heavy breathing' },
+    { id: 'heartbeat', label: 'Heartbeat', promptToken: 'heartbeat pounding' },
+    { id: 'fighting', label: 'Fighting', promptToken: 'fighting impact sounds' },
+    { id: 'running', label: 'Running', promptToken: 'running footsteps' },
   ],
-  // 氛围效果
   atmosphere: [
-    { id: 'suspense', label: '悬疑', promptToken: 'suspenseful ambient sound' },
-    { id: 'dramatic', label: '戏剧性', promptToken: 'dramatic sound effect' },
-    { id: 'peaceful', label: '平静', promptToken: 'peaceful ambient sound' },
-    { id: 'tense', label: '紧张', promptToken: 'tense atmosphere sound' },
-    { id: 'epic', label: '史诗', promptToken: 'epic cinematic sound' },
+    { id: 'suspense', label: 'Suspense', promptToken: 'suspenseful ambient sound' },
+    { id: 'dramatic', label: 'Dramatic', promptToken: 'dramatic sound effect' },
+    { id: 'peaceful', label: 'Peaceful', promptToken: 'peaceful ambient sound' },
+    { id: 'tense', label: 'Tense', promptToken: 'tense atmosphere sound' },
+    { id: 'epic', label: 'Epic', promptToken: 'epic cinematic sound' },
   ],
-  // 城市环境
   urban: [
-    { id: 'traffic', label: '车流', promptToken: 'traffic noise' },
-    { id: 'crowd', label: '人群', promptToken: 'crowd murmuring' },
-    { id: 'siren', label: '警笛', promptToken: 'siren wailing' },
-    { id: 'horn', label: '喇叭', promptToken: 'car horn honking' },
+    { id: 'traffic', label: 'Traffic', promptToken: 'traffic noise' },
+    { id: 'crowd', label: 'Crowd', promptToken: 'crowd murmuring' },
+    { id: 'siren', label: 'Siren', promptToken: 'siren wailing' },
+    { id: 'horn', label: 'Horn', promptToken: 'car horn honking' },
   ],
 } as const;
 
@@ -83,7 +79,7 @@ export type SoundEffectTag =
   | typeof SOUND_EFFECT_PRESETS.atmosphere[number]['id']
   | typeof SOUND_EFFECT_PRESETS.urban[number]['id'];
 
-// ==================== 拍摄控制预设（每个分镜独立） ====================
+// ==================== 拍摄控制预设（每Shot独立） ====================
 
 // 灯光风格预设 (Gaffer)
 export const LIGHTING_STYLE_PRESETS = [
@@ -160,28 +156,28 @@ export const MOVEMENT_SPEED_PRESETS = [
 // 氛围特效预设 (On-set SFX)
 export const ATMOSPHERIC_EFFECT_PRESETS = {
   weather: [
-    { id: 'rain' as const, label: '雨', emoji: '🌧️', promptToken: 'rain' },
-    { id: 'heavy-rain' as const, label: '暴雨', emoji: '⛈️', promptToken: 'heavy rain pouring' },
-    { id: 'snow' as const, label: '雪', emoji: '❄️', promptToken: 'snow falling' },
-    { id: 'blizzard' as const, label: '暴风雪', emoji: '🌨️', promptToken: 'blizzard, heavy snowstorm' },
-    { id: 'fog' as const, label: '浓雾', emoji: '🌫️', promptToken: 'dense fog' },
-    { id: 'mist' as const, label: '薄雾', emoji: '🌁', promptToken: 'light mist' },
+    { id: 'rain' as const, label: 'Rain', emoji: '🌧️', promptToken: 'rain' },
+    { id: 'heavy-rain' as const, label: 'Heavy Rain', emoji: '⛈️', promptToken: 'heavy rain pouring' },
+    { id: 'snow' as const, label: 'Snow', emoji: '❄️', promptToken: 'snow falling' },
+    { id: 'blizzard' as const, label: 'Blizzard', emoji: '🌨️', promptToken: 'blizzard, heavy snowstorm' },
+    { id: 'fog' as const, label: 'Dense Fog', emoji: '🌫️', promptToken: 'dense fog' },
+    { id: 'mist' as const, label: 'Light Mist', emoji: '🌁', promptToken: 'light mist' },
   ],
   environment: [
-    { id: 'dust' as const, label: '尘土', emoji: '💨', promptToken: 'dust particles in air' },
-    { id: 'sandstorm' as const, label: '沙暴', emoji: '🏜️', promptToken: 'sandstorm' },
-    { id: 'smoke' as const, label: '烟雾', emoji: '💨', promptToken: 'smoke' },
-    { id: 'haze' as const, label: '薄霾', emoji: '🌫️', promptToken: 'atmospheric haze' },
-    { id: 'fire' as const, label: '火焰', emoji: '🔥', promptToken: 'fire, flames' },
-    { id: 'sparks' as const, label: '火花', emoji: '✨', promptToken: 'sparks flying' },
+    { id: 'dust' as const, label: 'Dust', emoji: '💨', promptToken: 'dust particles in air' },
+    { id: 'sandstorm' as const, label: 'Sandstorm', emoji: '🏜️', promptToken: 'sandstorm' },
+    { id: 'smoke' as const, label: 'Smoke', emoji: '💨', promptToken: 'smoke' },
+    { id: 'haze' as const, label: 'Haze', emoji: '🌫️', promptToken: 'atmospheric haze' },
+    { id: 'fire' as const, label: 'Fire', emoji: '🔥', promptToken: 'fire, flames' },
+    { id: 'sparks' as const, label: 'Sparks', emoji: '✨', promptToken: 'sparks flying' },
   ],
   artistic: [
-    { id: 'lens-flare' as const, label: '镜头光晕', emoji: '🌟', promptToken: 'lens flare' },
-    { id: 'light-rays' as const, label: '丁达尔效应', emoji: '🌅', promptToken: 'god rays, light rays through atmosphere' },
-    { id: 'falling-leaves' as const, label: '落叶', emoji: '🍂', promptToken: 'falling leaves' },
-    { id: 'cherry-blossom' as const, label: '樱花', emoji: '🌸', promptToken: 'cherry blossom petals floating' },
-    { id: 'fireflies' as const, label: '萤火虫', emoji: '✨', promptToken: 'fireflies glowing' },
-    { id: 'particles' as const, label: '粒子', emoji: '💫', promptToken: 'floating particles' },
+    { id: 'lens-flare' as const, label: 'Lens Flare', emoji: '🌟', promptToken: 'lens flare' },
+    { id: 'light-rays' as const, label: 'God Rays', emoji: '🌅', promptToken: 'god rays, light rays through atmosphere' },
+    { id: 'falling-leaves' as const, label: 'Falling Leaves', emoji: '🍂', promptToken: 'falling leaves' },
+    { id: 'cherry-blossom' as const, label: 'Cherry Blossom', emoji: '🌸', promptToken: 'cherry blossom petals floating' },
+    { id: 'fireflies' as const, label: 'Fireflies', emoji: '✨', promptToken: 'fireflies glowing' },
+    { id: 'particles' as const, label: 'Particles', emoji: '💫', promptToken: 'floating particles' },
   ],
 } as const;
 
@@ -201,26 +197,26 @@ export const PLAYBACK_SPEED_PRESETS = [
   { id: 'timelapse' as const, label: '延时摄影', labelEn: 'Timelapse', emoji: '⏱️', promptToken: 'timelapse, time passing rapidly,' },
 ] as const;
 
-// ==================== 镜头运动预设 (Camera Movement) ====================
+// ==================== Shot运动预设 (Camera Movement) ====================
 
 export const CAMERA_MOVEMENT_PRESETS = [
-  { id: 'none' as const, label: '无', labelEn: 'None', promptToken: '' },
+  { id: 'none' as const, label: 'None', labelEn: 'None', promptToken: '' },
   { id: 'static' as const, label: '固定机位', labelEn: 'Static', promptToken: 'static camera, locked off,' },
   { id: 'tracking' as const, label: '跟拍', labelEn: 'Tracking', promptToken: 'tracking shot, following subject,' },
   { id: 'orbit' as const, label: '环绕', labelEn: 'Orbit', promptToken: 'orbiting around subject, circular camera movement,' },
   { id: 'zoom-in' as const, label: '变焦拉近', labelEn: 'Zoom In', promptToken: 'zoom in, lens zooming closer,' },
   { id: 'zoom-out' as const, label: '变焦拉远', labelEn: 'Zoom Out', promptToken: 'zoom out, lens zooming wider,' },
-  { id: 'pan-left' as const, label: '镜头左摇', labelEn: 'Pan Left', promptToken: 'pan left, horizontal camera rotation left,' },
-  { id: 'pan-right' as const, label: '镜头右摇', labelEn: 'Pan Right', promptToken: 'pan right, horizontal camera rotation right,' },
-  { id: 'tilt-up' as const, label: '镜头上仰', labelEn: 'Tilt Up', promptToken: 'tilt up, camera tilting upward,' },
-  { id: 'tilt-down' as const, label: '镜头下俯', labelEn: 'Tilt Down', promptToken: 'tilt down, camera tilting downward,' },
-  { id: 'dolly-in' as const, label: '镜头前移', labelEn: 'Dolly In', promptToken: 'dolly in, camera pushing forward,' },
-  { id: 'dolly-out' as const, label: '镜头后移', labelEn: 'Dolly Out', promptToken: 'dolly out, camera pulling back,' },
-  { id: 'truck-left' as const, label: '镜头左移', labelEn: 'Truck Left', promptToken: 'truck left, lateral camera movement left,' },
-  { id: 'truck-right' as const, label: '镜头右移', labelEn: 'Truck Right', promptToken: 'truck right, lateral camera movement right,' },
+  { id: 'pan-left' as const, label: 'Shot左摇', labelEn: 'Pan Left', promptToken: 'pan left, horizontal camera rotation left,' },
+  { id: 'pan-right' as const, label: 'Shot右摇', labelEn: 'Pan Right', promptToken: 'pan right, horizontal camera rotation right,' },
+  { id: 'tilt-up' as const, label: 'Shot上仰', labelEn: 'Tilt Up', promptToken: 'tilt up, camera tilting upward,' },
+  { id: 'tilt-down' as const, label: 'Shot下俯', labelEn: 'Tilt Down', promptToken: 'tilt down, camera tilting downward,' },
+  { id: 'dolly-in' as const, label: 'Shot前移', labelEn: 'Dolly In', promptToken: 'dolly in, camera pushing forward,' },
+  { id: 'dolly-out' as const, label: 'Shot后移', labelEn: 'Dolly Out', promptToken: 'dolly out, camera pulling back,' },
+  { id: 'truck-left' as const, label: 'Shot左移', labelEn: 'Truck Left', promptToken: 'truck left, lateral camera movement left,' },
+  { id: 'truck-right' as const, label: 'Shot右移', labelEn: 'Truck Right', promptToken: 'truck right, lateral camera movement right,' },
   { id: 'crane-up' as const, label: '摇臂上升', labelEn: 'Crane Up', promptToken: 'crane up, camera ascending vertically,' },
   { id: 'crane-down' as const, label: '摇臂下降', labelEn: 'Crane Down', promptToken: 'crane down, camera descending vertically,' },
-  { id: 'drone-aerial' as const, label: '无人机航拍', labelEn: 'Drone Aerial', promptToken: 'drone aerial shot, sweeping aerial movement,' },
+  { id: 'drone-aerial' as const, label: 'None人机航拍', labelEn: 'Drone Aerial', promptToken: 'drone aerial shot, sweeping aerial movement,' },
   { id: '360-roll' as const, label: '360°横滚', labelEn: '360° Roll', promptToken: '360 degree barrel roll, rotating camera,' },
 ] as const;
 
@@ -229,52 +225,49 @@ export type CameraMovementType = typeof CAMERA_MOVEMENT_PRESETS[number]['id'];
 // ==================== 特殊拍摄手法预设 (Special Technique) ====================
 
 export const SPECIAL_TECHNIQUE_PRESETS = [
-  { id: 'none' as const, label: '无', labelEn: 'None', promptToken: '' },
+  { id: 'none' as const, label: 'None', labelEn: 'None', promptToken: '' },
   { id: 'hitchcock-zoom' as const, label: '希区柯克变焦', labelEn: 'Hitchcock Zoom', promptToken: 'dolly zoom, vertigo effect, Hitchcock zoom,' },
   { id: 'timelapse' as const, label: '延时摄影', labelEn: 'Timelapse', promptToken: 'timelapse, time passing rapidly,' },
-  { id: 'crash-zoom-in' as const, label: '急推镜头', labelEn: 'Crash Zoom In', promptToken: 'crash zoom in, sudden rapid zoom,' },
-  { id: 'crash-zoom-out' as const, label: '急拉镜头', labelEn: 'Crash Zoom Out', promptToken: 'crash zoom out, sudden rapid pull back,' },
+  { id: 'crash-zoom-in' as const, label: '急推Shot', labelEn: 'Crash Zoom In', promptToken: 'crash zoom in, sudden rapid zoom,' },
+  { id: 'crash-zoom-out' as const, label: '急拉Shot', labelEn: 'Crash Zoom Out', promptToken: 'crash zoom out, sudden rapid pull back,' },
   { id: 'whip-pan' as const, label: '快速甩镜', labelEn: 'Whip Pan', promptToken: 'whip pan, fast swish pan, motion blur transition,' },
   { id: 'bullet-time' as const, label: '子弹时间', labelEn: 'Bullet Time', promptToken: 'bullet time, frozen time orbit shot, ultra slow motion,' },
   { id: 'fpv-shuttle' as const, label: 'FPV 穿梭', labelEn: 'FPV Shuttle', promptToken: 'FPV drone shuttle, first person flight through scene,' },
-  { id: 'macro-closeup' as const, label: '微距特写', labelEn: 'Macro Close-up', promptToken: 'macro extreme close-up, intricate detail shot,' },
+  { id: 'macro-closeup' as const, label: '微距Close-up', labelEn: 'Macro Close-up', promptToken: 'macro extreme close-up, intricate detail shot,' },
   { id: 'first-person' as const, label: '第一人称', labelEn: 'First Person', promptToken: 'first person POV shot, subjective camera,' },
-  { id: 'slow-motion' as const, label: '慢镜头', labelEn: 'Slow Motion', promptToken: 'slow motion, dramatic slow mo, high frame rate,' },
-  { id: 'probe-lens' as const, label: '探针镜头', labelEn: 'Probe Lens', promptToken: 'probe lens shot, snorkel camera, macro perspective movement,' },
-  { id: 'spinning-tilt' as const, label: '旋转倾斜镜头', labelEn: 'Spinning Tilt', promptToken: 'spinning tilting camera, disorienting rotation,' },
+  { id: 'slow-motion' as const, label: '慢Shot', labelEn: 'Slow Motion', promptToken: 'slow motion, dramatic slow mo, high frame rate,' },
+  { id: 'probe-lens' as const, label: '探针Shot', labelEn: 'Probe Lens', promptToken: 'probe lens shot, snorkel camera, macro perspective movement,' },
+  { id: 'spinning-tilt' as const, label: '旋转倾斜Shot', labelEn: 'Spinning Tilt', promptToken: 'spinning tilting camera, disorienting rotation,' },
 ] as const;
 
 export type SpecialTechniqueType = typeof SPECIAL_TECHNIQUE_PRESETS[number]['id'];
 
-// ==================== 情绪标签预设 ====================
+// ==================== Mood标签预设 ====================
 
 export const EMOTION_PRESETS = {
-  // 基础情绪
   basic: [
-    { id: 'happy', label: '开心', emoji: '😊' },
-    { id: 'sad', label: '悲伤', emoji: '😢' },
-    { id: 'angry', label: '愤怒', emoji: '😠' },
-    { id: 'surprised', label: '惊讶', emoji: '😲' },
-    { id: 'fearful', label: '恐惧', emoji: '😨' },
-    { id: 'calm', label: '平静', emoji: '😐' },
+    { id: 'happy', label: 'Happy', emoji: '😊' },
+    { id: 'sad', label: 'Sad', emoji: '😢' },
+    { id: 'angry', label: 'Angry', emoji: '😠' },
+    { id: 'surprised', label: 'Surprised', emoji: '😲' },
+    { id: 'fearful', label: 'Fearful', emoji: '😨' },
+    { id: 'calm', label: 'Calm', emoji: '😐' },
   ],
-  // 氛围情绪
   atmosphere: [
-    { id: 'tense', label: '紧张', emoji: '😰' },
-    { id: 'excited', label: '兴奋', emoji: '🤩' },
-    { id: 'mysterious', label: '神秘', emoji: '🤔' },
-    { id: 'romantic', label: '浪漫', emoji: '🥰' },
-    { id: 'funny', label: '搞笑', emoji: '😂' },
-    { id: 'touching', label: '感动', emoji: '🥹' },
+    { id: 'tense', label: 'Tense', emoji: '😰' },
+    { id: 'excited', label: 'Excited', emoji: '🤩' },
+    { id: 'mysterious', label: 'Mysterious', emoji: '🤔' },
+    { id: 'romantic', label: 'Romantic', emoji: '🥰' },
+    { id: 'funny', label: 'Funny', emoji: '😂' },
+    { id: 'touching', label: 'Touching', emoji: '🥹' },
   ],
-  // 语气情绪
   tone: [
-    { id: 'serious', label: '严肃', emoji: '😑' },
-    { id: 'relaxed', label: '轻松', emoji: '😌' },
-    { id: 'playful', label: '调侃', emoji: '😜' },
-    { id: 'gentle', label: '温柔', emoji: '😇' },
-    { id: 'passionate', label: '激昂', emoji: '🔥' },
-    { id: 'low', label: '低沉', emoji: '😔' },
+    { id: 'serious', label: 'Serious', emoji: '😑' },
+    { id: 'relaxed', label: 'Relaxed', emoji: '😌' },
+    { id: 'playful', label: 'Playful', emoji: '😜' },
+    { id: 'gentle', label: 'Gentle', emoji: '😇' },
+    { id: 'passionate', label: 'Passionate', emoji: '🔥' },
+    { id: 'low', label: 'Somber', emoji: '😔' },
   ],
 } as const;
 
@@ -285,7 +278,7 @@ export type EmotionTag = typeof EMOTION_PRESETS.basic[number]['id']
 // ==================== 拍摄角度预设 (Camera Angle) ====================
 
 export const CAMERA_ANGLE_PRESETS = [
-  { id: 'eye-level' as const, label: '平视', labelEn: 'Eye Level', emoji: '👁️', promptToken: 'eye level angle,' },
+  { id: 'eye-level' as const, label: 'Eye Level', labelEn: 'Eye Level', emoji: '👁️', promptToken: 'eye level angle,' },
   { id: 'high-angle' as const, label: '俯拍', labelEn: 'High Angle', emoji: '⬇️', promptToken: 'high angle shot, looking down,' },
   { id: 'low-angle' as const, label: '仰拍', labelEn: 'Low Angle', emoji: '⬆️', promptToken: 'low angle shot, looking up, heroic perspective,' },
   { id: 'birds-eye' as const, label: '鸟瞰', labelEn: "Bird's Eye", emoji: '🦅', promptToken: "bird's eye view, top-down overhead shot," },
@@ -298,14 +291,14 @@ export const CAMERA_ANGLE_PRESETS = [
 
 export type CameraAngleType = typeof CAMERA_ANGLE_PRESETS[number]['id'];
 
-// ==================== 镜头焦距预设 (Focal Length) ====================
+// ==================== Shot焦距预设 (Focal Length) ====================
 
 export const FOCAL_LENGTH_PRESETS = [
   { id: '8mm' as const, label: '8mm 鱼眼', labelEn: '8mm Fisheye', emoji: '🐟', promptToken: '8mm fisheye lens, extreme barrel distortion, ultra wide field of view,' },
   { id: '14mm' as const, label: '14mm 超广角', labelEn: '14mm Ultra Wide', emoji: '🌐', promptToken: '14mm ultra wide angle lens, dramatic perspective distortion,' },
   { id: '24mm' as const, label: '24mm 广角', labelEn: '24mm Wide', emoji: '🏔️', promptToken: '24mm wide angle lens, environmental context, slight perspective exaggeration,' },
-  { id: '35mm' as const, label: '35mm 标准广角', labelEn: '35mm Standard Wide', emoji: '📷', promptToken: '35mm lens, natural wide perspective, street photography feel,' },
-  { id: '50mm' as const, label: '50mm 标准', labelEn: '50mm Standard', emoji: '👁️', promptToken: '50mm standard lens, natural human eye perspective,' },
+  { id: '35mm' as const, label: '35mm Standard广角', labelEn: '35mm Standard Wide', emoji: '📷', promptToken: '35mm lens, natural wide perspective, street photography feel,' },
+  { id: '50mm' as const, label: '50mm Standard', labelEn: '50mm Standard', emoji: '👁️', promptToken: '50mm standard lens, natural human eye perspective,' },
   { id: '85mm' as const, label: '85mm 人像', labelEn: '85mm Portrait', emoji: '🧑', promptToken: '85mm portrait lens, flattering facial proportions, smooth background compression,' },
   { id: '105mm' as const, label: '105mm 中焦', labelEn: '105mm Medium Tele', emoji: '🔭', promptToken: '105mm medium telephoto, gentle background compression,' },
   { id: '135mm' as const, label: '135mm 长焦', labelEn: '135mm Telephoto', emoji: '📡', promptToken: '135mm telephoto lens, strong background compression, subject isolation,' },

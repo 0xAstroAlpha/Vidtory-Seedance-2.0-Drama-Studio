@@ -4,7 +4,7 @@
 
 /**
  * PropsLibrary - 道具库主视图
- * 左侧目录树 + 右侧道具网格，支持自定义目录管理
+ * 左侧目录树 + 右侧道具网格，支持Custom目录管理
  */
 
 import { useState, useRef } from 'react';
@@ -69,7 +69,7 @@ function PropCard({ item }: { item: PropItem }) {
   return (
     <>
       <div className="group relative flex flex-col rounded-lg border border-border bg-card overflow-hidden hover:border-primary/40 transition-colors">
-        {/* 图片区 */}
+        {/* Image区 */}
         <div className="aspect-square bg-muted relative overflow-hidden">
           {resolvedUrl ? (
             <img
@@ -100,21 +100,21 @@ function PropCard({ item }: { item: PropItem }) {
               <DropdownMenuContent align="end" className="w-36">
                 <DropdownMenuItem onClick={() => { setNameInput(item.name); setRenaming(true); }}>
                   <Pencil className="mr-2 h-3.5 w-3.5" />
-                  重命名
+                  Rename
                 </DropdownMenuItem>
                 {/* 移动到目录 */}
                 {folders.length > 0 && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem disabled className="text-xs text-muted-foreground py-1">
-                      移动到目录
+                      Move to folder
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => moveProp(item.id, null)}
                       className={cn(item.folderId === null && 'text-primary')}
                     >
                       <Layers className="mr-2 h-3.5 w-3.5" />
-                      根目录
+                      Root
                     </DropdownMenuItem>
                     {folders.map((f) => (
                       <DropdownMenuItem
@@ -134,7 +134,7 @@ function PropCard({ item }: { item: PropItem }) {
                   onClick={() => setShowDeleteAlert(true)}
                 >
                   <Trash2 className="mr-2 h-3.5 w-3.5" />
-                  删除
+                  Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -167,25 +167,25 @@ function PropCard({ item }: { item: PropItem }) {
         </div>
       </div>
 
-      {/* 删除确认 */}
+      {/* DeleteConfirm */}
       <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>删除道具</AlertDialogTitle>
+            <AlertDialogTitle>Delete Prop</AlertDialogTitle>
             <AlertDialogDescription>
-              确认删除「{item.name}」？此操作不可撤销。
+              Confirm delete "{item.name}"? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
                 deleteProp(item.id);
-                toast.success(`已删除「${item.name}」`);
+                toast.success(`Deleted "${item.name}"`);
               }}
             >
-              删除
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -268,7 +268,7 @@ function FolderItem({
                 }}
               >
                 <Pencil className="mr-2 h-3.5 w-3.5" />
-                重命名
+                Rename
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -279,33 +279,33 @@ function FolderItem({
                 }}
               >
                 <Trash2 className="mr-2 h-3.5 w-3.5" />
-                删除目录
+                Delete Folder
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )}
       </div>
 
-      {/* 删除目录确认 */}
+      {/* Delete目录Confirm */}
       <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>删除目录</AlertDialogTitle>
+            <AlertDialogTitle>Delete Folder</AlertDialogTitle>
             <AlertDialogDescription>
-              确认删除目录「{folder.name}」？目录内的道具将移至根目录，不会被删除。
+              Confirm delete folder "{folder.name}"? Props in the folder will be moved to the root folder, and will not be deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
                 deleteFolder(folder.id);
                 setSelectedFolderId('all');
-                toast.success(`目录「${folder.name}」已删除`);
+                toast.success(`Folder "${folder.name}" deleted`);
               }}
             >
-              删除
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -333,19 +333,19 @@ function NewFolderDialog({
     setSelectedFolderId(folder.id);
     setName('');
     onOpenChange(false);
-    toast.success(`目录「${trimmed}」已创建`);
+    toast.success(`Folder "${trimmed}" created`);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[320px]">
         <DialogHeader>
-          <DialogTitle>新建目录</DialogTitle>
+          <DialogTitle>New Folder</DialogTitle>
         </DialogHeader>
         <div className="py-2">
           <Input
             autoFocus
-            placeholder="输入目录名称，如：汽车、武器..."
+            placeholder="Enter folder name, e.g., Cars, Weapons..."
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
@@ -356,10 +356,10 @@ function NewFolderDialog({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
+            Cancel
           </Button>
           <Button onClick={handleConfirm} disabled={!name.trim()}>
-            创建
+            Create
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -383,8 +383,8 @@ export function PropsLibrary() {
   const visibleItems = getPropsByFolder(selectedFolderId);
   const currentFolderName =
     selectedFolderId === 'all'
-      ? '全部道具'
-      : folders.find((f) => f.id === selectedFolderId)?.name ?? '全部道具';
+      ? 'All Props'
+      : folders.find((f) => f.id === selectedFolderId)?.name ?? 'All Props';
 
   return (
     <div className="h-full flex">
@@ -392,13 +392,13 @@ export function PropsLibrary() {
       <div className="w-[160px] shrink-0 border-r border-border flex flex-col bg-panel">
         {/* 目录树标题 */}
         <div className="px-3 py-2.5 border-b border-border flex items-center justify-between shrink-0">
-          <span className="text-xs font-semibold text-muted-foreground">目录</span>
+          <span className="text-xs font-semibold text-muted-foreground">Folders</span>
           <Button
             size="icon"
             variant="ghost"
             className="h-5 w-5"
             onClick={() => setNewFolderOpen(true)}
-            title="新建目录"
+            title="New Folder"
           >
             <FolderPlus className="h-3.5 w-3.5" />
           </Button>
@@ -417,11 +417,11 @@ export function PropsLibrary() {
             onClick={() => setSelectedFolderId('all')}
           >
             <Package className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">全部道具</span>
+            <span className="truncate">All Props</span>
             <span className="ml-auto text-[10px] opacity-60">{items.length}</span>
           </button>
 
-          {/* 用户自定义目录 */}
+          {/* 用户Custom目录 */}
           {folders.map((folder) => {
             const count = items.filter((i) => i.folderId === folder.id).length;
             return (
@@ -438,10 +438,10 @@ export function PropsLibrary() {
             );
           })}
 
-          {/* 无目录提示 */}
+          {/* None目录Notice */}
           {folders.length === 0 && (
             <p className="text-[10px] text-muted-foreground px-3 py-2 leading-relaxed">
-              点击右上角 + 新建目录
+              Click + to create a new folder
             </p>
           )}
         </ScrollArea>
@@ -455,7 +455,7 @@ export function PropsLibrary() {
             onClick={() => setNewFolderOpen(true)}
           >
             <FolderPlus className="mr-1.5 h-3.5 w-3.5" />
-            新建目录
+            New Folder
           </Button>
         </div>
       </div>
@@ -466,7 +466,7 @@ export function PropsLibrary() {
         <div className="px-4 py-2.5 border-b border-border shrink-0 flex items-center gap-2">
           <Package className="w-4 h-4 text-muted-foreground" />
           <span className="text-sm font-medium">{currentFolderName}</span>
-          <span className="text-xs text-muted-foreground">({visibleItems.length} 个道具)</span>
+          <span className="text-xs text-muted-foreground">({visibleItems.length} items)</span>
         </div>
 
         {/* 道具网格 */}
@@ -475,10 +475,10 @@ export function PropsLibrary() {
             <div className="h-full flex flex-col items-center justify-center gap-4 text-muted-foreground py-24">
               <Package className="h-16 w-16 opacity-20" />
               <div className="text-center">
-                <p className="text-base font-medium">道具库为空</p>
+                <p className="text-base font-medium">Props library is empty</p>
                 <p className="text-sm mt-1">
-                  在「自由」板块的图片工作室生成图片后，<br />
-                  点击「保存到道具库」即可添加道具
+                  After generating an image in the Image Studio of the "Freedom" section,<br />
+                  click "Save to Props Library" to add a prop
                 </p>
               </div>
             </div>

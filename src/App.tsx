@@ -37,7 +37,7 @@ function App() {
     })();
   }, []);
 
-  // 启动时自动同步所有已配置 API Key 的供应商模型元数据
+  // 启动时自动同步所有Configured API Key 的ProviderModel元数据
   useEffect(() => {
     if (isMigrating) return;
     let cancelled = false;
@@ -46,7 +46,7 @@ function App() {
       const { providers, syncProviderModels } = useAPIConfigStore.getState();
       const configuredProviders = providers
         .filter((p) => parseApiKeys(p.apiKey).length > 0)
-        .sort((a, b) => Number(b.platform === 'memefast') - Number(a.platform === 'memefast'));
+        .sort((a, b) => Number(b.platform === 'gemini') - Number(a.platform === 'gemini'));
 
       for (const p of configuredProviders) {
         if (cancelled) return;
@@ -123,7 +123,7 @@ function App() {
       <div className="h-screen w-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">正在初始化...</p>
+          <p className="text-muted-foreground">Initializing...</p>
         </div>
       </div>
     );

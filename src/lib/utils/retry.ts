@@ -44,7 +44,7 @@ export function isRateLimitError(error: unknown): boolean {
     message.includes("负载已满") ||
     message.includes("暂时不可用") ||
     message.includes("服务暂时不可用") ||
-    message.includes("无可用渠道") ||
+    message.includes("None可用渠道") ||
     message.includes("no available channel") ||
     message.includes("server error")
   ) {
@@ -70,8 +70,8 @@ export async function retryOperation<T>(
   
   let lastError: Error | undefined;
 
-  // maxRetries 表示"失败后最多重试几次"，首次尝试不计入重试
-  // 总共尝试 1 + maxRetries 次
+  // maxRetries 表示"Failed后最多重试几次"，首次尝试不计入重试
+  // 总Total尝试 1 + maxRetries 次
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await operation();

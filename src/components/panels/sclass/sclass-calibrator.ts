@@ -5,9 +5,9 @@
 /**
  * S级「组级 AI 校准」核心模块
  *
- * 功能：
+ * Feature：
  * 1. 读取组内各 SplitScene 数据（只读，不修改 director-store）
- * 2. 调用 LLM 生成组级叙事弧线、镜头过渡、音频设计、优化 prompt
+ * 2. 调用 LLM 生成组级叙事弧线、Shot过渡、Audio设计、优化 prompt
  * 3. 写入 sclass-store 的 ShotGroup 校准字段
  *
  * 数据安全：
@@ -28,9 +28,9 @@ import { useSClassStore } from '@/stores/sclass-store';
 export interface CalibrationResult {
   /** 组级叙事弧线描述 */
   narrativeArc: string;
-  /** 镜头间过渡指令（长度 = scenes.length - 1） */
+  /** Shot间过渡指令（长度 = scenes.length - 1） */
   transitions: string[];
-  /** 组级音频设计（整段 15s 规划） */
+  /** 组级Audio设计（整段 15s 规划） */
   groupAudioDesign: string;
   /** AI 优化后的组级 prompt */
   calibratedPrompt: string;
@@ -48,17 +48,17 @@ function summarizeScene(scene: SplitScene, characters: Character[]): string {
     .join('、');
 
   const parts: string[] = [];
-  parts.push(`场景：${scene.sceneName || '未命名'}`);
-  if (scene.sceneLocation) parts.push(`地点：${scene.sceneLocation}`);
-  parts.push(`时长：${scene.duration || 5}s`);
+  parts.push(`Scene：${scene.sceneName || 'Untitled'}`);
+  if (scene.sceneLocation) parts.push(`Location：${scene.sceneLocation}`);
+  parts.push(`Duration：${scene.duration || 5}s`);
   if (charNames) parts.push(`角色：${charNames}`);
   if (scene.actionSummary) parts.push(`动作：${scene.actionSummary}`);
   if (scene.cameraMovement) parts.push(`运镜：${scene.cameraMovement}`);
   if (scene.dialogue) parts.push(`对白：${scene.dialogue}`);
-  if (scene.ambientSound) parts.push(`环境音：${scene.ambientSound}`);
-  if (scene.soundEffectText) parts.push(`音效：${scene.soundEffectText}`);
-  if (scene.emotionTags?.length) parts.push(`情绪：${scene.emotionTags.join('、')}`);
-  if (scene.narrativeFunction) parts.push(`叙事功能：${scene.narrativeFunction}`);
+  if (scene.ambientSound) parts.push(`Ambient Sound：${scene.ambientSound}`);
+  if (scene.soundEffectText) parts.push(`Sound Effect：${scene.soundEffectText}`);
+  if (scene.emotionTags?.length) parts.push(`Mood：${scene.emotionTags.join('、')}`);
+  if (scene.narrativeFunction) parts.push(`叙事Feature：${scene.narrativeFunction}`);
 
   return parts.join('\n  ');
 }
@@ -66,12 +66,12 @@ function summarizeScene(scene: SplitScene, characters: Character[]): string {
 // ==================== 核心函数 ====================
 
 /**
- * 校准单个组
+ * 校准单组
  *
  * @param group       目标组（只读 sceneIds）
  * @param scenes      组内 SplitScene[]（只读，来自 director-store）
- * @param characters  角色库（用于名称映射）
- * @param sceneLibrary 场景库（备用上下文）
+ * @param characters  Character Library（用于名称映射）
+ * @param sceneLibrary Scene库（备用上下文）
  * @returns CalibrationResult
  */
 export async function calibrateGroup(
@@ -81,46 +81,46 @@ export async function calibrateGroup(
   _sceneLibrary: Scene[],
 ): Promise<CalibrationResult> {
   if (scenes.length === 0) {
-    throw new Error('组内无镜头，无法校准');
+    throw new Error('组内NoneShot，None法校准');
   }
 
   const totalDuration = scenes.reduce((sum, s) => sum + (s.duration || 5), 0);
 
   // ---- 构建输入 ----
   const sceneSummaries = scenes.map((s, i) =>
-    `【镜头${i + 1}】\n  ${summarizeScene(s, characters)}`
+    `【Shot${i + 1}】\n  ${summarizeScene(s, characters)}`
   ).join('\n\n');
 
-  const systemPrompt = `你是一位资深电影导演兼剪辑师，擅长多镜头叙事视频的节奏把控和叙事连贯性优化。
+  const systemPrompt = `你是一位资深电影导演兼剪辑师，擅长多Shot叙事Video的节奏把控和叙事连贯性优化。
 
 【核心约束 — 严格执行】
-1. 严格基于以下镜头数据，不得添加剧本中不存在的角色、场景或对白。
-2. 只做叙事连贯优化和过渡设计，不改变各镜头的核心内容和情绪基调。
-3. 保留每个镜头的原有运镜和动作设计，只在镜头衔接处增加过渡指令。
-4. 音频设计必须基于各镜头已有的环境音/音效信息，不凭空创造新音源。
-5. calibratedPrompt 是对所有镜头的整合重写，必须包含每个镜头的核心信息，不遗漏。
+1. 严格基于以下Shot数据，不得Add剧本中不存在的角色、Scene或对白。
+2. 只做叙事连贯优化和过渡设计，不改变各Shot的核心内容和Mood基调。
+3. 保留每Shot的原有运镜和动作设计，只在Shot衔接处增加过渡指令。
+4. Audio设计必须基于各Shot已有的Ambient Sound/Sound Effect信息，不凭空创造新音源。
+5. calibratedPrompt 是对所有Shot的整合重写，必须包含每Shot的核心信息，不遗漏。
 
-请以 JSON 格式返回，不要有任何解释文字。`;
+请以 JSON 格式Back，不要有任何解释文字。`;
 
   const userPrompt = `【组信息】
 组名：${group.name}
-镜头数：${scenes.length}
-总时长：${totalDuration}s
+Shot数：${scenes.length}
+总Duration：${totalDuration}s
 
 ${sceneSummaries}
 
 请输出以下 JSON：
 {
-  "narrativeArc": "用一句话描述这组镜头的叙事弧线（起承转合）",
+  "narrativeArc": "用一句话描述这组Shot的叙事弧线（起承转合）",
   "transitions": [
-    "镜头1→镜头2 的过渡指令（如：画面溶解、硬切、声桥过渡等）"
+    "Shot1→Shot2 的过渡指令（如：画面溶解、硬切、声桥过渡等）"
   ],
-  "groupAudioDesign": "整段 ${totalDuration}s 的音频设计规划（环境音层次、音效时机、情绪曲线）",
-  "calibratedPrompt": "整合优化后的完整组级提示词，中文，用于 Seedance 2.0 多镜头叙事视频生成"
+  "groupAudioDesign": "整段 ${totalDuration}s 的Audio设计规划（Ambient Sound层次、Sound Effect时机、Mood曲线）",
+  "calibratedPrompt": "整合优化后的完整组级Prompt，中文，用于 Seedance 2.0 多Shot叙事Video Generation"
 }
 
-transitions 数组长度必须为 ${scenes.length - 1}（每两个相邻镜头之间一条）。
-calibratedPrompt 必须覆盖全部 ${scenes.length} 个镜头，保持镜头编号和时间轴。`;
+transitions 数组长度必须为 ${scenes.length - 1}（每两相邻Shot之间一条）。
+calibratedPrompt 必须覆盖全部 ${scenes.length} Shot，保持Shot编号和时间轴。`;
 
   // ---- 调用 LLM ----
   const raw = await callFeatureAPI('script_analysis', systemPrompt, userPrompt, {
@@ -140,7 +140,7 @@ calibratedPrompt 必须覆盖全部 ${scenes.length} 个镜头，保持镜头编
   try {
     parsed = JSON.parse(cleaned);
   } catch {
-    throw new Error('AI 返回的 JSON 解析失败，请重试');
+    throw new Error('AI Back的 JSON Parsing failed，Please retry');
   }
 
   // ---- 校验 & 容错 ----
@@ -161,7 +161,7 @@ calibratedPrompt 必须覆盖全部 ${scenes.length} 个镜头，保持镜头编
   }
 
   if (!result.calibratedPrompt) {
-    throw new Error('AI 未返回有效的 calibratedPrompt');
+    throw new Error('AI 未Back有效的 calibratedPrompt');
   }
 
   return result;
@@ -172,7 +172,7 @@ calibratedPrompt 必须覆盖全部 ${scenes.length} 个镜头，保持镜头编
 /**
  * 执行校准并写入 store
  *
- * 这是 UI 层应该调用的入口。处理状态更新和错误。
+ * 这是 UI 层应该调用的入口。处理状态更新和Error。
  */
 export async function runCalibration(
   groupId: string,
@@ -209,11 +209,11 @@ export async function runCalibration(
       calibrationError: null,
     });
 
-    console.log(`[SClassCalibrator] ✅ 组「${group.name}」校准完成`);
+    console.log(`[SClassCalibrator] ✅ 组「${group.name}」校准Done`);
     return true;
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);
-    console.error(`[SClassCalibrator] ❌ 组「${group.name}」校准失败:`, errMsg);
+    console.error(`[SClassCalibrator] ❌ 组「${group.name}」校准Failed:`, errMsg);
 
     store.updateShotGroup(groupId, {
       calibrationStatus: 'failed',
@@ -227,7 +227,7 @@ export async function runCalibration(
 /**
  * 批量校准所有未校准的组
  *
- * @returns 成功数 / 总数
+ * @returns Success数 / 总数
  */
 export async function runBatchCalibration(
   scenes: SplitScene[],
@@ -241,7 +241,7 @@ export async function runBatchCalibration(
 
   if (!projectData) return { success: 0, total: 0 };
 
-  // 筛选需要校准的组（未校准 或 校准失败）
+  // 筛选需要校准的组（未校准 或 校准Failed）
   const groups = projectData.shotGroups.filter(g =>
     !g.calibrationStatus || g.calibrationStatus === 'idle' || g.calibrationStatus === 'failed'
   );

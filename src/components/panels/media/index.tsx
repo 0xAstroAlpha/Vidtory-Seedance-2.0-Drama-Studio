@@ -107,7 +107,7 @@ function FolderContextMenu({
       <ContextMenuContent>
         <ContextMenuItem onClick={() => onRename(folder)}>
           <Pencil className="h-4 w-4 mr-2" />
-          重命名
+          Rename
         </ContextMenuItem>
         <ContextMenuSeparator />
         <ContextMenuItem
@@ -115,7 +115,7 @@ function FolderContextMenu({
           onClick={() => onDelete(folder.id)}
         >
           <Trash2 className="h-4 w-4 mr-2" />
-          删除文件夹
+          Delete Folder
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
@@ -150,33 +150,33 @@ function MediaItemWithContextMenu({
     <ContextMenu>
       <ContextMenuTrigger>{children}</ContextMenuTrigger>
       <ContextMenuContent>
-        {/* AI 导演功能 - 仅图片显示 */}
+        {/* AI 导演Feature - 仅Image显示 */}
         {isImage && onSmartSplit && onGenerateScenes && (
           <>
             <ContextMenuItem onClick={() => onSmartSplit(item)}>
               <Scissors className="h-4 w-4 mr-2 text-yellow-500" />
-              智能切割
+              Smart Split
             </ContextMenuItem>
             <ContextMenuItem onClick={() => onGenerateScenes(item)}>
               <Film className="h-4 w-4 mr-2 text-blue-500" />
-              分镜生成
+              Generate Shots
             </ContextMenuItem>
             <ContextMenuSeparator />
           </>
         )}
         <ContextMenuItem onClick={() => onRename(item)}>
           <Pencil className="h-4 w-4 mr-2" />
-          重命名
+          Rename
         </ContextMenuItem>
         <ContextMenuSub>
           <ContextMenuSubTrigger>
             <FolderInput className="h-4 w-4 mr-2" />
-            移动到
+            Move To
           </ContextMenuSubTrigger>
           <ContextMenuSubContent>
             <ContextMenuItem onClick={() => onMove(item.id, null)}>
               <Home className="h-4 w-4 mr-2" />
-              根目录
+              Root
             </ContextMenuItem>
             {folders.map((f) => (
               <ContextMenuItem key={f.id} onClick={() => onMove(item.id, f.id)}>
@@ -189,7 +189,7 @@ function MediaItemWithContextMenu({
         <ContextMenuSeparator />
         <ContextMenuItem onClick={() => onExport(item)}>
           <Download className="h-4 w-4 mr-2" />
-          导出
+          Export
         </ContextMenuItem>
         <ContextMenuSeparator />
         <ContextMenuItem
@@ -197,7 +197,7 @@ function MediaItemWithContextMenu({
           onClick={(e) => onRemove(e, item.id)}
         >
           <Trash2 className="h-4 w-4 mr-2" />
-          删除
+          Delete
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
@@ -254,23 +254,23 @@ export function MediaView() {
   const processFiles = async (files: FileList | File[]) => {
     if (!files || files.length === 0) return;
     if (!activeProject) {
-      toast.error("没有活动项目");
+      toast.error("No active project");
       return;
     }
 
     setIsProcessing(true);
     setProgress(0);
     try {
-      // Auto-assign to "上传文件" system folder if user is at root
+      // Auto-assign to "Upload文件" system folder if user is at root
       const uploadFolderId = currentFolderId || getOrCreateCategoryFolder('upload');
       const processedItems = await processMediaFiles(files, (p) => setProgress(p));
       for (const item of processedItems) {
         await addMediaFile(activeProject.id, { ...item, folderId: uploadFolderId });
       }
-      toast.success(`已添加 ${processedItems.length} 个文件`);
+      toast.success(`Added ${processedItems.length} files`);
     } catch (error) {
       console.error("Error processing files:", error);
-      toast.error("处理文件失败");
+      toast.error("Failed to process files");
     } finally {
       setIsProcessing(false);
       setProgress(0);
@@ -298,11 +298,11 @@ export function MediaView() {
   const handleRemove = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     if (!activeProject) {
-      toast.error("没有活动项目");
+      toast.error("No active project");
       return;
     }
     await removeMediaFile(activeProject.id, id);
-    toast.success("已删除");
+    toast.success("Deleted");
   };
 
   const handlePreview = (item: MediaFile) => {
@@ -316,7 +316,7 @@ export function MediaView() {
 
   const handleExport = async (item: MediaFile) => {
     if (!item.url) {
-      toast.error('文件URL不可用');
+      toast.error('File URL is not available');
       return;
     }
     try {
@@ -332,16 +332,16 @@ export function MediaView() {
               : [{ name: 'Image', extensions: ['png', 'jpg', 'jpeg', 'gif'] }],
           });
           if (result.success) {
-            toast.success(`已导出: ${item.name}`);
+            toast.success(`Exported: ${item.name}`);
           } else if (result.canceled) {
             // User canceled, do nothing
           } else if (result.error) {
-            toast.error(`导出失败: ${result.error}`);
+            toast.error(`Export failed: ${result.error}`);
           }
           return;
         }
         
-        toast.error('请重启应用以启用导出功能');
+        toast.error('Please restart the app to enable the export feature');
         return;
       }
       
@@ -352,32 +352,32 @@ export function MediaView() {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      toast.success(`已导出: ${item.name}`);
+      toast.success(`Exported: ${item.name}`);
     } catch (error) {
       const err = error as Error;
-      toast.error(`导出失败: ${err.message}`);
+      toast.error(`Export failed: ${err.message}`);
     }
   };
 
-  // AI 导演功能 - 智能切割（直接进入切割状态）
+  // AI 导演Feature - 智能切割（直接进入切割状态）
   const handleSmartSplit = (item: MediaFile) => {
     if (item.type !== 'image' || !item.url) return;
     
-    // 设置项目文件夹（如果图片在文件夹中）
+    // 设置项目文件夹（如果Image在文件夹中）
     if (item.folderId) {
       setProjectFolderId(item.folderId);
     }
     
-    // 设置故事板图片并进入预览状态（等待用户点击切割）
+    // 设置故事板Image并进入预览状态（等待用户点击切割）
     setStoryboardImage(item.url, item.id);
     setStoryboardStatus('preview');
     
     // 切换到导演面板
     setActiveTab('director');
-    toast.success('已载入图片，请点击“切割场景”开始智能切割');
+    toast.success('Image loaded, please click "Split Scene" to start smart splitting');
   };
 
-  // AI 导演功能 - 分镜生成（直接进入编辑状态，作为单张分镜）
+  // AI 导演Feature - Shot生成（直接进入Edit状态，作为单张Shot）
   const handleGenerateScenes = (item: MediaFile) => {
     if (item.type !== 'image' || !item.url) return;
     
@@ -386,25 +386,25 @@ export function MediaView() {
       setProjectFolderId(item.folderId);
     }
     
-    // 设置故事板图片为当前图片
+    // 设置故事板Image为当前Image
     setStoryboardImage(item.url, item.id);
     
-    // 直接设置为编辑状态，并创建单个分镜
+    // 直接设置为Edit状态，并Create单Shot
     const { setSplitScenes, setStoryboardConfig } = useDirectorStore.getState();
     
-    // 设置配置为单场景
+    // 设置配置为单Scene
     setStoryboardConfig({
       sceneCount: 1,
       storyPrompt: item.name,
     });
     
-    // 创建单个分镜（包含所有必需属性）
+    // Create单Shot（包含所有必需属性）
     setSplitScenes([{
       id: 0,
-      // 场景信息
+      // Scene信息
       sceneName: item.name,
       sceneLocation: '',
-      // 首帧
+      // First Frame
       imageDataUrl: item.url,
       imageHttpUrl: null,
       width: item.width || 1920,
@@ -414,7 +414,7 @@ export function MediaView() {
       imageStatus: 'completed',
       imageProgress: 100,
       imageError: null,
-      // 尾帧
+      // Tail Frame
       needsEndFrame: false,
       endFrameImageUrl: null,
       endFrameHttpUrl: null,
@@ -424,15 +424,15 @@ export function MediaView() {
       endFrameStatus: 'idle',
       endFrameProgress: 0,
       endFrameError: null,
-      // 视频
+      // Video
       videoPrompt: '',
-      videoPromptZh: `场景 1`,
+      videoPromptZh: `Scene 1`,
       videoStatus: 'idle',
       videoProgress: 0,
       videoUrl: null,
       videoError: null,
       videoMediaId: null,
-      // 角色与情绪
+      // 角色与Mood
       characterIds: [],
       emotionTags: [],
       // 剧本信息
@@ -440,7 +440,7 @@ export function MediaView() {
       actionSummary: '',
       cameraMovement: '',
       soundEffectText: '',
-      // 视频参数
+      // Video参数
       shotSize: null,
       duration: 5,
       ambientSound: '',
@@ -455,7 +455,7 @@ export function MediaView() {
     
     // 切换到导演面板
     setActiveTab('director');
-    toast.success('已创建分镜，可以开始生成视频');
+    toast.success('Shot created, can start generating video');
   };
 
   const formatDuration = (duration: number) => {
@@ -566,7 +566,7 @@ export function MediaView() {
     addFolder(newFolderName.trim(), currentFolderId, projectId);
     setNewFolderName("");
     setNewFolderDialogOpen(false);
-    toast.success(`文件夹「${newFolderName}」已创建`);
+    toast.success(`Folder "${newFolderName}" created`);
   };
 
   // Handle rename
@@ -579,19 +579,19 @@ export function MediaView() {
     }
     setRenameTarget(null);
     setRenameDialogOpen(false);
-    toast.success("已重命名");
+    toast.success("Renamed");
   };
 
   // Handle folder delete
   const handleDeleteFolder = (id: string) => {
     deleteFolder(id);
-    toast.success("文件夹已删除");
+    toast.success("Folder deleted");
   };
 
   // Handle move to folder
   const handleMoveToFolder = (mediaId: string, folderId: string | null) => {
     moveToFolder(mediaId, folderId);
-    toast.success("已移动");
+    toast.success("Moved");
   };
 
   // Open rename dialog for folder
@@ -679,9 +679,9 @@ export function MediaView() {
       {/* Header */}
       <div className="p-3 pb-2 bg-panel">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="font-semibold text-sm">素材库</h2>
+          <h2 className="font-semibold text-sm">Media Library</h2>
           <span className="text-xs text-muted-foreground">
-            {currentFolders.length} 文件夹, {filteredMediaItems.length} 文件
+            {currentFolders.length} Folders, {filteredMediaItems.length} Files
           </span>
         </div>
 
@@ -692,7 +692,7 @@ export function MediaView() {
             className="hover:text-primary flex items-center gap-1 shrink-0"
           >
             <Home className="h-3 w-3" />
-            根目录
+            Root
           </button>
           {breadcrumbPath.map((folder) => (
             <span key={folder.id} className="flex items-center gap-1 shrink-0">
@@ -720,7 +720,7 @@ export function MediaView() {
             ) : (
               <CloudUpload className="h-4 w-4 mr-2" />
             )}
-            上传
+            Upload
           </Button>
 
           <TooltipProvider>
@@ -735,7 +735,7 @@ export function MediaView() {
                   <FolderPlus className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>新建文件夹</TooltipContent>
+              <TooltipContent>New Folder</TooltipContent>
             </Tooltip>
           </TooltipProvider>
 
@@ -756,7 +756,7 @@ export function MediaView() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                {viewMode === "grid" ? "列表视图" : "网格视图"}
+                {viewMode === "grid" ? "List View" : "Grid View"}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -769,13 +769,13 @@ export function MediaView() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => { setSortBy("name"); setSortOrder("asc"); }}>
-                名称 {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
+                Name {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => { setSortBy("type"); setSortOrder("asc"); }}>
-                类型 {sortBy === "type" && (sortOrder === "asc" ? "↑" : "↓")}
+                Type {sortBy === "type" && (sortOrder === "asc" ? "↑" : "↓")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => { setSortBy("duration"); setSortOrder("asc"); }}>
-                时长 {sortBy === "duration" && (sortOrder === "asc" ? "↑" : "↓")}
+                Duration {sortBy === "duration" && (sortOrder === "asc" ? "↑" : "↓")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -791,15 +791,15 @@ export function MediaView() {
         {currentFolders.length === 0 && filteredMediaItems.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-muted-foreground border-2 border-dashed border-border rounded-lg">
             <CloudUpload className="h-12 w-12 mb-2 opacity-50" />
-            <p className="text-sm">拖放文件到这里</p>
-            <p className="text-xs">或点击上传按钮</p>
+            <p className="text-sm">Drop files here</p>
+            <p className="text-xs">Or click the upload button</p>
           </div>
         ) : viewMode === "grid" ? (
           <div className="space-y-3">
             {/* System category folders */}
             {systemFolders.length > 0 && (
               <div>
-                <p className="text-xs text-muted-foreground mb-1.5 font-medium">素材分类</p>
+                <p className="text-xs text-muted-foreground mb-1.5 font-medium">Media Categories</p>
                 <div
                   className="grid gap-2"
                   style={{ gridTemplateColumns: "repeat(auto-fill, 100px)" }}
@@ -815,7 +815,7 @@ export function MediaView() {
                       >
                         <div className="w-[100px] h-[100px] rounded overflow-hidden bg-primary/5 flex flex-col items-center justify-center border border-primary/20 hover:border-primary/50 gap-1">
                           <IconComp className="h-8 w-8 text-primary/70" />
-                          <span className="text-[10px] text-muted-foreground">{count} 项</span>
+                          <span className="text-[10px] text-muted-foreground">{count} items</span>
                         </div>
                         <p className="text-xs mt-1 truncate text-center font-medium">{folder.name}</p>
                       </div>
@@ -829,7 +829,7 @@ export function MediaView() {
               <div>
                 {systemFolders.length > 0 && (customFolders.length > 0 || filteredMediaItems.length > 0) && (
                   <p className="text-xs text-muted-foreground mb-1.5 font-medium">
-                    {currentFolderId === null ? '自定义文件夹' : '内容'}
+                    {currentFolderId === null ? 'Custom Folders' : 'Content'}
                   </p>
                 )}
                 <div
@@ -851,7 +851,7 @@ export function MediaView() {
                         >
                           <div className="w-[100px] h-[100px] rounded overflow-hidden bg-muted/50 flex flex-col items-center justify-center border-2 border-dashed border-muted-foreground/20 hover:border-primary/50 gap-1">
                             <Folder className="h-8 w-8 text-primary/70" />
-                            <span className="text-[10px] text-muted-foreground">{count} 项</span>
+                            <span className="text-[10px] text-muted-foreground">{count} items</span>
                           </div>
                           <p className="text-xs mt-1 truncate text-center">{folder.name}</p>
                         </div>
@@ -915,7 +915,7 @@ export function MediaView() {
             {/* System folders in list view */}
             {systemFolders.length > 0 && (
               <>
-                <p className="text-xs text-muted-foreground px-2 pt-1 font-medium">素材分类</p>
+                <p className="text-xs text-muted-foreground px-2 pt-1 font-medium">Media Categories</p>
                 {systemFolders.map((folder) => {
                   const IconComp = getFolderIcon(folder);
                   const count = folderFileCounts[folder.id] || 0;
@@ -930,7 +930,7 @@ export function MediaView() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm truncate font-medium">{folder.name}</p>
-                        <p className="text-xs text-muted-foreground">{count} 项</p>
+                        <p className="text-xs text-muted-foreground">{count} items</p>
                       </div>
                     </div>
                   );
@@ -941,7 +941,7 @@ export function MediaView() {
             {customFolders.length > 0 && (
               <>
                 {systemFolders.length > 0 && (
-                  <p className="text-xs text-muted-foreground px-2 pt-2 font-medium">自定义文件夹</p>
+                  <p className="text-xs text-muted-foreground px-2 pt-2 font-medium">Custom Folders</p>
                 )}
                 {customFolders.map((folder) => {
                   const count = folderFileCounts[folder.id] || 0;
@@ -961,7 +961,7 @@ export function MediaView() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm truncate">{folder.name}</p>
-                          <p className="text-xs text-muted-foreground">{count} 项</p>
+                          <p className="text-xs text-muted-foreground">{count} items</p>
                         </div>
                       </div>
                     </FolderContextMenu>
@@ -1017,7 +1017,7 @@ export function MediaView() {
                     <p className="text-xs text-muted-foreground">
                       {item.type}
                       {item.duration && ` · ${formatDuration(item.duration)}`}
-                      {item.source && item.source !== 'upload' && ' · AI生成'}
+                      {item.source && item.source !== 'upload' && ' · AI Generated'}
                     </p>
                   </div>
                 </div>
@@ -1031,20 +1031,20 @@ export function MediaView() {
       <Dialog open={newFolderDialogOpen} onOpenChange={setNewFolderDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>新建文件夹</DialogTitle>
+            <DialogTitle>New Folder</DialogTitle>
           </DialogHeader>
           <Input
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
-            placeholder="文件夹名称"
+            placeholder="Folder name"
             onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()}
             autoFocus
           />
           <DialogFooter>
             <Button variant="outline" onClick={() => setNewFolderDialogOpen(false)}>
-              取消
+              Cancel
             </Button>
-            <Button onClick={handleCreateFolder}>创建</Button>
+            <Button onClick={handleCreateFolder}>Create</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1053,20 +1053,20 @@ export function MediaView() {
       <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>重命名</DialogTitle>
+            <DialogTitle>Rename</DialogTitle>
           </DialogHeader>
           <Input
             value={renameTarget?.name || ''}
             onChange={(e) => setRenameTarget(prev => prev ? { ...prev, name: e.target.value } : null)}
-            placeholder="新名称"
+            placeholder="New name"
             onKeyDown={(e) => e.key === 'Enter' && handleRename()}
             autoFocus
           />
           <DialogFooter>
             <Button variant="outline" onClick={() => setRenameDialogOpen(false)}>
-              取消
+              Cancel
             </Button>
-            <Button onClick={handleRename}>确定</Button>
+            <Button onClick={handleRename}>Confirm</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

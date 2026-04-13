@@ -166,14 +166,14 @@ async function handleGenerateScreenplay(command: GenerateScreenplayCommand): Pro
     // Note: API key should be passed from main thread in config
     // The main thread gets it from useAPIConfigStore
     const apiKey = (config as any).apiKey || '';
-    const provider = (config as any).chatProvider || 'memefast';
+    const provider = (config as any).chatProvider || 'gemini';
     const sceneCount = config.sceneCount || 5;
     
     console.log('[AI Worker] Using sceneCount:', sceneCount);
     
     // Only require API key if not in mock mode
     if (!apiKey && !mockMode) {
-      throw new Error('未配置 API Key，请在设置中添加或启用 Mock 模式');
+      throw new Error('Not Configured API Key，请在设置中Add或启用 Mock 模式');
     }
     
     // Call the backend API with correct schema
@@ -231,10 +231,10 @@ async function generateImage(
   referenceImages?: string[]
 ): Promise<string> {
   const apiKey = config.apiKey || (config as any).imageApiKey || '';
-  const provider = (config as any).imageProvider || 'memefast';
+  const provider = (config as any).imageProvider || 'gemini';
   
   if (!apiKey) {
-    throw new Error('未配置图片生成 API Key');
+    throw new Error('Not ConfiguredImage Generation API Key');
   }
   
   // Submit image generation task
@@ -287,10 +287,10 @@ async function generateVideo(
   referenceImages?: string[]
 ): Promise<string> {
   const apiKey = config.apiKey || (config as any).videoApiKey || '';
-  const provider = (config as any).videoProvider || 'memefast';
+  const provider = (config as any).videoProvider || 'gemini';
   
   if (!apiKey) {
-    throw new Error('未配置视频生成 API Key');
+    throw new Error('Not ConfiguredVideo Generation API Key');
   }
   
   // Submit video generation task
@@ -347,7 +347,7 @@ async function pollTaskCompletion(
       throw new Error('Cancelled');
     }
     
-    // API Key 通过 Header 传递，避免明文出现在 URL 中（安全风险：URL 会被日志/历史记录）
+    // API Key 通过 Header 传递，避免明文出现在 URL 中（安全风险：URL 会被日志/History）
     const statusResponse = await fetch(
       buildApiUrl(`/api/ai/task/${taskId}?provider=${provider}&type=${type}`),
       {
@@ -418,7 +418,7 @@ async function fetchAsBlob(url: string): Promise<Blob> {
 
 async function handleExecuteScene(command: ExecuteSceneCommand): Promise<void> {
   const { screenplayId, scene, config, characterBible, characterReferenceImages } = command.payload;
-  cancelled = false; // 新操作启动时重置取消标志
+  cancelled = false; // 新操作启动时ResetCancel标志
 
   console.log(`[AI Worker] Executing scene ${scene.sceneId} for screenplay ${screenplayId}`);
   
@@ -574,7 +574,7 @@ function reportSceneFailed(
  */
 async function handleExecuteScreenplay(command: { type: string; payload: { screenplay: AIScreenplay; config: GenerationConfig } }): Promise<void> {
   const { screenplay, config } = command.payload;
-  cancelled = false; // 新操作启动时重置取消标志
+  cancelled = false; // 新操作启动时ResetCancel标志
 
   console.log(`[AI Worker] Executing screenplay ${screenplay.id} with ${screenplay.scenes.length} scenes`);
   
@@ -655,7 +655,7 @@ async function handleExecuteScreenplay(command: { type: string; payload: { scree
  */
 async function handleExecuteScreenplayImages(command: { type: string; payload: { screenplay: AIScreenplay; config: GenerationConfig } }): Promise<void> {
   const { screenplay, config } = command.payload;
-  cancelled = false; // 新操作启动时重置取消标志
+  cancelled = false; // 新操作启动时ResetCancel标志
 
   console.log(`[AI Worker] Generating images for screenplay ${screenplay.id} with ${screenplay.scenes.length} scenes`);
   
@@ -685,12 +685,12 @@ async function handleExecuteScreenplayImages(command: { type: string; payload: {
         completedCount: 0,
         failedCount: screenplay.scenes.length,
         totalCount: screenplay.scenes.length,
-        error: '未配置图片生成 API Key，请在服务映射中配置',
+        error: 'Not ConfiguredImage Generation API Key，请在服务映射中配置',
       },
     });
     // Also report failure for each scene
     for (const scene of screenplay.scenes) {
-      reportSceneFailed(screenplay.id, scene.sceneId, '未配置图片生成 API Key', false);
+      reportSceneFailed(screenplay.id, scene.sceneId, 'Not ConfiguredImage Generation API Key', false);
     }
     return;
   }
@@ -758,7 +758,7 @@ async function handleExecuteScreenplayImages(command: { type: string; payload: {
  */
 async function handleExecuteScreenplayVideos(command: { type: string; payload: { screenplay: AIScreenplay; config: GenerationConfig } }): Promise<void> {
   const { screenplay, config } = command.payload;
-  cancelled = false; // 新操作启动时重置取消标志
+  cancelled = false; // 新操作启动时ResetCancel标志
 
   console.log(`[AI Worker] Generating videos for screenplay ${screenplay.id} with ${screenplay.scenes.length} scenes`);
   
@@ -1194,7 +1194,7 @@ async function executeSceneInternal(
 function handleCancel(command: CancelCommand): void {
   console.log('[AI Worker] Cancelling operations');
   cancelled = true;
-  // 不自动重置 cancelled 标志，由新的生成操作启动时重置
+  // 不自动Reset cancelled 标志，由新的生成操作启动时Reset
 }
 
 // ==================== Helpers ====================

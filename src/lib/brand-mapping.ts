@@ -3,8 +3,8 @@
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
 
 /**
- * 品牌注册表 + 模型名 → 品牌映射
- * 用于服务映射面板的品牌分类选择
+ * 品牌注册表 + Model名 → 品牌映射
+ * 用于服务映射面板的品牌分类Select
  */
 
 export interface BrandInfo {
@@ -47,7 +47,7 @@ export const BRAND_REGISTRY: Record<string, BrandInfo> = {
 };
 
 /**
- * 模型名前缀 → 品牌映射规则
+ * Model名前缀 → 品牌映射规则
  * 顺序重要：更具体的模式应放在前面
  */
 const BRAND_PATTERNS: Array<{ pattern: RegExp; brand: string }> = [
@@ -71,7 +71,7 @@ const BRAND_PATTERNS: Array<{ pattern: RegExp; brand: string }> = [
 
   // 豆包 Doubao (ByteDance)
   { pattern: /^(doubao|seed[- ]?oss)/i,                                  brand: 'doubao' },
-  // seedance (豆包视频) — must be before generic seed
+  // seedance (豆包Video) — must be before generic seed
   { pattern: /^(doubao-)?seed(ance|dream)/i,                             brand: 'doubao' },
 
   // Kling (可灵)
@@ -137,12 +137,12 @@ const BRAND_PATTERNS: Array<{ pattern: RegExp; brand: string }> = [
   // Pika
   { pattern: /^pika/i,                                                       brand: 'other' },
 
-  // aigc-* (MemeFast 聚合)
+  // aigc-* (Gemini 聚合)
   { pattern: /^aigc[-_]?(image|video)/i,                                     brand: 'other' },
 ];
 
 /**
- * 根据模型名称提取品牌 ID
+ * 根据Model名称提取品牌 ID
  */
 export function extractBrandFromModel(modelName: string): string {
   for (const { pattern, brand } of BRAND_PATTERNS) {

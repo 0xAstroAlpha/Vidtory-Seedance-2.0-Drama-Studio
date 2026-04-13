@@ -4,9 +4,9 @@
 /**
  * Series Meta Sync — 剧级元数据工具模块
  *
- * 1. populateSeriesMetaFromImport: 首次导入时从解析结果 + AI 分析构建 SeriesMeta
+ * 1. populateSeriesMetaFromImport: 首次Import时从解析结果 + AI 分析构建 SeriesMeta
  * 2. buildSeriesContextSummary: 从 SeriesMeta 构建紧凑的 AI 注入上下文摘要
- * 3. syncToSeriesMeta: 校准完成后回写丰富数据到 SeriesMeta
+ * 3. syncToSeriesMeta: 校准Done后回写丰富数据到 SeriesMeta
  */
 
 import type {
@@ -21,10 +21,10 @@ import type {
 } from '@/types/script';
 import type { ScriptStructureAnalysis } from './script-normalizer';
 
-// ==================== 1. 首次导入填充 ====================
+// ==================== 1. 首次Import填充 ====================
 
 /**
- * 从导入结果构建 SeriesMeta
+ * 从Import结果构建 SeriesMeta
  * 优先使用 AI 分析结果，不足时从 background + scriptData 补全
  */
 export function populateSeriesMetaFromImport(
@@ -33,10 +33,10 @@ export function populateSeriesMetaFromImport(
   aiAnalysis?: ScriptStructureAnalysis | null,
   importSettings?: { styleId?: string; promptLanguage?: PromptLanguage }
 ): SeriesMeta {
-  // 验证标题不是集标题（如"第一集 初遇"）
-  const isEpTitle = (t: string) => /^第[一二三四五六七八九十百千\d]+集/.test(t);
+  // 验证标题不是Episode标题（如"Episode 1 初遇"）
+  const isEpTitle = (t: string) => /^第[一二三四五六七八九十百千\d]+Episode/.test(t);
   const rawTitle = background.title || scriptData.title || '';
-  const safeTitle = (rawTitle && !isEpTitle(rawTitle)) ? rawTitle : '未命名';
+  const safeTitle = (rawTitle && !isEpTitle(rawTitle)) ? rawTitle : 'Untitled';
 
   const meta: SeriesMeta = {
     // 故事核心
@@ -58,17 +58,17 @@ export function populateSeriesMetaFromImport(
     characters: scriptData.characters || [],
     factions: aiAnalysis?.factions || undefined,
 
-    // 视觉系统 — 直接使用用户在导入面板选择的风格
+    // 视觉系统 — 直接使用用户在Import面板Select的风格
     styleId: importSettings?.styleId,
     recurringLocations: undefined,
     colorPalette: undefined,
 
-    // 制作设定 — promptLanguage 从用户选择直接映射
+    // 制作设定 — promptLanguage 从用户Select直接映射
     language: scriptData.language || '中文',
     promptLanguage: importSettings?.promptLanguage,
   };
 
-  // 如果 AI 分析提取了角色但 scriptData 没有（紧凑格式解析失败的情况），用 AI 的
+  // 如果 AI 分析提取了角色但 scriptData 没有（紧凑格式Parsing failed的情况），用 AI 的
   if (meta.characters.length === 0 && aiAnalysis?.characters?.length) {
     meta.characters = aiAnalysis.characters.map((c, i) => ({
       id: `char_${i + 1}`,
@@ -79,7 +79,7 @@ export function populateSeriesMetaFromImport(
       keyActions: c.keyActions,
       tags: c.faction ? [c.faction] : undefined,
     }));
-    console.log(`[populateSeriesMeta] AI 角色作为主数据源: ${meta.characters.length} 个`);
+    console.log(`[populateSeriesMeta] AI 角色作为主数据源: ${meta.characters.length} `);
   }
 
   // 如果 AI 提取了阵营信息但角色没有 faction tag，补充 faction
@@ -138,7 +138,7 @@ export function buildSeriesContextSummary(meta: SeriesMeta | null): string {
   // 角色列表（紧凑格式）
   if (meta.characters.length > 0) {
     const charSummary = meta.characters
-      .slice(0, 15) // 最多 15 个避免过长
+      .slice(0, 15) // 最多 15 避免过长
       .map(c => {
         const info = [c.name];
         if (c.age) info.push(`${c.age}岁`);
@@ -188,7 +188,7 @@ export function buildSeriesContextSummary(meta: SeriesMeta | null): string {
 export type CalibrationSyncType = 'character' | 'scene' | 'shot';
 
 /**
- * 校准完成后回写数据到 SeriesMeta
+ * 校准Done后回写数据到 SeriesMeta
  *
  * @param meta 当前 SeriesMeta
  * @param syncType 校准类型
@@ -217,7 +217,7 @@ export function syncToSeriesMeta(
           );
           if (!calibrated) return existing;
 
-          // 只回写 AI 校准产出的字段，不覆盖用户手动编辑的
+          // 只回写 AI 校准产出的字段，不覆盖用户手动Edit的
           return {
             ...existing,
             identityAnchors: calibrated.identityAnchors || existing.identityAnchors,
@@ -232,15 +232,15 @@ export function syncToSeriesMeta(
           };
         });
         updates.characters = updatedChars;
-        console.log(`[syncToSeriesMeta:character] 回写 ${results.characters.length} 个角色校准结果`);
+        console.log(`[syncToSeriesMeta:character] 回写 ${results.characters.length} 角色校准结果`);
       }
       break;
     }
 
     case 'scene': {
-      // 场景校准后：识别常驻场景（≥2集出现），更新地理
+      // Scene校准后：识别常驻Scene（≥2Episode出现），更新地理
       if (results.scenes?.length) {
-        // 常驻场景：episodeNumbers >= 2
+        // 常驻Scene：episodeNumbers >= 2
         const recurring = results.scenes.filter(s =>
           s.episodeNumbers && s.episodeNumbers.length >= 2
         );
@@ -256,11 +256,11 @@ export function syncToSeriesMeta(
               ...(meta.recurringLocations || []),
               ...newRecurring,
             ];
-            console.log(`[syncToSeriesMeta:scene] 新增 ${newRecurring.length} 个常驻场景`);
+            console.log(`[syncToSeriesMeta:scene] 新增 ${newRecurring.length} 常驻Scene`);
           }
         }
 
-        // 更新地理设定：从场景的 eraDetails 中提取新地名
+        // 更新地理设定：从Scene的 eraDetails 中提取新地名
         const existingGeoNames = new Set(
           (meta.geography || []).map(g => g.name)
         );
@@ -274,14 +274,14 @@ export function syncToSeriesMeta(
         }
         if (newGeo.length > 0) {
           updates.geography = [...(meta.geography || []), ...newGeo];
-          console.log(`[syncToSeriesMeta:scene] 新增 ${newGeo.length} 个地理设定`);
+          console.log(`[syncToSeriesMeta:scene] 新增 ${newGeo.length} 地理设定`);
         }
       }
       break;
     }
 
     case 'shot': {
-      // 分镜校准后：追加新关键物品（只追加不覆盖）
+      // Shot校准后：追加新关键物品（只追加不覆盖）
       if (results.keyItems?.length) {
         const existingItemNames = new Set(
           (meta.keyItems || []).map(i => i.name)
@@ -291,7 +291,7 @@ export function syncToSeriesMeta(
         );
         if (newItems.length > 0) {
           updates.keyItems = [...(meta.keyItems || []), ...newItems];
-          console.log(`[syncToSeriesMeta:shot] 新增 ${newItems.length} 个关键物品`);
+          console.log(`[syncToSeriesMeta:shot] 新增 ${newItems.length} 关键物品`);
         }
       }
       break;

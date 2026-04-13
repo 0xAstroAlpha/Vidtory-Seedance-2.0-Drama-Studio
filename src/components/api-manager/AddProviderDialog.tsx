@@ -31,10 +31,9 @@ import { toast } from "sonner";
 import type { IProvider } from "@/lib/api-key-manager";
 
 /**
- * 平台预设配置
- * 1. 魔因API (memefast) - 全功能中转（推荐）
- * 2. RunningHub - 视角切换/多角度生成
- * 3. 自定义 - OpenAI 兼容 API
+ * Platform presets:
+ * 1. Google Gemini - Text/Image/Video via Google AI or OpenAI-compatible proxy
+ * 2. Custom - Any OpenAI-compatible API
  */
 const PLATFORM_PRESETS: Array<{
   platform: string;
@@ -46,39 +45,26 @@ const PLATFORM_PRESETS: Array<{
   recommended?: boolean;
 }> = [
   {
-    platform: "memefast",
-    name: "魔因API",
-    baseUrl: "https://memefast.top",
-    description: "543+ 模型中转，支持 GPT/Claude/Gemini/DeepSeek/Veo/Sora 等",
-    services: ["对话", "图片生成", "视频生成", "图片理解"],
+    platform: "gemini",
+    name: "Google Gemini",
+    baseUrl: "",
+    description: "Google AI models — text, image, and video generation",
+    services: ["Dialogue", "Image Gen", "Video Gen", "Vision"],
     models: [
-      "deepseek-v3.2",
-      "glm-4.7",
+      "gemini-2.5-flash",
+      "gemini-2.5-pro",
+      "gemini-2.0-flash",
       "gemini-3-pro-preview",
-      "gemini-3-pro-image-preview",
-      "gpt-image-1.5",
-      "doubao-seedance-1-5-pro-251215",
-      "veo3.1",
-      "sora-2-all",
-      "wan2.6-i2v",
-      "grok-video-3-10s",
-      "claude-haiku-4-5-20251001",
+      "gemini-3-flash-preview",
+      "imagen-4",
     ],
     recommended: true,
   },
   {
-    platform: "runninghub",
-    name: "RunningHub",
-    baseUrl: "https://www.runninghub.cn/openapi/v2",
-    description: "Qwen 视角切换 / 多角度生成",
-    services: ["视角切换", "图生图"],
-    models: ["2009613632530812930"],
-  },
-  {
     platform: "custom",
-    name: "自定义",
+    name: "Custom",
     baseUrl: "",
-    description: "自定义 OpenAI 兼容 API 供应商",
+    description: "Custom OpenAI Compatible API Provider",
     services: [],
     models: [],
   },
@@ -123,7 +109,7 @@ export function AddProviderDialog({
     if (selectedPreset && !isCustom) {
       setName(selectedPreset.name);
       setBaseUrl(selectedPreset.baseUrl);
-      // 自动填充默认模型
+      // 自动填充DefaultModel
       if (selectedPreset.models && selectedPreset.models.length > 0) {
         setModel(selectedPreset.models[0]);
       }
@@ -132,23 +118,23 @@ export function AddProviderDialog({
 
   const handleSubmit = () => {
     if (!platform) {
-      toast.error("请选择平台");
+      toast.error("Please selectPlatform");
       return;
     }
     if (!name.trim()) {
-      toast.error("请输入名称");
+      toast.error("请输入Name");
       return;
     }
     if (isCustom && !baseUrl.trim()) {
-      toast.error("自定义平台需要输入 Base URL");
+      toast.error("Custom platform requires Base URL");
       return;
     }
     if (!apiKey.trim()) {
-      toast.error("请输入 API Key");
+      toast.error("Please enter API Key");
       return;
     }
 
-    // 保存该平台的所有预设模型，确保 provider.model 不为空
+    // Save该Platform的所Has 预设Model，确保 provider.model 不为空
     const presetModels = selectedPreset?.models || [];
     const modelArray = presetModels.length > 0 
       ? presetModels 
@@ -163,30 +149,30 @@ export function AddProviderDialog({
     });
 
     onOpenChange(false);
-    toast.success(isMemefastAppend ? `已追加 Key 到 ${name}` : `已添加 ${name}`);
+    toast.success(isGeminiAppend ? `Key appended to ${name}` : `Added ${name}`);
   };
 
-  // Filter out already existing platforms (except custom and memefast which allow repeat add)
+  // Filter out already existing platforms (except custom and gemini which allow repeat add)
   const availablePlatforms = PLATFORM_PRESETS.filter(
-    (p) => p.platform === "custom" || p.platform === "memefast" || !existingPlatforms.includes(p.platform)
+    (p) => p.platform === "custom" || p.platform === "gemini" || !existingPlatforms.includes(p.platform)
   );
-  const isMemefastAppend = platform === "memefast" && existingPlatforms.includes("memefast");
+  const isGeminiAppend = platform === "gemini" && existingPlatforms.includes("gemini");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>添加 API 供应商</DialogTitle>
-          <DialogDescription className="hidden">添加一个新的 API 供应商</DialogDescription>
+          <DialogTitle>Add API Provider</DialogTitle>
+          <DialogDescription className="hidden">Add a new API Provider</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-4">
           {/* Platform Selection */}
           <div className="space-y-2">
-            <Label>平台</Label>
+            <Label>Platform</Label>
             <Select value={platform} onValueChange={setPlatform}>
               <SelectTrigger>
-                <SelectValue placeholder="选择平台" />
+                <SelectValue placeholder="SelectPlatform" />
               </SelectTrigger>
               <SelectContent>
               {availablePlatforms.map((preset) => (
@@ -195,7 +181,7 @@ export function AddProviderDialog({
                       {preset.name}
                       {preset.recommended && (
                         <span className="text-[10px] px-1.5 py-0.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded font-medium">
-                          推荐
+                          Recommended
                         </span>
                       )}
                     </span>
@@ -207,18 +193,18 @@ export function AddProviderDialog({
 
           {/* Name */}
           <div className="space-y-2">
-            <Label>名称</Label>
+            <Label>Name</Label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="供应商名称"
+              placeholder="ProviderName"
             />
           </div>
 
           {/* Base URL (only for custom or editable) */}
           {(isCustom || platform) && (
             <div className="space-y-2">
-              <Label>Base URL {!isCustom && "(可选修改)"}</Label>
+              <Label>Base URL {!isCustom && "(Optional)"}</Label>
               <Input
                 value={baseUrl}
                 onChange={(e) => setBaseUrl(e.target.value)}
@@ -234,30 +220,30 @@ export function AddProviderDialog({
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              placeholder="输入 API Key"
+              placeholder="Enter API Key"
               className="font-mono"
             />
             <p className="text-xs text-muted-foreground">
-              支持多个 Key，用逗号分隔
+              Supports multiple keys, separated by comma
             </p>
           </div>
 
           {/* Model - optional input */}
           <div className="space-y-2">
-            <Label>模型 (可选)</Label>
+            <Label>Model (Optional)</Label>
             <Input
               value={model}
               onChange={(e) => setModel(e.target.value)}
-              placeholder="输入模型名称，如 gpt-4o"
+              placeholder="Enter model name, e.g. gemini-2.5-flash"
             />
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
+            Cancel
           </Button>
-          <Button onClick={handleSubmit}>{isMemefastAppend ? "追加 Key" : "添加"}</Button>
+          <Button onClick={handleSubmit}>{isGeminiAppend ? 'Append Key' : 'Add'}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

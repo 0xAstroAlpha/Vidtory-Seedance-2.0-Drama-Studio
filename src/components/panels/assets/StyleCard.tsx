@@ -5,7 +5,7 @@
 
 /**
  * StyleCard - 风格卡片组件
- * 默认风格和自定义风格共用
+ * 默认风格和Custom风格Total用
  */
 
 import { cn } from "@/lib/utils";
@@ -23,15 +23,15 @@ const CATEGORY_COLORS: Record<string, string> = {
 const CATEGORY_LABELS: Record<string, string> = {
   '3d': '3D',
   '2d': '2D',
-  'real': '真人',
-  'stop_motion': '定格',
+  'real': 'Real',
+  'stop_motion': 'Stop-motion',
 };
 
 interface StyleCardProps {
   name: string;
   description?: string;
   category?: StyleCategory;     // 内置风格分类（用于色块显示）
-  referenceImages?: string[];   // 自定义风格参考图
+  referenceImages?: string[];   // Custom风格Reference Image
   isCustom?: boolean;
   isSelected?: boolean;
   onClick?: () => void;
@@ -48,7 +48,7 @@ export function StyleCard({
   onClick,
   onDoubleClick,
 }: StyleCardProps) {
-  // 自定义风格用第一张参考图
+  // Custom风格用第一张Reference Image
   const customImage = isCustom ? referenceImages?.[0] : undefined;
 
   return (
@@ -80,13 +80,13 @@ export function StyleCard({
           </div>
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
-            无参考图
+            No reference image
           </div>
         )}
-        {/* 自定义标记 */}
+        {/* Custom标记 */}
         {isCustom && (
           <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded text-[10px] bg-primary/80 text-primary-foreground">
-            自定义
+            Custom
           </div>
         )}
       </div>

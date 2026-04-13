@@ -543,13 +543,13 @@ export async function splitStoryboardImage(
   const cellWidth = Math.floor(totalWidth / expectedCols);
   const cellHeight = Math.floor(totalHeight / expectedRows);
   
-  // === 动态居中裁剪修正（学习自合并生成的切割方法）===
+  // === 动态居中裁剪修正（学习自Merge generation的切割方法）===
   // 计算目标宽高比
   const targetAspectW = aspectRatio === '16:9' ? 16 : 9;
   const targetAspectH = aspectRatio === '16:9' ? 9 : 16;
   const targetRatio = targetAspectW / targetAspectH;
   
-  // 计算原图每个格子的实际比例
+  // 计算原图每格子的实际比例
   const rawRatio = cellWidth / cellHeight;
   
   // 计算裁剪参数（如果比例不匹配，进行居中裁剪修正）

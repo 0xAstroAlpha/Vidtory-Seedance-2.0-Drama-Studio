@@ -44,7 +44,7 @@ export function CinemaStudio() {
 
   const handleGenerate = useCallback(async () => {
     if (!cinemaPrompt.trim()) {
-      toast.error('请输入描述文字');
+      toast.error('请输入Description文字');
       return;
     }
 
@@ -84,9 +84,9 @@ export function CinemaStudio() {
         type: 'image',
       });
 
-      toast.success('电影级图片生成成功！已保存到素材库');
+      toast.success('电影级ImageGenerated successfully！Saved到Media Library');
     } catch (err: any) {
-      toast.error(`生成失败: ${err.message}`);
+      toast.error(`Generation failed: ${err.message}`);
     } finally {
       setCinemaGenerating(false);
     }
@@ -100,7 +100,7 @@ export function CinemaStudio() {
         <div className="p-4 border-b space-y-2">
           <div className="flex items-center gap-2">
             <Film className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">相机设置</span>
+            <span className="text-sm font-medium">Camera Settings</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             <Badge variant="secondary" className="text-xs">{selectedCamera}</Badge>
@@ -128,7 +128,7 @@ export function CinemaStudio() {
         {/* Prompt + Generate */}
         <div className="p-4 border-t space-y-3">
           <Textarea
-            placeholder="描述你的电影场景..."
+            placeholder="Description你的电影Scene..."
             value={cinemaPrompt}
             onChange={(e) => setCinemaPrompt(e.target.value)}
             className="min-h-[80px] resize-none"
@@ -137,7 +137,7 @@ export function CinemaStudio() {
           {/* Compiled prompt preview */}
           {cinemaPrompt.trim() && (
             <details className="text-xs">
-              <summary className="text-muted-foreground cursor-pointer">查看编译后的 Prompt</summary>
+              <summary className="text-muted-foreground cursor-pointer">View compiled prompt</summary>
               <p className="mt-1 p-2 bg-muted rounded text-muted-foreground break-words">
                 {compiledPrompt}
               </p>
@@ -150,9 +150,9 @@ export function CinemaStudio() {
             disabled={cinemaGenerating || !cinemaPrompt.trim()}
           >
             {cinemaGenerating ? (
-              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> 生成中...</>
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating......</>
             ) : (
-              <><Sparkles className="mr-2 h-4 w-4" /> 电影级拍摄</>
+              <><Sparkles className="mr-2 h-4 w-4" /> Cinematic Shot</>
             )}
           </Button>
         </div>
@@ -163,7 +163,7 @@ export function CinemaStudio() {
         {cinemaGenerating ? (
           <div className="flex flex-col items-center gap-4">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">电影级图片生成中...</p>
+            <p className="text-sm text-muted-foreground">Generating cinematic image......</p>
           </div>
         ) : cinemaResult ? (
           <div className="max-w-full max-h-full relative group">
@@ -175,7 +175,7 @@ export function CinemaStudio() {
             <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
               <Button size="sm" variant="secondary" asChild>
                 <a href={cinemaResult} download target="_blank" rel="noopener">
-                  <Download className="h-4 w-4 mr-1" /> 下载
+                  <Download className="h-4 w-4 mr-1" /> Download
                 </a>
               </Button>
             </div>
@@ -183,9 +183,9 @@ export function CinemaStudio() {
         ) : (
           <div className="flex flex-col items-center gap-3 text-muted-foreground">
             <CameraIcon className="h-16 w-16 opacity-20" />
-            <p className="text-lg font-medium">电影工作室</p>
-            <p className="text-sm">选择相机、镜头、焦距、光圈，生成电影级图片</p>
-            <p className="text-xs text-muted-foreground/60">相机参数会自动编译为 AI 提示词</p>
+            <p className="text-lg font-medium">Cinema Studio</p>
+            <p className="text-sm">Select相机、Shot、Focal Length、Aperture，Generate电影级Image</p>
+            <p className="text-xs text-muted-foreground/60">Camera parameters auto-compile to AI config</p>
           </div>
         )}
       </div>

@@ -3,8 +3,8 @@
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
 
 /**
- * 品牌 SVG 图标（源自 MemeFast pricing 页面 lobe-icons）
- * 拆分为多个文件避免单文件过大
+ * 品牌 SVG 图标（源自 Gemini pricing 页面 lobe-icons）
+ * 拆分为多文件避免单文件过大
  */
 
 import type { ReactNode } from "react";

@@ -67,8 +67,8 @@
   --popover: 0 0% 100%;
   --popover-foreground: 220 9% 15%;
   
-  /* Brand/Primary - 蓝色品牌色 */
-  --primary: 212 100% 48%;        /* #0091ff - 主品牌色 */
+  /* Brand/Primary - Emerald Green */
+  --primary: 152 76% 42%;          /* #1aab6b - Primary brand green */
   --primary-foreground: 0 0% 100%;
   
   /* Secondary */
@@ -80,8 +80,8 @@
   --muted-foreground: 220 9% 45%;
   
   /* Accent */
-  --accent: 212 100% 95%;
-  --accent-foreground: 212 100% 40%;
+  --accent: 152 76% 93%;
+  --accent-foreground: 152 76% 30%;
   
   /* Destructive */
   --destructive: 0 84% 60%;
@@ -90,7 +90,7 @@
   /* Borders & Inputs */
   --border: 220 13% 88%;
   --input: 220 14% 92%;
-  --ring: 212 100% 48%;
+  --ring: 152 76% 42%;
   
   /* Functional colors */
   --success: 142 76% 36%;         /* 绿色 - 成功 */
@@ -101,11 +101,11 @@
   --info-foreground: 0 0% 100%;
   
   /* Brand gradient */
-  --brand-start: 212 100% 48%;    /* 蓝色 */
-  --brand-end: 262 83% 58%;       /* 紫色 */
+  --brand-start: 152 76% 42%;     /* Green */
+  --brand-end: 170 70% 40%;       /* Teal */
   
   /* Timeline track colors */
-  --timeline-video: 212 100% 48%; /* 视频轨道 - 蓝色 */
+  --timeline-video: 152 76% 42%; /* Video track - green */
   --timeline-audio: 142 76% 36%;  /* 音频轨道 - 绿色 */
   --timeline-text: 38 92% 50%;    /* 文字轨道 - 橙色 */
   --timeline-effect: 262 83% 58%; /* 特效轨道 - 紫色 */
@@ -131,8 +131,8 @@
   --popover: 0 0% 15%;            /* #262626 */
   --popover-foreground: 0 0% 93%;
   
-  /* Brand/Primary - 蓝色品牌色 */
-  --primary: 212 100% 50%;        /* #0099ff - 亮蓝 */
+  /* Brand/Primary - Emerald Green */
+  --primary: 152 76% 45%;          /* #22c97a - Bright emerald */
   --primary-foreground: 0 0% 100%;
   
   /* Secondary */
@@ -143,8 +143,8 @@
   --muted: 0 0% 18%;              /* #2e2e2e */
   --muted-foreground: 0 0% 55%;   /* #8c8c8c */
   
-  /* Accent - 紫色强调 */
-  --accent: 262 83% 58%;          /* #8b5cf6 */
+  /* Accent - Teal accent */
+  --accent: 170 70% 40%;           /* Teal */
   --accent-foreground: 0 0% 100%;
   
   /* Destructive */
@@ -154,7 +154,7 @@
   /* Borders & Inputs */
   --border: 0 0% 20%;             /* #333333 */
   --input: 0 0% 18%;              /* #2e2e2e */
-  --ring: 212 100% 50%;
+  --ring: 152 76% 45%;
   
   /* Functional colors */
   --success: 142 71% 45%;         /* #22c55e */
@@ -165,14 +165,14 @@
   --info-foreground: 0 0% 100%;
   
   /* Brand gradient */
-  --brand-start: 212 100% 50%;    /* 蓝色 */
-  --brand-end: 280 100% 60%;      /* 紫色 */
+  --brand-start: 152 76% 45%;     /* Green */
+  --brand-end: 170 70% 40%;       /* Teal */
   
   /* Timeline track colors */
-  --timeline-video: 212 100% 50%; /* 视频轨道 - 蓝色 */
+  --timeline-video: 152 76% 45%; /* Video track - green */
   --timeline-audio: 142 71% 45%;  /* 音频轨道 - 绿色 */
   --timeline-text: 38 92% 50%;    /* 文字轨道 - 橙色 */
-  --timeline-effect: 280 100% 60%;/* 特效轨道 - 紫色 */
+  --timeline-effect: 170 70% 40%;/* Effect track - teal */
 }
 
 @layer base {

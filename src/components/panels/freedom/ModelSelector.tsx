@@ -38,7 +38,7 @@ const KLING_VIDEO_VARIANTS = [
   'kling-avatar-image2video',
   'kling-advanced-lip-sync',
   'kling-effects',
-  // kling-video 模型版本 (MemeFast model_version)
+  // kling-video 模型版本 (Gemini model_version)
   'kling-v1',
   'kling-v1-5',
   'kling-v1-6',
@@ -178,7 +178,7 @@ const SEEDREAM_IMAGE_VARIANTS = [
 const KLING_IMAGE_VARIANTS = [
   'kling-image',
   'kling-omni-image',
-  // kling-image 模型版本 (MemeFast model_version)
+  // kling-image 模型版本 (Gemini model_version)
   'kling-image-v1',
   'kling-image-v1-5',
   'kling-image-v2',
@@ -217,7 +217,7 @@ const VIDEO_FAMILY_VARIANTS: Record<string, string[]> = {
   'kling-advanced-lip-sync': KLING_VIDEO_VARIANTS,
   'kling-effects': KLING_VIDEO_VARIANTS,
   'aigc-video-kling': KLING_VIDEO_VARIANTS,
-  // kling-video 模型版本 (MemeFast model_version)
+  // kling-video 模型版本 (Gemini model_version)
   'kling-v1': KLING_VIDEO_VARIANTS,
   'kling-v1-5': KLING_VIDEO_VARIANTS,
   'kling-v1-6': KLING_VIDEO_VARIANTS,
@@ -324,7 +324,7 @@ const IMAGE_FAMILY_VARIANTS: Record<string, string[]> = {
   // Kling image
   'kling-image': KLING_IMAGE_VARIANTS,
   'kling-omni-image': KLING_IMAGE_VARIANTS,
-  // kling-image 模型版本 (MemeFast model_version)
+  // kling-image 模型版本 (Gemini model_version)
   'kling-image-v1': KLING_IMAGE_VARIANTS,
   'kling-image-v1-5': KLING_IMAGE_VARIANTS,
   'kling-image-v2': KLING_IMAGE_VARIANTS,

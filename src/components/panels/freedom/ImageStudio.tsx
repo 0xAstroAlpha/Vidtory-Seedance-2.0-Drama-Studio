@@ -56,7 +56,7 @@ export function ImageStudio() {
 
   const handleGenerate = useCallback(async () => {
     if (!imagePrompt.trim()) {
-      toast.error('请输入描述文字');
+      toast.error('请输入Description文字');
       return;
     }
 
@@ -86,9 +86,9 @@ export function ImageStudio() {
         type: 'image',
       });
 
-      toast.success('图片生成成功！已保存到素材库');
+      toast.success('ImageGenerated successfully！Saved到Media Library');
     } catch (err: any) {
-      toast.error(`生成失败: ${err.message}`);
+      toast.error(`Generation failed: ${err.message}`);
     } finally {
       setImageGenerating(false);
     }
@@ -106,7 +106,7 @@ export function ImageStudio() {
           <div className="p-4 space-y-5">
             {/* Model Selection */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">模型选择</Label>
+              <Label className="text-sm font-medium">ModelSelect</Label>
               <ModelSelector
                 type="image"
                 value={selectedImageModel}
@@ -121,7 +121,7 @@ export function ImageStudio() {
 
             {/* Aspect Ratio */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">宽高比</Label>
+              <Label className="text-sm font-medium">Aspect Ratio</Label>
               <div className="flex flex-wrap gap-1.5">
                 {aspectRatios.map((ratio) => (
                   <Button
@@ -140,10 +140,10 @@ export function ImageStudio() {
             {/* Resolution (conditional) */}
             {hasResolution && (
               <div className="space-y-2">
-                <Label className="text-sm font-medium">分辨率</Label>
+                <Label className="text-sm font-medium">Resolution</Label>
                 <Select value={imageResolution} onValueChange={setImageResolution}>
                   <SelectTrigger className="h-9">
-                    <SelectValue placeholder="选择分辨率" />
+                    <SelectValue placeholder="SelectResolution" />
                   </SelectTrigger>
                   <SelectContent>
                     {resolutions.map((r) => (
@@ -158,7 +158,7 @@ export function ImageStudio() {
             {hasMidjourneyParams && (
               <>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">速度</Label>
+                  <Label className="text-sm font-medium">Speed</Label>
                   <Select
                     value={imageExtraParams.speed || 'fast'}
                     onValueChange={(v) => updateExtraParam('speed', v)}
@@ -202,7 +202,7 @@ export function ImageStudio() {
             {hasIdeogramParams && (
               <>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">渲染速度</Label>
+                  <Label className="text-sm font-medium">渲染Speed</Label>
                   <Select
                     value={imageExtraParams.render_speed || 'Balanced'}
                     onValueChange={(v) => updateExtraParam('render_speed', v)}
@@ -235,9 +235,9 @@ export function ImageStudio() {
 
             {/* Prompt Input */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">描述文字</Label>
+              <Label className="text-sm font-medium">Description文字</Label>
               <Textarea
-                placeholder="描述你想生成的图片..."
+                placeholder="Description你想Generate的Image..."
                 value={imagePrompt}
                 onChange={(e) => setImagePrompt(e.target.value)}
                 className="min-h-[120px] resize-none"
@@ -251,9 +251,9 @@ export function ImageStudio() {
               disabled={imageGenerating || !imagePrompt.trim()}
             >
               {imageGenerating ? (
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> 生成中...</>
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating......</>
               ) : (
-                <><Sparkles className="mr-2 h-4 w-4" /> 生成图片</>
+                <><Sparkles className="mr-2 h-4 w-4" /> Generate Image</>
               )}
             </Button>
           </div>
@@ -265,7 +265,7 @@ export function ImageStudio() {
         {imageGenerating ? (
           <div className="flex flex-col items-center gap-4">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">图片生成中，请稍候...</p>
+            <p className="text-sm text-muted-foreground">ImageGenerating...，Please wait...</p>
           </div>
         ) : imageResult ? (
           <div className="max-w-full max-h-full relative group">
@@ -276,11 +276,11 @@ export function ImageStudio() {
             />
             <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
               <Button size="sm" variant="secondary" onClick={() => setSaveToPropsOpen(true)}>
-                <Archive className="h-4 w-4 mr-1" /> 保存到道具库
+                <Archive className="h-4 w-4 mr-1" /> Save to Props Library
               </Button>
               <Button size="sm" variant="secondary" asChild>
                 <a href={imageResult} download target="_blank" rel="noopener">
-                  <Download className="h-4 w-4 mr-1" /> 下载
+                  <Download className="h-4 w-4 mr-1" /> Download
                 </a>
               </Button>
             </div>
@@ -288,8 +288,8 @@ export function ImageStudio() {
         ) : (
           <div className="flex flex-col items-center gap-3 text-muted-foreground">
             <ImageIcon className="h-16 w-16 opacity-20" />
-            <p className="text-lg font-medium">图片工作室</p>
-            <p className="text-sm">选择模型，输入描述，生成你想要的图片</p>
+            <p className="text-lg font-medium">Image Studio</p>
+            <p className="text-sm">Select Model，输入Description，Generate你想要的Image</p>
           </div>
         )}
       </div>
@@ -303,7 +303,7 @@ export function ImageStudio() {
         }} />
       </div>
 
-      {/* 保存到道具库弹窗 */}
+      {/* Save to Props Library弹窗 */}
       {imageResult && (
         <SaveToPropsDialog
           open={saveToPropsOpen}

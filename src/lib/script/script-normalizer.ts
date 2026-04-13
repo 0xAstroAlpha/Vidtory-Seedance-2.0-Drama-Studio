@@ -4,17 +4,17 @@
 /**
  * Script Format Normalizer - 剧本格式归一化器
  * 
- * 在 parseFullScript 之前自动检测非标准格式并插入结构标记，
- * 使解析器能正确提取标题、大纲、人物小传、集数等信息。
+ * 在 parseFullScript 之前自动检测非Standard格式并插入结构标记，
+ * 使解析器能正确提取标题、大纲、人物小传、Episodes等信息。
  * 
  * 双层架构：
  * 1. AI 检测（优先）：调用 LLM 理解内容语义，精准识别结构 + 补全缺失大纲
- * 2. 正则兜底（降级）：无 AI 配置或 AI 调用失败时使用硬编码模式匹配
+ * 2. 正则兜底（降级）：None AI 配置或 AI 调用Failed时使用硬编码模式匹配
  * 
  * 核心原则：
  * - 只插入结构标记（《》、大纲：、人物小传：）+ AI 生成的大纲
- * - 不修改、不删除任何原始内容
- * - 幂等：已有标准格式的文本不受影响
+ * - 不修改、不Delete任何原始内容
+ * - 幂等：已有Standard格式的文本不受影响
  */
 
 import { callFeatureAPI } from '@/lib/ai/feature-router';
@@ -23,14 +23,14 @@ import { getFeatureConfig } from '@/lib/ai/feature-router';
 /**
  * 预处理：为缺少换行的文本自动在结构标记前插入换行
  * 
- * 用户从 Word/微信/网页复制的剧本经常丢失换行，变成一整段文字。
+ * 用户从 Word/微信/网页Copy的剧本经常丢失换行，变成一整段文字。
  * 本函数在关键结构标记前插入 \n，使后续的行首正则能正常匹配。
  * 
- * 检测条件：文本无换行 或 平均行长 > 500 字
+ * 检测条件：文本None换行 或 平均行长 > 500 字
  * 插入位置（按优先级）：
- *   1. 集标记：第X集 / 第X章 / Episode X
+ *   1. Episode标记：第XEpisode / 第X章 / Episode X
  *   2. 中文编号段落：一、 二、 三、...
- *   3. 场景号：数字-数字（如 1-1、2-3）
+ *   3. Scene号：数字-数字（如 1-1、2-3）
  *   4. 动作描写：△
  *   5. 对白：角色名：或 角色名（
  *   6. 补充说明：补充: / 注：/ 备注：
@@ -46,9 +46,9 @@ export function preprocessLineBreaks(text: string): { text: string; inserted: bo
   
   let result = text;
   
-  // 1. 集/章/幕标记前换行
+  // 1. Episode/章/幕标记前换行
   result = result.replace(
-    /(?<!\n)(?=\*{0,2}第[一二三四五六七八九十百千\d]+[集章幕][：:]?)/g,
+    /(?<!\n)(?=\*{0,2}第[一二三四五六七八九十百千\d]+[Episode章幕][：:]?)/g,
     '\n'
   );
   
@@ -58,7 +58,7 @@ export function preprocessLineBreaks(text: string): { text: string; inserted: bo
     '\n'
   );
   
-  // 3. 场景号前换行（1-1 xxx、2-3 xxx，前面不是数字/冒号避免误切时间）
+  // 3. Scene号前换行（1-1 xxx、2-3 xxx，前面不是数字/冒号避免误切时间）
   result = result.replace(
     /(?<!\n)(?<![\d：:])(?=\d+-\d+[\s\u4e00-\u9fa5])/g,
     '\n'
@@ -70,14 +70,14 @@ export function preprocessLineBreaks(text: string): { text: string; inserted: bo
     '\n'
   );
   
-  // 5. 对白前换行：2-8字中文名 + 全角冒号/括号（避免切断 "年龄：" 等属性）
+  // 5. 对白前换行：2-8字中文名 + 全角冒号/括号（避免切断 "Age：" 等属性）
   // 仅当前面不是换行且不在属性描述中（前面有中文+冒号）
   result = result.replace(
     /(?<!\n)(?<![\u4e00-\u9fa5：])(?=[\u4e00-\u9fa5]{2,8}[（(][^）)]{0,10}[）)][：:])/g,
     '\n'
   );
   result = result.replace(
-    /(?<!\n)(?<![\u4e00-\u9fa5：年龄身份性格])(?=[\u4e00-\u9fa5]{2,6}[：:][（(「])/g,
+    /(?<!\n)(?<![\u4e00-\u9fa5：Age身份性格])(?=[\u4e00-\u9fa5]{2,6}[：:][（(「])/g,
     '\n'
   );
   
@@ -87,10 +87,10 @@ export function preprocessLineBreaks(text: string): { text: string; inserted: bo
     '\n'
   );
   
-  // 7. 角色传记条目前换行：句号/感叹号/分号等标点后紧跟 角色名：年龄/年两：
+  // 7. 角色传记条目前换行：句号/感叹号/分号等标点后紧跟 角色名：Age/年两：
   // 处理紧凑格式人物小传（所有角色挤在同一行）
   result = result.replace(
-    /([。！；;）\)」】])\s*(?=[\u4e00-\u9fa5]{2,8}[：:]\s*(?:年龄|年两)[：:])/g,
+    /([。！；;）\)」】])\s*(?=[\u4e00-\u9fa5]{2,8}[：:]\s*(?:Age|年两)[：:])/g,
     '$1\n'
   );
   
@@ -116,18 +116,18 @@ export interface NormalizationResult {
 }
 
 /**
- * 正则兜底归一化（无 AI 时使用）
- * 检测非标准格式并插入结构标记，原文内容一字不差
+ * 正则兜底归一化（None AI 时使用）
+ * 检测非Standard格式并插入结构标记，原文内容一字不差
  */
 export function normalizeScriptFormat(text: string): NormalizationResult {
   const changes: string[] = [];
   
-  // 检查已有标准标记
+  // 检查已有Standard标记
   const hasTitle = /[《「][^》」]+[》」]/.test(text);
   const hasOutline = /(?:\*{0,2}大纲[：:]\*{0,2}|【大纲】)/i.test(text);
   const hasCharBios = /(?:\*{0,2}人物小传[：:]\*{0,2}|【人物小传】)/i.test(text);
   
-  // 全部标准，无需归一化
+  // 全部Standard，None需归一化
   if (hasTitle && hasOutline && hasCharBios) {
     return { normalized: text, changes: [] };
   }
@@ -150,7 +150,7 @@ export function normalizeScriptFormat(text: string): NormalizationResult {
     normalized = normalizeOutlineSection(normalized, changes);
   }
   
-  // === Step 4: 集标记归一化（第X章 → 第X集 等）===
+  // === Step 4: Episode标记归一化（第X章 → 第XEpisode 等）===
   normalized = normalizeEpisodeMarkers(normalized, changes);
   
   return { normalized, changes };
@@ -172,16 +172,16 @@ export interface ScriptStructureAnalysis {
   hasOutline: boolean;
   /** AI 生成的大纲（仅当 hasOutline=false 时填充） */
   generatedOutline: string;
-  /** 人物/角色描述区域起始文本（精确复制原文前30字符） */
+  /** 人物/Character Description区域起始文本（精确Copy原文前30字符） */
   characterSectionKeyword: string;
-  /** 大纲/故事概述区域起始文本（原文前30字符，无则留空） */
+  /** 大纲/故事概述区域起始文本（原文前30字符，None则留空） */
   outlineSectionKeyword: string;
   // === 剧级元数据提取（可选，AI 有能力时填充） ===
   /** 一句话概括 */
   logline?: string;
   /** 核心冲突 */
   centralConflict?: string;
-  /** 主题关键词 */
+  /** 主题Keywords */
   themes?: string[];
   /** 提取的角色列表 */
   characters?: Array<{
@@ -201,19 +201,19 @@ export interface ScriptStructureAnalysis {
 }
 
 /**
- * AI 结构检测：调用 LLM 分析剧本结构，识别标题/大纲/人物/年代，并补全缺失大纲
- * @returns 分析结果，AI 不可用或调用失败时返回 null
+ * AI 结构检测：调用 LLM Analyze Script结构，识别标题/大纲/人物/年代，并补全缺失大纲
+ * @returns 分析结果，AI 不可用或调用Failed时Back null
  */
 export async function analyzeScriptStructureWithAI(text: string): Promise<ScriptStructureAnalysis | null> {
   // 检查 AI 是否可用
   const config = getFeatureConfig('script_analysis');
   if (!config) {
-    console.log('[scriptNormalizer] 无 AI 配置，跳过结构检测');
+    console.log('[scriptNormalizer] None AI 配置，跳过结构检测');
     return null;
   }
   
   try {
-    // 发送较多内容以便提取剧级元数据（角色/阵营/物品/地理）
+    // Hair送较多内容以便提取剧级元数据（角色/阵营/物品/地理）
     const MAX_ANALYSIS_LENGTH = 10000;
     const analysisText = text.length > MAX_ANALYSIS_LENGTH
       ? text.substring(0, MAX_ANALYSIS_LENGTH) + '\n...\uff08后续内容省略\uff09'
@@ -221,20 +221,20 @@ export async function analyzeScriptStructureWithAI(text: string): Promise<Script
     
     const systemPrompt = `你是剧本结构分析专家。分析用户提供的剧本/角色规格文本，识别结构要素并提取剧级元数据。
 
-严格返回以下 JSON 格式（不要添加任何其他内容）：
+严格Back以下 JSON 格式（不要Add任何其他内容）：
 {
   "title": "作品名称",
   "era": "时代背景（古代/现代/民国/清末/未来/当代等）",
   "genre": "类型（武侠/商战/爱情/悬疑/科幻/仙侠/军旅/家庭等）",
   "hasOutline": false,
   "generatedOutline": "如果文本中没有大纲/故事概述区域，基于全文内容生成一段简洁大纲（100-200字）；如果已有大纲则留空字符串",
-  "characterSectionKeyword": "人物/角色描述区域开始处的原文文本（精确复制前30个字符），找不到则留空",
-  "outlineSectionKeyword": "大纲/故事概述区域开始处的原文文本（精确复制前30个字符），找不到则留空",
-  "logline": "一句话概括整个故事（比如：被驱逐的侠客为救百姓重返雁城）",
+  "characterSectionKeyword": "人物/Character Description区域开始处的原文文本（精确Copy前30字符），找不到则留空",
+  "outlineSectionKeyword": "大纲/故事概述区域开始处的原文文本（精确Copy前30字符），找不到则留空",
+  "logline": "一句话概括整故事（比如：被驱逐的侠客为救百姓重返雁城）",
   "centralConflict": "主线矛盾（如：主角 vs 反派+外部势力）",
-  "themes": ["主题关键词1", "主题关键词2"],
+  "themes": ["主题Keywords1", "主题Keywords2"],
   "characters": [
-    {"name": "角色名", "age": "年龄", "identity": "身份", "faction": "所属阵营", "personality": "性格特点", "keyActions": "关键行为"}
+    {"name": "角色名", "age": "Age", "identity": "身份", "faction": "所属阵营", "personality": "性格特点", "keyActions": "关键行为"}
   ],
   "factions": [{"name": "阵营名", "members": ["角色名1", "角色名2"]}],
   "keyItems": [{"name": "物品名", "description": "简述"}],
@@ -248,13 +248,13 @@ export async function analyzeScriptStructureWithAI(text: string): Promise<Script
 4. hasOutline：原文中是否已有“大纲”“故事简介”“故事背景”等明确的概述性段落
 5. generatedOutline：仅当 hasOutline=false 时生成
 6. characterSectionKeyword：必须是原文中实际存在的文本片段
-7. characters：从人物小传/角色描述中提取所有角色，包含名字、年龄、身份、阵营、性格、关键行为
+7. characters：从人物小传/Character Description中提取所有角色，包含名字、Age、身份、阵营、性格、关键行为
 8. factions：从「一、核心主角」「二、正面势力角色」「三、反派势力角色」等分类中提取阵营
-9. keyItems：从大纲+角色描述中识别重要物品（如武器、信物、象征物）
-10. geography：从场景头和角色描述中识别重要地名
+9. keyItems：从大纲+Character Description中识别重要物品（如武器、信物、象征物）
+10. geography：从Scene头和Character Description中识别重要地名
 11. 只分析结构，不修改任何原文内容`;
 
-    // 最多重试 2 次（共 3 次尝试），避免临时网络错误导致降级
+    // 最多重试 2 次（Total 3 次尝试），避免临时Network error导致降级
     const MAX_RETRIES = 2;
     let result: string | null = null;
     let lastError: Error | null = null;
@@ -265,21 +265,21 @@ export async function analyzeScriptStructureWithAI(text: string): Promise<Script
           console.log(`[scriptNormalizer] AI 结构检测重试 (${attempt}/${MAX_RETRIES})...`);
           await new Promise(r => setTimeout(r, 1500 * attempt));
         } else {
-          console.log('[scriptNormalizer] 调用 AI 分析剧本结构...');
+          console.log('[scriptNormalizer] 调用 AI Analyze Script结构...');
         }
         result = await callFeatureAPI('script_analysis', systemPrompt, analysisText, {
           temperature: 0.1,
           maxTokens: 1024,
         });
-        break; // 成功则跳出重试循环
+        break; // Success则跳出重试循环
       } catch (e) {
         lastError = e as Error;
-        console.warn(`[scriptNormalizer] AI 调用失败 (attempt ${attempt + 1}/${MAX_RETRIES + 1}):`, lastError.message);
+        console.warn(`[scriptNormalizer] AI 调用Failed (attempt ${attempt + 1}/${MAX_RETRIES + 1}):`, lastError.message);
       }
     }
     
     if (!result) {
-      console.warn('[scriptNormalizer] AI 结构检测全部失败，将降级到正则兖底:', lastError?.message);
+      console.warn('[scriptNormalizer] AI 结构检测全部Failed，将降级到正则兖底:', lastError?.message);
       return null;
     }
     
@@ -290,22 +290,22 @@ export async function analyzeScriptStructureWithAI(text: string): Promise<Script
     // 2. 提取最外层 {...}
     const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.warn('[scriptNormalizer] AI 返回非 JSON 格式:', result.substring(0, 200));
+      console.warn('[scriptNormalizer] AI Back非 JSON 格式:', result.substring(0, 200));
       return null;
     }
     jsonStr = jsonMatch[0];
-    // 3. 尝试直接解析，失败则修复 JS 对象字面量（无引号 key）为 JSON
+    // 3. 尝试直接解析，Failed则修复 JS 对象字面量（None引号 key）为 JSON
     let analysis: ScriptStructureAnalysis;
     try {
       analysis = JSON.parse(jsonStr);
     } catch {
-      // 给无引号的 key 加上双引号：  title: → "title":
+      // 给None引号的 key 加上双引号：  title: → "title":
       const fixedJson = jsonStr.replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":');
       try {
         analysis = JSON.parse(fixedJson);
         console.log('[scriptNormalizer] 已修复 JS 对象格式为 JSON');
       } catch (e2) {
-        console.warn('[scriptNormalizer] JSON 解析失败:', (e2 as Error).message, '\n原文:', jsonStr.substring(0, 300));
+        console.warn('[scriptNormalizer] JSON Parsing failed:', (e2 as Error).message, '\n原文:', jsonStr.substring(0, 300));
         return null;
       }
     }
@@ -325,7 +325,7 @@ export async function analyzeScriptStructureWithAI(text: string): Promise<Script
     
     return analysis;
   } catch (error) {
-    console.warn('[scriptNormalizer] AI 结构检测失败，将降级到正则兜底:', error);
+    console.warn('[scriptNormalizer] AI 结构检测Failed，将降级到正则兜底:', error);
     return null;
   }
 }
@@ -343,8 +343,8 @@ export function applyAIAnalysis(text: string, analysis: ScriptStructureAnalysis)
   const hasCharBios = /(?:\*{0,2}人物小传[：:]\*{0,2}|【人物小传】)/i.test(text);
   
   // === 1. 标题 ===
-  // 验证 AI 返回的 title 不是集标题（如"第一集 初遇"）
-  const isEpisodeTitle = analysis.title && /^第[一二三四五六七八九十百千\d]+集/.test(analysis.title);
+  // 验证 AI Back的 title 不是Episode标题（如"Episode 1 初遇"）
+  const isEpisodeTitle = analysis.title && /^第[一二三四五六七八九十百千\d]+Episode/.test(analysis.title);
   if (!hasTitle && analysis.title && !isEpisodeTitle) {
     const titlePos = normalized.indexOf(analysis.title);
     // 标题应在文本前部
@@ -355,7 +355,7 @@ export function applyAIAnalysis(text: string, analysis: ScriptStructureAnalysis)
       changes.push(`[AI] 标题: 《${analysis.title}》`);
     }
   } else if (isEpisodeTitle) {
-    console.warn(`[applyAIAnalysis] AI 返回的标题疑似集标题，已跳过: "${analysis.title}"`);
+    console.warn(`[applyAIAnalysis] AI Back的标题疑似Episode标题，已跳过: "${analysis.title}"`);
   }
   
   // === 2. 人物小传 ===
@@ -373,7 +373,7 @@ export function applyAIAnalysis(text: string, analysis: ScriptStructureAnalysis)
   const hasOutlineNow = /(?:\*{0,2}大纲[：:]\*{0,2}|【大纲】)/i.test(normalized);
   if (!hasOutlineNow) {
     if (!hasOutline && analysis.outlineSectionKeyword) {
-      // 原文有大纲内容但没有标准标记
+      // 原文有大纲内容但没有Standard标记
       const outlinePos = normalized.indexOf(analysis.outlineSectionKeyword);
       if (outlinePos !== -1) {
         normalized = normalized.substring(0, outlinePos)
@@ -382,17 +382,17 @@ export function applyAIAnalysis(text: string, analysis: ScriptStructureAnalysis)
         changes.push(`[AI] 大纲标记: 在"${analysis.outlineSectionKeyword.substring(0, 20)}..."前插入`);
       }
     } else {
-      // 原文无大纲 → 插入 AI 生成的大纲
+      // 原文None大纲 → 插入 AI 生成的大纲
       const charBiosPos = normalized.search(/(?:\*{0,2}人物小传[：:]\*{0,2}|【人物小传】)/i);
       let outlineContent = (!analysis.hasOutline && analysis.generatedOutline)
         ? analysis.generatedOutline
         : '';
       
-      // 清理大纲中的集标记，防止 parseEpisodes 误匹配
-      // "第1集 初遇：..." → "第1话 初遇：..."
+      // 清理大纲中的Episode标记，防止 parseEpisodes 误匹配
+      // "第1Episode 初遇：..." → "第1话 初遇：..."
       if (outlineContent) {
         outlineContent = outlineContent.replace(
-          /第([一二三四五六七八九十百千\d]+)集([：:]?)/g,
+          /第([一二三四五六七八九十百千\d]+)Episode([：:]?)/g,
           '第$1话$2'
         );
       }
@@ -408,7 +408,7 @@ export function applyAIAnalysis(text: string, analysis: ScriptStructureAnalysis)
     }
   }
   
-  // === 4. 集标记归一化（复用正则逻辑） ===
+  // === 4. Episode标记归一化（复用正则逻辑） ===
   normalized = normalizeEpisodeMarkers(normalized, changes);
   
   return { normalized, changes, aiAnalysis: analysis };
@@ -420,7 +420,7 @@ export function applyAIAnalysis(text: string, analysis: ScriptStructureAnalysis)
 
 /**
  * 标题检测与归一化
- * 取前5行中第一个符合条件的短行作为标题，包裹《》
+ * 取前5行中第一符合条件的短行作为标题，包裹《》
  */
 function normalizeTitle(text: string, changes: string[]): string {
   const lines = text.split('\n');
@@ -435,11 +435,11 @@ function normalizeTitle(text: string, changes: string[]): string {
     // 跳过看起来像章节编号的行
     if (/^[一二三四五六七八九十百千\d]+[、.]/.test(trimmed)) continue;
     
-    // 跳过集/章标记
-    if (/^第[一二三四五六七八九十百千\d]+[集章幕]/.test(trimmed)) continue;
+    // 跳过Episode/章标记
+    if (/^第[一二三四五六七八九十百千\d]+[Episode章幕]/.test(trimmed)) continue;
     
-    // 跳过剧本结构关键词行（人物：XX、角色：XX、场景：XX 等）
-    if (/^(?:人物|角色|场景|地点|时间|背景|注|备注)[：:]/.test(trimmed)) continue;
+    // 跳过剧本结构Keywords行（人物：XX、角色：XX、Scene：XX 等）
+    if (/^(?:人物|角色|Scene|Location|时间|背景|注|备注)[：:]/.test(trimmed)) continue;
     
     // 跳过 Markdown 标题（但提取内容）
     const mdMatch = trimmed.match(/^#+\s+(.+)$/);
@@ -453,7 +453,7 @@ function normalizeTitle(text: string, changes: string[]): string {
       continue;
     }
     
-    // 跳过已有冒号的描述行（如 "角色名：年龄：35"）
+    // Skip existing冒号的描述行（如 "角色名：Age：35"）
     if (/[：:].{15,}/.test(trimmed)) continue;
     
     // 跳过括号标记行
@@ -476,9 +476,9 @@ function normalizeTitle(text: string, changes: string[]): string {
 /**
  * 人物小传区域检测与标记插入
  * 支持：
- * - 显式标题：人物介绍：、角色介绍：、主要角色：、角色设定：
- * - 中文编号角色分类：一、核心主角 / 一、主要角色
- * - 角色描述模式：XX：年龄：35 / XX：35岁
+ * - 显式标题：人物介绍：、角色介绍：、Main Character：、角色设定：
+ * - 中文编号角色分类：一、核心主角 / 一、Main Character
+ * - Character Description模式：XX：Age：35 / XX：35岁
  */
 function normalizeCharacterSection(text: string, changes: string[]): string {
   // 1. 显式角色区域标题 → 替换为 "人物小传："
@@ -498,8 +498,8 @@ function normalizeCharacterSection(text: string, changes: string[]): string {
     }
   }
   
-  // 2. 中文编号角色分类：一、核心主角 / 一、正面势力角色 / 1. 主要角色
-  const numberedCharPattern = /^([一二三四五六七八九十\d]+[、.]\s*(?:核心|主要|正面|反面|反派|配角|主角|正派|女主|男主|重要|关键|次要)[^\n]*)/m;
+  // 2. 中文编号角色分类：一、核心主角 / 一、正面势力角色 / 1. Main Character
+  const numberedCharPattern = /^([一二三四五六七八九十\d]+[、.]\s*(?:核心|主要|正面|反面|反派|Supporting Character|主角|正派|Female主|Male主|重要|关键|次要)[^\n]*)/m;
   const numberedMatch = numberedCharPattern.exec(text);
   if (numberedMatch && numberedMatch.index !== undefined) {
     const insertPos = numberedMatch.index;
@@ -507,12 +507,12 @@ function normalizeCharacterSection(text: string, changes: string[]): string {
     return text.slice(0, insertPos) + '人物小传：\n' + text.slice(insertPos);
   }
   
-  // 3. 角色描述特征模式：角色名：年龄：XX 或 角色名：XX岁，身份：...
-  const charDescPattern = /^([\u4e00-\u9fa5]{2,8}[：:]\s*(?:年龄[：:]|性别[：:]|身份[：:]|\d{1,3}岁))/m;
+  // 3. Character Description特征模式：角色名：Age：XX 或 角色名：XX岁，身份：...
+  const charDescPattern = /^([\u4e00-\u9fa5]{2,8}[：:]\s*(?:Age[：:]|Gender[：:]|身份[：:]|\d{1,3}岁))/m;
   const charDescMatch = charDescPattern.exec(text);
   if (charDescMatch && charDescMatch.index !== undefined) {
     const insertPos = charDescMatch.index;
-    changes.push(`人物小传标记: 在角色描述"${charDescMatch[1].substring(0, 15)}..."前插入`);
+    changes.push(`人物小传标记: 在Character Description"${charDescMatch[1].substring(0, 15)}..."前插入`);
     return text.slice(0, insertPos) + '人物小传：\n' + text.slice(insertPos);
   }
   
@@ -522,15 +522,15 @@ function normalizeCharacterSection(text: string, changes: string[]): string {
 /**
  * 大纲区域检测与标记插入
  * 支持：
- * - 显式标题：故事背景：、故事简介：、剧情简介：、概述：
+ * - 显式标题：故事背景：、故事简介：、Plot简介：、概述：
  * - 如果找不到大纲但有人物小传标记，在人物小传前插入空大纲标记
  */
 function normalizeOutlineSection(text: string, changes: string[]): string {
   // 1. 显式大纲标题 → 替换为 "大纲："
   const outlineHeaders = [
-    /^((?:故事(?:背景|简介|概述|大纲|梗概)|剧情(?:简介|概述|大纲|梗概))[：:])/m,
+    /^((?:故事(?:背景|简介|概述|大纲|梗概)|Plot(?:简介|概述|大纲|梗概))[：:])/m,
     /^((?:背景|概述|简介|梗概)[：:])/m,
-    /^(#+\s*(?:故事(?:背景|简介|概述|大纲|梗概)|剧情简介|背景|概述|简介)\s*)$/m,
+    /^(#+\s*(?:故事(?:背景|简介|概述|大纲|梗概)|Plot简介|背景|概述|简介)\s*)$/m,
     /^(【(?:故事(?:背景|简介|概述|大纲)|大纲|简介)】)/m,
   ];
   
@@ -555,42 +555,42 @@ function normalizeOutlineSection(text: string, changes: string[]): string {
 }
 
 /**
- * 集标记归一化
- * 第X章 → 第X集、EP.X → 第X集 等
+ * Episode标记归一化
+ * 第X章 → 第XEpisode、EP.X → 第XEpisode 等
  */
 function normalizeEpisodeMarkers(text: string, changes: string[]): string {
   let normalized = text;
   let changed = false;
   
-  // 第X章 → 第X集
+  // 第X章 → 第XEpisode
   normalized = normalized.replace(
     /^(\*{0,2})第([一二三四五六七八九十百千\d]+)章([：:]\s*[^\n]*)?(\*{0,2})$/gm,
     (_match, s1, num, title, s2) => {
       changed = true;
-      return `${s1}第${num}集${title || ''}${s2}`;
+      return `${s1}第${num}Episode${title || ''}${s2}`;
     }
   );
   
-  // 第X幕 → 第X集
+  // 第X幕 → 第XEpisode
   normalized = normalized.replace(
     /^(\*{0,2})第([一二三四五六七八九十百千\d]+)幕([：:]\s*[^\n]*)?(\*{0,2})$/gm,
     (_match, s1, num, title, s2) => {
       changed = true;
-      return `${s1}第${num}集${title || ''}${s2}`;
+      return `${s1}第${num}Episode${title || ''}${s2}`;
     }
   );
   
-  // Episode X / EP.X / EP X → 第X集（英文格式）
+  // Episode X / EP.X / EP X → 第XEpisode（英文格式）
   normalized = normalized.replace(
     /^(?:Episode|EP\.?)\s*(\d+)\s*[：:.\-]?\s*([^\n]*)?$/gim,
     (_match, num, title) => {
       changed = true;
-      return `第${num}集${title ? '：' + title.trim() : ''}`;
+      return `第${num}Episode${title ? '：' + title.trim() : ''}`;
     }
   );
   
   if (changed) {
-    changes.push('集标记: 非标准集标记已归一化为"第X集"格式');
+    changes.push('Episode标记: 非StandardEpisode标记已归一化为"第XEpisode"格式');
   }
   
   return normalized;

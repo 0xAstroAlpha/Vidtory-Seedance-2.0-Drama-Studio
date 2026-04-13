@@ -1,0 +1,260 @@
+
+--- src/lib/script/character-calibrator.ts ---
+601: console.error('[CharacterCalibrator] AI角色分析Failed:', err.message);
+602: console.error('[CharacterCalibrator] Error堆栈:', err.stack);
+
+--- src/lib/script/scene-viewpoint-generator.ts ---
+
+--- src/types/script.ts ---
+13: /** 被过滤的角色记录（用于恢复） */
+24: stageName: string;              // 阶段名称："青年版"、"中年版"、"创业初期"
+25: episodeRange: [number, number]; // 适用Episodes范围：[起始Episode, 结束Episode]
+26: ageDescription?: string;        // 该阶段Age描述："25岁"、"50岁"
+34: facialFeatures?: string;  // 面部特征（不变）：眼睛形状、五官比例
+35: bodyType?: string;        // Body type特征：身高、体格
+36: uniqueMarks?: string;     // 独特标记：胎记、疤痕、标志性特征
+46: jawline?: string;         // 下颌线：sharp angular/soft rounded/prominent
+47: cheekbones?: string;      // 颧骨：high prominent/subtle/wide set
+56: uniqueMarks: string[];    // 必填！胎记/疤痕/痣的精确位置："small mole 2cm below left eye"
+60: iris?: string;          // 虹膜色：#3D2314 (dark brown)
+61: hair?: string;          // Hair色：#1A1A1A (jet black)
+62: skin?: string;          // Skin色：#E8C4A0 (warm beige)
+63: lips?: string;          // Lips色：#C4727E (dusty rose)
+70: hairStyle?: string;       // Hair型：shoulder-length, layered, side-parted
+71: hairlineDetails?: string; // Hair际线：natural hairline, slight widow's peak
+79: avoid: string[];          // 要避免的特征：["blonde hair", "blue eyes", "beard"]
+80: styleExclusions?: string[]; // 风格排除：["anime style", "cartoon"]
+88: personality?: string; // 性格特点（详细描述）
+89: role?: string; // 身份/背景（详细描述）
+90: traits?: string; // 核心特质（详细描述）
+91: skills?: string; // 技能/能力（如武功、魔法等）
+92: keyActions?: string; // 关键行为/事迹
+93: appearance?: string; // 外貌描述
+94: relationships?: string; // 主要关系
+95: tags?: string[]; // 角色标签，如: #武侠 #Male主 #剑客
+96: notes?: string; // 角色备注（Plot说明）
+97: status?: CompletionStatus; // 角色形象生成状态
+98: characterLibraryId?: string; // 关联的Character LibraryID
+101: baseCharacterId?: string;        // 原始角色ID（阶段角色指向基础角色，如"张明青年版"指向"张明"）
+102: stageInfo?: CharacterStageInfo;  // 阶段信息（仅阶段角色有此字段）
+103: stageCharacterIds?: string[];    // 派生的阶段角色ID列表（仅基础角色有此字段）
+104: consistencyElements?: CharacterConsistencyElements; // 一致性元素（基础角色定义，阶段角色继承）
+105: visualPromptEn?: string;         // 英文视觉Prompt（用于AIImage Generation）
+106: visualPromptZh?: string;         // 中文视觉Prompt
+109: identityAnchors?: CharacterIdentityAnchors;  // 身份锚点（用于角色一致性）
+110: negativePrompt?: CharacterNegativePrompt;    // 负面Prompt（排除不符合的特征）
+119: visualPrompt?: string; // 中文Scene视觉描述（用于Scene概念图生成）
+120: tags?: string[]; // Scene标签，如: #木柱 #窗棂 #古建筑
+121: notes?: string; // Location备注（Plot说明）
+122: status?: CompletionStatus; // Scene生成状态
+123: sceneLibraryId?: string; // 关联的Scene库ID
+126: visualPromptEn?: string;      // 英文视觉Prompt（用于AIImage Generation）
+127: architectureStyle?: string;   // 建筑风格（现代简约/中式古典/工业风/欧式等）
+128: lightingDesign?: string;      // 光影设计（自然光/灯光/昏暗/明亮等）
+129: colorPalette?: string;        // 色彩基调（暖色调/冷色调/中性色等）
+130: keyProps?: string[];          // 关键道具列表
+131: spatialLayout?: string;       // 空间布局描述
+132: eraDetails?: string;          // 时代特征（如2000年代的装修风格）
+135: episodeNumbers?: number[];    // 出现在哪些Episode
+136: appearanceCount?: number;     // 出场次数
+137: importance?: 'main' | 'secondary' | 'transition';  // Scene重要性
+140: contactSheetImage?: string;   // 联合图原图（base64 或 URL）
+141: contactSheetImageUrl?: string; // 联合图 HTTP URL
+142: viewpoints?: SceneViewpointData[]; // Viewpoint列表
+144: imageUrl: string;           // 切割后的Image（base64 或 URL）
+145: imageBase64?: string;       // 持久化用 base64
+146: gridIndex: number;          // 在联合图中的位置 (0-5)
+154: id: string;           // ViewpointID，如 'dining', 'sofa', 'window'
+155: name: string;         // 中文名：餐桌区、沙Hair区、窗边
+156: nameEn: string;       // 英文名
+157: shotIds: string[];    // 关联的ShotID列表
+158: keyProps: string[];   // 该Viewpoint需要的道具
+159: gridIndex: number;    // 在联合图中的位置 (0-5)
+170: sceneHeader: string;        // Scene头：如 "1-1日 内 沪上 张家"
+171: characters: string[];       // 出场人物
+172: content: string;            // 完整Scene内容（对白+动作+字幕等）
+173: dialogues: DialogueLine[];  // 解析后的对白列表
+174: actions: string[];          // 动作描写列表（△开头的）
+175: subtitles: string[];        // 字幕【】
+176: weather?: string;           // Weather（晴/雨/雪/雾/阴等，从Scene内容检测）
+177: timeOfDay?: string;         // 时间（日/夜/晨/暮等，从Scene头提取）
+182: character: string;          // 角色名
+183: parenthetical?: string;     // 括号内动作/Mood，如（喝酒）
+184: line: string;               // Dialogue内容
+189: episodeIndex: number;       // 第几Episode
+190: title: string;              // Episode标题
+191: synopsis?: string;          // Episode大纲/摘要（AI生成或手动Edit）
+192: keyEvents?: string[];       // 本Episode关键事件
+193: rawContent: string;         // 原始完整内容
+194: scenes: SceneRawContent[];  // 解析后的Scene列表
+195: shotGenerationStatus: 'idle' | 'generating' | 'completed' | 'error';  // Shot生成状态
+196: lastGeneratedAt?: number;   // 上次生成时间
+197: synopsisGeneratedAt?: number; // 大纲生成时间
+198: season?: string;            // 季节（春/夏/秋/冬，从字幕提取）
+203: title: string;              // 剧名
+204: genre?: string;             // 类型（商战/武侠/爱情等）
+205: era?: string;               // 时代背景（民国/现代/古代等）
+206: timelineSetting?: string;   // 精确时间线设定（如"2022年夏天"、"1990-2020年"）
+207: storyStartYear?: number;    // 故事开始年份（用于推算角色Age）
+208: storyEndYear?: number;      // 故事结束年份
+209: totalEpisodes?: number;     // 总Episodes
+210: outline: string;            // 故事大纲
+211: characterBios: string;      // 人物小传
+212: worldSetting?: string;      // 世界观/风格设定
+213: themes?: string[];          // 主题Keywords
+218: /** 命名实体：地理/物品/阵营等 */
+224: /** 阵营/势力 */
+230: /** 角色关系 */
+244: logline?: string;                   // 一句话概括
+245: outline?: string;                   // 100-500字完整故事线
+246: centralConflict?: string;           // 主线矛盾
+247: themes?: string[];                  // [复仇, 权谋, 友情]
+250: era?: string;                       // 古代/现代/未来
+251: genre?: string;                     // 武侠/商战/爱情
+252: timelineSetting?: string;           // 精确时间线
+253: geography?: NamedEntity[];          // 地理设定
+254: socialSystem?: string;              // 社会体系
+255: powerSystem?: string;               // 力量体系
+256: keyItems?: NamedEntity[];           // 关键物品
+257: worldNotes?: string;                // 世界观补充（自由文本）
+260: characters: ScriptCharacter[];      // 从 scriptData.characters 提升
+261: factions?: Faction[];               // 阵营/势力
+262: relationships?: CharacterRelationship[];  // 角色关系
+266: recurringLocations?: ScriptScene[]; // 常驻Scene库（≥2Episode出现的）
+267: colorPalette?: string;              // 全剧主色调
+273: metadataMarkdown?: string;          // AI 知识库 MD
+283: sceneIds: string[]; // 该Episode包含的SceneID
+294: episodes: Episode[]; // Episode列表
+302: | 'high-key'      // 高调：明亮、低对比，适合喜剧/日常
+303: | 'low-key'       // 低调：暗沉、高对比，适合悬疑/noir
+304: | 'silhouette'    // 剪影：逆光全黑轮廓
+305: | 'chiaroscuro'   // 明暗法：伦勃朗式强烈明暗
+306: | 'natural'       // 自然光：真实日光感
+307: | 'neon'          // 霓虹：赛博朋克/夜店
+308: | 'candlelight'   // 烛光：暖黄微弱光
+309: | 'moonlight';    // 月光：冷蓝柔和
+312: | 'front'         // 正面光：平坦、None阴影
+313: | 'side'          // 侧光：强调轮廓和纹理
+314: | 'back'          // 逆光：轮廓光/剪影
+315: | 'top'           // 顶光：审讯感/戏剧性
+316: | 'bottom'        // 底光：恐怖/不自然
+317: | 'rim'           // 轮廓光：边缘Hair光，与背景分离
+318: | 'three-point';  // 三点布光：Standard影视照明
+321: | 'warm'          // 暖色 3200K：烛光/钨丝灯
+322: | 'neutral'       // 中性 5500K：日光
+323: | 'cool'          // 冷色 7000K：阴天/月光
+324: | 'golden-hour'   // 黄金时段：日出日落
+325: | 'blue-hour'     // 蓝调时分：日落后
+326: | 'mixed';        // 混合色温：冷暖交织
+330: | 'ultra-shallow' // f/1.4 极浅：只有眼睛清晰，强烈虚化
+331: | 'shallow'       // f/2.8 浅：人物清晰，背景虚化
+332: | 'medium'        // f/5.6 中等：前景到Medium Shot清晰
+333: | 'deep'          // f/11 深：全画面清晰
+334: | 'split-diopter';// 分屈光镜：前后都清晰但中间虚
+337: | 'rack-to-fg'    // 转焦到前景
+338: | 'rack-to-bg'    // 转焦到背景
+339: | 'rack-between'  // 人物间转焦
+340: | 'pull-focus'    // 跟焦（跟随运动主体）
+341: | 'none';         // 固定焦点
+345: | 'tripod'        // 三脚架：绝对稳定
+346: | 'handheld'      // 手持：呼吸感/纪实/紧张
+347: | 'steadicam'     // 斯坦尼康：丝滑跟随
+348: | 'dolly'         // 轨道车：匀速直线推拉
+349: | 'crane'         // 摇臂：垂直升降/大幅弧线
+350: | 'drone'         // 航拍：俯瞰/大范围运动
+351: | 'shoulder'      // 肩扛：轻微晃动/新闻纪实
+352: | 'slider';       // 滑轨：短距离平滑移动
+358: | 'rain'          | 'heavy-rain'     // 雨 / 暴雨
+359: | 'snow'          | 'blizzard'       // 雪 / 暴风雪
+360: | 'fog'           | 'mist'           // 浓雾 / 薄雾
+361: | 'dust'          | 'sandstorm'      // 尘土 / 沙暴
+362: | 'smoke'         | 'haze'           // 烟雾 / 薄霾
+363: | 'fire'          | 'sparks'         // 火焰 / 火花
+364: | 'lens-flare'    | 'light-rays'     // Shot光晕 / 丁达尔效应
+365: | 'falling-leaves'| 'cherry-blossom' // 落叶 / 樱花
+366: | 'fireflies'     | 'particles';     // 萤火虫 / 粒子
+372: | 'slow-motion-4x'  // 0.25x 超慢：子弹时间
+373: | 'slow-motion-2x'  // 0.5x 慢动作：动作高潮
+375: | 'fast-2x'          // 2x 快进：时间流逝
+376: | 'timelapse';       // 延时摄影
+380: | 'eye-level'      // Eye Level：自然Viewpoint
+381: | 'high-angle'     // 俯拍：居高临下
+382: | 'low-angle'      // 仰拍：英雄感
+383: | 'birds-eye'      // 鸟瞰：俄视俄视
+384: | 'worms-eye'      // 虫视：极端低角
+385: | 'over-shoulder'  // 过肩：对话Scene
+386: | 'side-angle'     // 侧拍：侧面Viewpoint
+387: | 'dutch-angle'    // 荷兰角：倾斜不安感
+388: | 'third-person';  // 第三人称：游戏Viewpoint
+392: | '8mm'    // 鱼眼：极端桶形畸变
+393: | '14mm'   // 超广角：强烈透视感
+394: | '24mm'   // 广角：环境上下文
+395: | '35mm'   // Standard广角：街拍/纪实感
+396: | '50mm'   // Standard：接近人眼Viewpoint
+397: | '85mm'   // 人像：脸部比例舒适
+398: | '105mm'  // 中焦：柔和背景压缩
+399: | '135mm'  // 长焦：强背景压缩
+400: | '200mm'  // 远摄：极端压缩
+401: | '400mm'; // 超长焦：最强压缩
+405: | 'long-exposure'        // 长曝光：运动模糊/光迹
+406: | 'double-exposure'      // 多重曝光：叠加透明效果
+407: | 'macro'                // 微距：极近细节
+408: | 'tilt-shift'           // 移轴：微缩效果
+409: | 'high-speed'           // 高速快门：冻结动作
+410: | 'bokeh'                // 浅景深虚化：梦幻光斑
+411: | 'reflection'           // 反射/镜面拍摄
+412: | 'silhouette-technique';// 剪影拍摄
+416: position: string;      // "画面左侧站立"
+417: clothing: string;      // "蓝色西装，领带松开"
+418: expression: string;    // "眉头紧皱"
+419: props: string[];       // ["手持信封", "左手插兜"]
+423: prevShotId: string | null;         // 上一Shot ID
+424: nextShotId: string | null;         // 下一Shot ID
+425: prevEndFrameUrl: string | null;    // 上一ShotTail Frame（自动填充）
+426: characterStates: Record<string, ContinuityCharacterState>;  // charName -> 状态快照
+427: lightingContinuity: string;        // "与上一Shot保持同一侧光方向"
+428: flaggedIssues: string[];           // AI 自动检测的穿帮风险
+459: episodeId?: string;        // 所属EpisodeID
+462: sceneViewpointId?: string; // 关联的SceneViewpointID（联合图切割后的Viewpoint）
+465: actionSummary: string;     // Action Description（用户语言）
+466: visualDescription?: string; // 详细的Visual Description（用户语言，如：“法坛Wide Shot，黑暗中微弱光芒笼罩...”）
+470: cameraMovement?: string;   // 鎡头运动（Dolly In, Pan Right, Static, Tracking等）
+471: specialTechnique?: string; // 特殊拍摄手法（希区柯克变焦、子弹时间、FPV穿梭等）
+472: shotSize?: string;         // 景别（Wide Shot, Medium Shot, Close-up, ECU等）
+473: duration?: number;         // 预估Duration（sec）
+476: visualPrompt?: string;     // 英文视觉描述（用于Image Generation，兼容旧版）
+479: imagePrompt?: string;      // First FramePrompt（英文，静态描述）
+480: imagePromptZh?: string;    // First FramePrompt（中文）
+481: videoPrompt?: string;      // VideoPrompt（英文，动态动作）
+482: videoPromptZh?: string;    // VideoPrompt（中文）
+483: endFramePrompt?: string;   // Tail FramePrompt（英文，静态描述）
+484: endFramePromptZh?: string; // Tail FramePrompt（中文）
+485: needsEndFrame?: boolean;   // 是否需要Tail Frame
+488: dialogue?: string;         // 对白/Dialogue
+489: ambientSound?: string;     // 环境声（如：“沉重的风声伴随空旷堂内回响”）
+490: soundEffect?: string;      // Sound Effect（如：“远处悠长的钟声”）
+498: emotionTags?: string[];  // Mood标签 ID 数组，如 ['sad', 'tense', 'serious']
+501: narrativeFunction?: string;   // 叙事Feature：铺垫/升级/高潮/转折/过渡/尾声
+502: conflictStage?: string;       // 冲突阶段：引入/激化/对抗/转折/解决/余波/辅助
+503: shotPurpose?: string;         // Shot目的：此Shot如何服务于故事核心
+504: storyAlignment?: string;      // 与世界观/故事核心的一致性：aligned/minor-deviation/needs-review
+505: visualFocus?: string;         // 视觉焦点：观众应该看什么（按顺序）
+506: cameraPosition?: string;      // 机位描述：摄影机相对于人物的位置
+507: characterBlocking?: string;   // 人物布局：人物在画面中的位置关系
+508: rhythm?: string;              // 节奏描述：这Shot的节奏感
+511: lightingStyle?: LightingStyle;           // 灯光风格预设
+512: lightingDirection?: LightingDirection;   // 主光源方向
+513: colorTemperature?: ColorTemperature;     // 色温
+514: lightingNotes?: string;                  // 灯光自由描述（补充）
+517: depthOfField?: DepthOfField;             // 景深
+518: focusTarget?: string;                    // 焦点目标: "人物面部" / "桌上的信封"
+519: focusTransition?: FocusTransition;       // 转焦动作
+522: cameraRig?: CameraRig;                   // 拍摄器材
+523: movementSpeed?: MovementSpeed;           // 运动速度
+526: atmosphericEffects?: AtmosphericEffect[]; // 氛围特效（可多选）
+527: effectIntensity?: EffectIntensity;       // 特效强度
+530: playbackSpeed?: PlaybackSpeed;           // 播放速度
+533: cameraAngle?: CameraAngle;               // 拍摄角度
+534: focalLength?: FocalLength;               // Shot焦距
+535: photographyTechnique?: PhotographyTechnique; // 摄影技法
+538: continuityRef?: ContinuityRef;           // 连戏参考

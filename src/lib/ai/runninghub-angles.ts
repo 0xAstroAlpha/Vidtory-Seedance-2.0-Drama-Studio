@@ -3,7 +3,7 @@
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
 /**
  * RunningHub Angle Constants
- * 96种视角定义：8方向 × 4俯仰角 × 3景别
+ * 96种Viewpoint定义：8方向 × 4俯仰角 × 3景别
  */
 
 export type HorizontalDirection = 
@@ -17,15 +17,15 @@ export type HorizontalDirection =
   | 'front-left-quarter'; // 左前 315°
 
 export type ElevationAngle = 
-  | 'low-angle'    // 仰视
-  | 'eye-level'    // 平视
-  | 'elevated'     // 微俯视
-  | 'high-angle';  // 大俯视
+  | 'low-angle'    // Low Angle
+  | 'eye-level'    // Eye Level
+  | 'elevated'     // 微Bird's Eye View
+  | 'high-angle';  // 大Bird's Eye View
 
 export type ShotSize = 
-  | 'close-up'      // 特写
-  | 'medium-shot'   // 中景
-  | 'wide-shot';    // 远景
+  | 'close-up'      // Close-up
+  | 'medium-shot'   // Medium Shot
+  | 'wide-shot';    // Long Shot
 
 export interface AnglePreset {
   id: string;
@@ -45,14 +45,14 @@ export const HORIZONTAL_DIRECTIONS: Array<{
   label: string;
   degrees: number;
 }> = [
-  { id: 'front', label: '正面', degrees: 0 },
-  { id: 'front-right-quarter', label: '右前', degrees: 45 },
-  { id: 'right-side', label: '右侧', degrees: 90 },
-  { id: 'back-right-quarter', label: '右后', degrees: 135 },
-  { id: 'back', label: '背面', degrees: 180 },
-  { id: 'back-left-quarter', label: '左后', degrees: 225 },
-  { id: 'left-side', label: '左侧', degrees: 270 },
-  { id: 'front-left-quarter', label: '左前', degrees: 315 },
+  { id: 'front', label: 'Front', degrees: 0 },
+  { id: 'front-right-quarter', label: 'Front-Right', degrees: 45 },
+  { id: 'right-side', label: 'Right Side', degrees: 90 },
+  { id: 'back-right-quarter', label: 'Back-Right', degrees: 135 },
+  { id: 'back', label: 'Back', degrees: 180 },
+  { id: 'back-left-quarter', label: 'Back-Left', degrees: 225 },
+  { id: 'left-side', label: 'Left Side', degrees: 270 },
+  { id: 'front-left-quarter', label: 'Front-Left', degrees: 315 },
 ];
 
 // 俯仰角度定义
@@ -61,10 +61,10 @@ export const ELEVATION_ANGLES: Array<{
   label: string;
   description: string;
 }> = [
-  { id: 'low-angle', label: '仰视', description: '从下往上拍' },
-  { id: 'eye-level', label: '平视', description: '水平视角' },
-  { id: 'elevated', label: '微俯视', description: '略微俯视' },
-  { id: 'high-angle', label: '大俯视', description: '从上往下拍' },
+  { id: 'low-angle', label: 'Low Angle', description: 'Shot from below looking up' },
+  { id: 'eye-level', label: 'Eye Level', description: 'Horizontal eye-level angle' },
+  { id: 'elevated', label: 'Slight High Angle', description: 'Slightly elevated high angle' },
+  { id: 'high-angle', label: 'High Angle', description: 'Shot from above looking down' },
 ];
 
 // 景别定义
@@ -73,12 +73,12 @@ export const SHOT_SIZES: Array<{
   label: string;
   description: string;
 }> = [
-  { id: 'close-up', label: '特写', description: 'Close-up' },
-  { id: 'medium-shot', label: '中景', description: 'Medium Shot' },
-  { id: 'wide-shot', label: '远景', description: 'Wide Shot' },
+  { id: 'close-up', label: 'Close-up', description: 'Close-up' },
+  { id: 'medium-shot', label: 'Medium Shot', description: 'Medium Shot' },
+  { id: 'wide-shot', label: 'Long Shot', description: 'Wide Shot' },
 ];
 
-// 方向到提示词的精确映射
+// 方向到Prompt的精确映射
 const DIRECTION_PROMPTS: Record<HorizontalDirection, string> = {
   'front': 'front view',
   'front-right-quarter': 'front-right quarter view',
@@ -90,7 +90,7 @@ const DIRECTION_PROMPTS: Record<HorizontalDirection, string> = {
   'front-left-quarter': 'front-left quarter view',
 };
 
-// 俯仰角到提示词的精确映射
+// 俯仰角到Prompt的精确映射
 const ELEVATION_PROMPTS: Record<ElevationAngle, string> = {
   'low-angle': 'low-angle shot',
   'eye-level': 'eye-level shot',
@@ -98,7 +98,7 @@ const ELEVATION_PROMPTS: Record<ElevationAngle, string> = {
   'high-angle': 'high-angle shot',
 };
 
-// 景别到提示词的精确映射
+// 景别到Prompt的精确映射
 const SHOT_SIZE_PROMPTS: Record<ShotSize, string> = {
   'close-up': 'close-up',
   'medium-shot': 'medium shot',
@@ -106,8 +106,8 @@ const SHOT_SIZE_PROMPTS: Record<ShotSize, string> = {
 };
 
 /**
- * 生成单个视角的提示词
- * 精确匹配96种标准提示词格式
+ * 生成单Viewpoint的Prompt
+ * 精确匹配96种StandardPrompt格式
  */
 export function generateAnglePrompt(
   direction: HorizontalDirection,
@@ -122,7 +122,7 @@ export function generateAnglePrompt(
 }
 
 /**
- * 生成所有96种视角预设
+ * 生成所有96种Viewpoint预设
  */
 export function generateAllAnglePresets(): AnglePreset[] {
   const presets: AnglePreset[] = [];
@@ -172,26 +172,26 @@ export function getAngleLabel(
 }
 
 /**
- * 常用视角快捷方式
+ * 常用Viewpoint快捷方式
  */
 export const COMMON_ANGLES: Array<{
   name: string;
   preset: Pick<AnglePreset, 'direction' | 'elevation' | 'shotSize'>;
 }> = [
   {
-    name: '正面平视中景',
+    name: 'Front Eye-Level Medium Shot',
     preset: { direction: 'front', elevation: 'eye-level', shotSize: 'medium-shot' },
   },
   {
-    name: '右前平视中景',
+    name: 'Front-Right Eye-Level Medium Shot',
     preset: { direction: 'front-right-quarter', elevation: 'eye-level', shotSize: 'medium-shot' },
   },
   {
-    name: '侧面平视中景',
+    name: 'Side Eye-Level Medium Shot',
     preset: { direction: 'right-side', elevation: 'eye-level', shotSize: 'medium-shot' },
   },
   {
-    name: '背面平视中景',
+    name: 'Back Eye-Level Medium Shot',
     preset: { direction: 'back', elevation: 'eye-level', shotSize: 'medium-shot' },
   },
 ];

@@ -50,9 +50,9 @@ export const SYSTEM_CATEGORIES: Array<{
   name: string;
   icon: string; // lucide icon name for UI reference
 }> = [
-  { category: 'ai-image', name: 'AI图片', icon: 'Sparkles' },
-  { category: 'ai-video', name: 'AI视频', icon: 'Film' },
-  { category: 'upload',   name: '上传文件', icon: 'CloudUpload' },
+  { category: 'ai-image', name: 'AIImage', icon: 'Sparkles' },
+  { category: 'ai-video', name: 'AIVideo', icon: 'Film' },
+  { category: 'upload',   name: 'Upload文件', icon: 'CloudUpload' },
 ];
 
 interface MediaStore {
@@ -605,7 +605,7 @@ export const useMediaStore = create<MediaStore>()(
         set((state) => ({
           folders: state.folders.map((f) =>
             f.id === legacyAiFolder.id
-              ? { ...f, name: 'AI图片', isSystem: true, category: 'ai-image' as const, projectId: undefined }
+              ? { ...f, name: 'AIImage', isSystem: true, category: 'ai-image' as const, projectId: undefined }
               : f
           ),
         }));
@@ -682,7 +682,7 @@ export const useMediaStore = create<MediaStore>()(
       },
       onRehydrateStorage: () => (state) => {
         if (!state) return;
-        // Initialize system folders (AI图片, AI视频, 上传文件)
+        // Initialize system folders (AIImage, AIVideo, Upload文件)
         state.initSystemFolders();
         // Migrate existing data: URLs to local files on startup
         migrateMediaDataUrls(state);

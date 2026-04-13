@@ -5,7 +5,7 @@
 
 /**
  * Script Input Component
- * 左栏：剧本输入（导入/创作两种模式）
+ * 左栏：Script Input（Import/Create两种模式）
  */
 
 import { useEffect, useState } from "react";
@@ -42,43 +42,43 @@ import type { PromptLanguage } from "@/types/script";
 import { useScriptStore } from "@/stores/script-store";
 
 const PROMPT_LANGUAGE_OPTIONS = [
-  { value: "zh", label: "仅中文" },
-  { value: "en", label: "仅英文" },
-  { value: "zh+en", label: "中英文" },
+  { value: "zh", label: "Chinese Only" },
+  { value: "en", label: "English Only" },
+  { value: "zh+en", label: "Chinese + English" },
 ];
 
 const DURATION_OPTIONS = [
-  { value: "auto", label: "自动" },
-  { value: "10s", label: "10秒" },
-  { value: "15s", label: "15秒" },
-  { value: "20s", label: "20秒" },
-  { value: "30s", label: "30秒" },
-  { value: "60s", label: "1分钟" },
-  { value: "90s", label: "1分30秒" },
-  { value: "120s", label: "2分钟" },
-  { value: "180s", label: "3分钟" },
+  { value: "auto", label: "Auto" },
+  { value: "10s", label: "10s" },
+  { value: "15s", label: "15s" },
+  { value: "20s", label: "20s" },
+  { value: "30s", label: "30s" },
+  { value: "60s", label: "1 min" },
+  { value: "90s", label: "1 min 30s" },
+  { value: "120s", label: "2 min" },
+  { value: "180s", label: "3 min" },
 ];
 
 const SCENE_COUNT_OPTIONS = [
-  { value: "1", label: "1个场景" },
-  { value: "2", label: "2个场景" },
-  { value: "3", label: "3个场景" },
-  { value: "4", label: "4个场景" },
-  { value: "5", label: "5个场景" },
-  { value: "6", label: "6个场景" },
-  { value: "8", label: "8个场景" },
-  { value: "10", label: "10个场景" },
+  { value: "1", label: "1 Scenes" },
+  { value: "2", label: "2 Scenes" },
+  { value: "3", label: "3 Scenes" },
+  { value: "4", label: "4 Scenes" },
+  { value: "5", label: "5 Scenes" },
+  { value: "6", label: "6 Scenes" },
+  { value: "8", label: "8 Scenes" },
+  { value: "10", label: "10 Scenes" },
 ];
 
 const SHOT_COUNT_OPTIONS = [
-  { value: "3", label: "3个分镜" },
-  { value: "4", label: "4个分镜" },
-  { value: "5", label: "5个分镜" },
-  { value: "6", label: "6个分镜" },
-  { value: "8", label: "8个分镜" },
-  { value: "10", label: "10个分镜" },
-  { value: "12", label: "12个分镜" },
-  { value: "custom", label: "自定义..." },
+  { value: "3", label: "3 Shots" },
+  { value: "4", label: "4 Shots" },
+  { value: "5", label: "5 Shots" },
+  { value: "6", label: "6 Shots" },
+  { value: "8", label: "8 Shots" },
+  { value: "10", label: "10 Shots" },
+  { value: "12", label: "12 Shots" },
+  { value: "custom", label: "Custom..." },
 ];
 
 interface ScriptInputProps {
@@ -99,7 +99,7 @@ interface ScriptInputProps {
   onShotCountChange?: (value: string) => void;
   onParse: () => void;
   onGenerateFromIdea?: (idea: string) => void;
-  // 完整剧本导入
+  // 完整剧本Import
   onImportFullScript?: (text: string) => Promise<void>;
   importStatus?: 'idle' | 'importing' | 'ready' | 'error';
   importError?: string;
@@ -111,15 +111,15 @@ interface ScriptInputProps {
   onGenerateSynopses?: () => Promise<void>;
   synopsisStatus?: 'idle' | 'generating' | 'completed' | 'error';
   missingSynopsisCount?: number;
-  // 分镜生成状态
+  // Shot生成状态
   viewpointAnalysisStatus?: 'idle' | 'analyzing' | 'completed' | 'error';
   // 角色校准状态
   characterCalibrationStatus?: 'idle' | 'calibrating' | 'completed' | 'error';
-  // 场景校准状态
+  // Scene校准状态
   sceneCalibrationStatus?: 'idle' | 'calibrating' | 'completed' | 'error';
-  // 二次校准追踪（中栏独立按钮触发）
+  // Second pass校准追踪（中栏独立按钮触Hair）
   secondPassTypes?: Set<string>;
-  // 提示词语言
+  // Prompt Language
   promptLanguage?: PromptLanguage;
   onPromptLanguageChange?: (value: PromptLanguage) => void;
 }
@@ -236,43 +236,49 @@ export function ScriptInput({
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="import" className="text-xs">
             <FileText className="h-3 w-3 mr-1" />
-            导入
+            Import
           </TabsTrigger>
           <TabsTrigger value="create" className="text-xs">
             <Sparkles className="h-3 w-3 mr-1" />
-            创作
+            Create
           </TabsTrigger>
         </TabsList>
 
-        {/* 导入模式 */}
+        {/* Import模式 */}
         <TabsContent value="import" className="flex-1 mt-3 overflow-y-auto">
           <div className="space-y-2">
             <Label className="text-xs text-muted-foreground">
-              粘贴完整剧本（包含大纲、人物小传、各集内容）
+              Paste full script (including synopsis, character bios, episodes)
             </Label>
             <Textarea
-              placeholder="支持的格式：\n• 第X集（集标记）\n• **1-1日 内 地点**（场景头）\n• 人物：角色A、角色B\n• 角色名：（动作）台词\n• △动作描写\n• 【字幕】【闪回】等"
+              placeholder="Supported formats:
+• Episode X (Episode marker)
+• **1-1 Day Int Location** (Scene header)
+• Characters: Character A, Character B
+• Name: (Action) Dialogue
+• △ Action description
+• [Subtitle][Flashback] etc."
               value={rawScript}
               onChange={(e) => onRawScriptChange(e.target.value)}
               className="min-h-[200px] max-h-[40vh] resize-none text-sm overflow-y-auto"
               disabled={parseStatus === "parsing" || isImporting}
             />
-            {/* 导入状态提示 */}
+            {/* Import状态Notice */}
             {importStatus === "ready" && (
               <div className="space-y-1">
-                <p className="text-xs text-green-600">✓ 导入成功！可在右侧点击集名生成分镜</p>
+                <p className="text-xs text-green-600">✓ Import successful! Click episode name on the right to generate shots</p>
                 {(missingTitleCount ?? 0) > 0 && (
                   <p className="text-xs text-amber-600">
-                    ⚠ {missingTitleCount} 集缺少标题，可使用AI校准生成
+                    ⚠ {missingTitleCount} episodes missing titles, use AI calibration to generate
                   </p>
                 )}
               </div>
             )}
             {importStatus === "error" && importError && (
-              <p className="text-xs text-destructive">导入失败：{importError}</p>
+              <p className="text-xs text-destructive">Import Failed:{importError}</p>
             )}
             
-            {/* 持久进度状态显示 - 在执行过程中始终可见 */}
+            {/* 持久Progress状态显示 - 在执行过程中始终可见 */}
             {(importStatus === 'importing' || 
               calibrationStatus === 'calibrating' || 
               synopsisStatus === 'generating' || 
@@ -280,18 +286,18 @@ export function ScriptInput({
               characterCalibrationStatus === 'calibrating' ||
               sceneCalibrationStatus === 'calibrating') && (
               <div className="p-4 rounded-xl bg-primary/10 border-2 border-primary/30 space-y-3 shadow-lg">
-                {/* 标题：根据是否二次校准显示不同文案 */}
+                {/* 标题：根据是否Second pass校准显示不同文案 */}
                 <div className="flex items-center gap-3 text-primary">
                   <Loader2 className="h-6 w-6 animate-spin" />
                   <span className="text-lg font-bold">
-                    {secondPassTypes && secondPassTypes.size > 0 ? '🔄 二次校准中...' : '正在处理中...'}
+                    {secondPassTypes && secondPassTypes.size > 0 ? '🔄 Second pass calibration...' : 'Processing...'}
                   </span>
                 </div>
                 <div className="space-y-2">
-                  {/* === 二次校准模式：只显示相关步骤 === */}
+                  {/* === Second pass校准模式：只显示相关步骤 === */}
                   {secondPassTypes && secondPassTypes.size > 0 ? (
                     <>
-                      {/* 分镜校准（二次） */}
+                      {/* Shot校准（Second pass） */}
                       {secondPassTypes.has('shots') && (
                         <div className={`flex items-center gap-3 py-1 ${viewpointAnalysisStatus === 'analyzing' ? 'text-primary font-bold' : viewpointAnalysisStatus === 'completed' ? 'text-green-600 font-medium' : 'text-muted-foreground'}`}>
                           {viewpointAnalysisStatus === 'analyzing' ? (
@@ -301,12 +307,12 @@ export function ScriptInput({
                           ) : (
                             <span className="w-5 h-5 rounded-full border-2 border-current" />
                           )}
-                          <span className="text-base">AI 校准分镜</span>
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">二次</span>
+                          <span className="text-base">AI Calibrate Shots</span>
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Second pass</span>
                         </div>
                       )}
                       
-                      {/* 角色校准（二次） */}
+                      {/* 角色校准（Second pass） */}
                       {secondPassTypes.has('characters') && (
                         <div className={`flex items-center gap-3 py-1 ${characterCalibrationStatus === 'calibrating' ? 'text-primary font-bold' : characterCalibrationStatus === 'completed' ? 'text-green-600 font-medium' : 'text-muted-foreground'}`}>
                           {characterCalibrationStatus === 'calibrating' ? (
@@ -316,12 +322,12 @@ export function ScriptInput({
                           ) : (
                             <span className="w-5 h-5 rounded-full border-2 border-current" />
                           )}
-                          <span className="text-base">AI 角色校准</span>
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">二次</span>
+                          <span className="text-base">AI Character Calibration</span>
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Second pass</span>
                         </div>
                       )}
                       
-                      {/* 场景校准（二次） */}
+                      {/* Scene校准（Second pass） */}
                       {secondPassTypes.has('scenes') && (
                         <div className={`flex items-center gap-3 py-1 ${sceneCalibrationStatus === 'calibrating' ? 'text-primary font-bold' : sceneCalibrationStatus === 'completed' ? 'text-green-600 font-medium' : 'text-muted-foreground'}`}>
                           {sceneCalibrationStatus === 'calibrating' ? (
@@ -331,15 +337,15 @@ export function ScriptInput({
                           ) : (
                             <span className="w-5 h-5 rounded-full border-2 border-current" />
                           )}
-                          <span className="text-base">AI 场景校准</span>
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">二次</span>
+                          <span className="text-base">AI Scene Calibration</span>
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Second pass</span>
                         </div>
                       )}
                     </>
                   ) : (
                     /* === 首次 pipeline 模式：完整 6 步骤 === */
                     <>
-                      {/* 导入剧本 */}
+                      {/* Import script */}
                       <div className={`flex items-center gap-3 py-1 ${importStatus === 'importing' ? 'text-primary font-bold' : importStatus === 'ready' ? 'text-green-600 font-medium' : 'text-muted-foreground'}`}>
                         {importStatus === 'importing' ? (
                           <Loader2 className="h-5 w-5 animate-spin" />
@@ -348,7 +354,7 @@ export function ScriptInput({
                         ) : (
                           <span className="w-5 h-5 rounded-full border-2 border-current" />
                         )}
-                        <span className="text-base">导入剧本</span>
+                        <span className="text-base">Import script</span>
                       </div>
                       
                       {/* 标题校准 */}
@@ -360,7 +366,7 @@ export function ScriptInput({
                         ) : (
                           <span className="w-5 h-5 rounded-full border-2 border-current" />
                         )}
-                        <span className="text-base">AI 标题校准</span>
+                        <span className="text-base">AI Title Calibration</span>
                       </div>
                       
                       {/* 大纲生成 */}
@@ -372,10 +378,10 @@ export function ScriptInput({
                         ) : (
                           <span className="w-5 h-5 rounded-full border-2 border-current" />
                         )}
-                        <span className="text-base">AI 大纲生成</span>
+                        <span className="text-base">AI Synopsis Generation</span>
                       </div>
                       
-                      {/* 分镜校准 */}
+                      {/* Shot校准 */}
                       <div className={`flex items-center gap-3 py-1 ${viewpointAnalysisStatus === 'analyzing' ? 'text-primary font-bold' : viewpointAnalysisStatus === 'completed' ? 'text-green-600 font-medium' : 'text-muted-foreground'}`}>
                         {viewpointAnalysisStatus === 'analyzing' ? (
                           <Loader2 className="h-5 w-5 animate-spin" />
@@ -384,7 +390,7 @@ export function ScriptInput({
                         ) : (
                           <span className="w-5 h-5 rounded-full border-2 border-current" />
                         )}
-                        <span className="text-base">AI 分镜校准</span>
+                        <span className="text-base">AI Shot Calibration</span>
                       </div>
                       
                       {/* 角色校准 */}
@@ -396,10 +402,10 @@ export function ScriptInput({
                         ) : (
                           <span className="w-5 h-5 rounded-full border-2 border-current" />
                         )}
-                        <span className="text-base">AI 角色校准</span>
+                        <span className="text-base">AI Character Calibration</span>
                       </div>
                       
-                      {/* 场景校准 */}
+                      {/* Scene校准 */}
                       <div className={`flex items-center gap-3 py-1 ${sceneCalibrationStatus === 'calibrating' ? 'text-primary font-bold' : sceneCalibrationStatus === 'completed' ? 'text-green-600 font-medium' : 'text-muted-foreground'}`}>
                         {sceneCalibrationStatus === 'calibrating' ? (
                           <Loader2 className="h-5 w-5 animate-spin" />
@@ -408,7 +414,7 @@ export function ScriptInput({
                         ) : (
                           <span className="w-5 h-5 rounded-full border-2 border-current" />
                         )}
-                        <span className="text-base">AI 场景校准</span>
+                        <span className="text-base">AI Scene Calibration</span>
                       </div>
                     </>
                   )}
@@ -418,15 +424,15 @@ export function ScriptInput({
           </div>
         </TabsContent>
 
-        {/* 创作模式 */}
+        {/* Create模式 */}
         <TabsContent value="create" className="flex-1 mt-3">
           <div className="space-y-3">
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">
-                输入故事创意，AI帮你生成剧本
+                Enter story idea, AI will help generate script
               </Label>
               <Textarea
-                placeholder="例如：一个内向程序员在咖啡店邂逅开朗女孩的温暖故事..."
+                placeholder="Example: A heartwarming story of an introverted programmer meeting a cheerful girl in a coffee shop..."
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
                 className="min-h-[100px] resize-none text-sm"
@@ -442,21 +448,21 @@ export function ScriptInput({
               {isGenerating ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  生成中...
+                  Generating...
                 </>
               ) : (
                 <>
                   <Sparkles className="h-4 w-4 mr-2" />
-                  AI生成剧本
+                  AI Generate Script
                 </>
               )}
             </Button>
 
-            {/* 生成后的剧本预览 */}
+            {/* 生成后的Script Preview */}
             {rawScript && (
               <div className="space-y-2">
                 <Label className="text-xs text-muted-foreground">
-                  生成的剧本（可编辑）
+                  Generated script (editable)
                 </Label>
                 <Textarea
                   value={rawScript}
@@ -467,22 +473,22 @@ export function ScriptInput({
               </div>
             )}
 
-            {/* 创作模式工作流引导 */}
+            {/* Create模式工作流引导 */}
             {parseStatus === "ready" && (
               <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 space-y-2">
-                <div className="text-xs font-medium text-primary">✨ 剧本已生成，下一步</div>
+                <div className="text-xs font-medium text-primary">✨ Script generated, next steps:</div>
                 <div className="space-y-1.5 text-xs text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold">1</span>
-                    <span>在中栏选择场景 → 右栏点「去场景库生成背景」</span>
+                    <span>Select scene in middle column → click 'Go to Scene Library' in right column</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold">2</span>
-                    <span>选择角色 → 右栏点「去角色库生成形象」</span>
+                    <span>Select character → click 'Go to Character Library' in right column</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold">3</span>
-                    <span>选择分镜 → 右栏点「去AI导演生成视频」</span>
+                    <span>Select shot → click 'Go to AI Director' in right column</span>
                   </div>
                 </div>
               </div>
@@ -493,11 +499,11 @@ export function ScriptInput({
 
       {/* 设置区域 - 根据模式显示不同选项 */}
       <div className="space-y-3 pt-2 border-t">
-        {/* 导入模式：显示语言、场景数量、分镜数量 */}
+        {/* Import模式：显示Language、Scene数量、Shot数量 */}
         {mode === "import" && (
           <div className="space-y-3">
             <div className="space-y-1">
-              <Label className="text-xs">剧本语言</Label>
+              <Label className="text-xs">Script Language</Label>
               <Select
                 value={language}
                 onValueChange={onLanguageChange}
@@ -507,15 +513,15 @@ export function ScriptInput({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="中文">中文</SelectItem>
+                  <SelectItem value="Chinese">Chinese</SelectItem>
                   <SelectItem value="English">English</SelectItem>
-                  <SelectItem value="日本語">日本語</SelectItem>
+                  <SelectItem value="Japanese">Japanese</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-1">
-              <Label className="text-xs">提示词语言</Label>
+              <Label className="text-xs">Prompt Language</Label>
               <Select
                 value={promptLanguage || "zh"}
                 onValueChange={(v) => onPromptLanguageChange?.(v as PromptLanguage)}
@@ -533,23 +539,23 @@ export function ScriptInput({
                 </SelectContent>
               </Select>
               <p className="text-[10px] text-muted-foreground">
-                控制AI校准生成中/英文提示词，默认仅中文可减少生成压力
+                Controls AI generating English prompts, default to Chinese Only to reduce load
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <Label className="text-xs">场景数量（可选）</Label>
+                <Label className="text-xs">Scene Count (Optional)</Label>
                 <Select
                   value={sceneCount || ""}
                   onValueChange={(v) => onSceneCountChange?.(v)}
                   disabled={parseStatus === "parsing"}
                 >
                   <SelectTrigger className="h-8 text-xs">
-                    <SelectValue placeholder="自动" />
+                    <SelectValue placeholder="Auto" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="auto">自动</SelectItem>
+                    <SelectItem value="auto">Auto</SelectItem>
                     {SCENE_COUNT_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
                         {opt.label}
@@ -560,14 +566,14 @@ export function ScriptInput({
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs">分镜数量（可选）</Label>
+                <Label className="text-xs">Shot Count (Optional)</Label>
                 {showCustomShotInput ? (
                   <div className="flex gap-1">
                     <Input
                       type="number"
                       min="1"
                       max="100"
-                      placeholder="输入数量"
+                      placeholder="Enter amount"
                       value={customShotValue}
                       onChange={(e) => setCustomShotValue(e.target.value)}
                       onBlur={() => {
@@ -593,7 +599,7 @@ export function ScriptInput({
                         onShotCountChange?.("auto");
                       }}
                     >
-                      取消
+                      Cancel
                     </Button>
                   </div>
                 ) : (
@@ -609,10 +615,10 @@ export function ScriptInput({
                     disabled={parseStatus === "parsing"}
                   >
                     <SelectTrigger className="h-8 text-xs">
-                      <SelectValue placeholder="自动" />
+                      <SelectValue placeholder="Auto" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="auto">自动</SelectItem>
+                      <SelectItem value="auto">Auto</SelectItem>
                       {SHOT_COUNT_OPTIONS.map((opt) => (
                         <SelectItem key={opt.value} value={opt.value}>
                           {opt.label}
@@ -624,11 +630,11 @@ export function ScriptInput({
               </div>
             </div>
 
-            {/* 视觉风格 - 导入模式也可以选择 */}
+            {/* Visual Style - Import模式也可以Select */}
             <div className="space-y-1">
               <Label className="text-xs flex items-center gap-1">
                 <Palette className="h-3 w-3" />
-                视觉风格
+                Visual Style
               </Label>
               <StylePicker
                 value={styleId}
@@ -636,17 +642,17 @@ export function ScriptInput({
                 disabled={parseStatus === "parsing"}
               />
               <p className="text-[10px] text-muted-foreground">
-                此风格将用于AI校准分镜时生成视觉描述
+                This style will be used to generate visual descriptions during AI shot calibration
               </p>
             </div>
           </div>
         )}
 
-        {/* 创作模式：显示语言、时长、风格、场景数量、分镜数量 */}
+        {/* Create模式：显示Language、Duration、Style、Scene数量、Shot数量 */}
         {mode === "create" && (
           <div className="space-y-3">
             <div className="space-y-1">
-              <Label className="text-xs">提示词语言</Label>
+              <Label className="text-xs">Prompt Language</Label>
               <Select
                 value={promptLanguage || "zh"}
                 onValueChange={(v) => onPromptLanguageChange?.(v as PromptLanguage)}
@@ -664,12 +670,12 @@ export function ScriptInput({
                 </SelectContent>
               </Select>
               <p className="text-[10px] text-muted-foreground">
-                控制AI生成中/英文提示词，默认仅中文可减少生成压力
+                Controls AI generating English prompts, default to Chinese Only to reduce load
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2">
               <div className="space-y-1">
-                <Label className="text-xs">语言</Label>
+                <Label className="text-xs">Language</Label>
                 <Select
                   value={language}
                   onValueChange={onLanguageChange}
@@ -679,15 +685,15 @@ export function ScriptInput({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="中文">中文</SelectItem>
+                    <SelectItem value="Chinese">Chinese</SelectItem>
                     <SelectItem value="English">English</SelectItem>
-                    <SelectItem value="日本語">日本語</SelectItem>
+                    <SelectItem value="Japanese">Japanese</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs">时长</Label>
+                <Label className="text-xs">Duration</Label>
                 <Select
                   value={targetDuration}
                   onValueChange={onDurationChange}
@@ -707,7 +713,7 @@ export function ScriptInput({
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs">风格</Label>
+                <Label className="text-xs">Style</Label>
                 <StylePicker
                   value={styleId}
                   onChange={(id) => onStyleChange(id)}
@@ -718,17 +724,17 @@ export function ScriptInput({
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <Label className="text-xs">场景数量（可选）</Label>
+                <Label className="text-xs">Scene Count (Optional)</Label>
                 <Select
                   value={sceneCount || ""}
                   onValueChange={(v) => onSceneCountChange?.(v)}
                   disabled={parseStatus === "parsing"}
                 >
                   <SelectTrigger className="h-8 text-xs">
-                    <SelectValue placeholder="自动" />
+                    <SelectValue placeholder="Auto" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="auto">自动</SelectItem>
+                    <SelectItem value="auto">Auto</SelectItem>
                     {SCENE_COUNT_OPTIONS.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>
                         {opt.label}
@@ -739,14 +745,14 @@ export function ScriptInput({
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs">分镜数量（可选）</Label>
+                <Label className="text-xs">Shot Count (Optional)</Label>
                 {showCustomShotInput ? (
                   <div className="flex gap-1">
                     <Input
                       type="number"
                       min="1"
                       max="100"
-                      placeholder="输入数量"
+                      placeholder="Enter amount"
                       value={customShotValue}
                       onChange={(e) => setCustomShotValue(e.target.value)}
                       onBlur={() => {
@@ -772,7 +778,7 @@ export function ScriptInput({
                         onShotCountChange?.("auto");
                       }}
                     >
-                      取消
+                      Cancel
                     </Button>
                   </div>
                 ) : (
@@ -788,10 +794,10 @@ export function ScriptInput({
                     disabled={parseStatus === "parsing"}
                   >
                     <SelectTrigger className="h-8 text-xs">
-                      <SelectValue placeholder="自动" />
+                      <SelectValue placeholder="Auto" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="auto">自动</SelectItem>
+                      <SelectItem value="auto">Auto</SelectItem>
                       {SHOT_COUNT_OPTIONS.map((opt) => (
                         <SelectItem key={opt.value} value={opt.value}>
                           {opt.label}
@@ -805,20 +811,20 @@ export function ScriptInput({
           </div>
         )}
 
-        {/* API 警告 */}
+        {/* API Warning */}
         {!chatConfigured && (
           <div className="flex items-start gap-2 p-2 rounded-md bg-yellow-500/10 border border-yellow-500/20">
             <AlertCircle className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
             <div className="text-xs text-yellow-600 dark:text-yellow-400">
-              <p className="font-medium">API 未配置</p>
-              <p className="opacity-80">请在设置中配置API密钥</p>
+              <p className="font-medium">API Not Configured</p>
+              <p className="opacity-80">Please configure API key in settings</p>
             </div>
           </div>
         )}
 
-        {/* 导入/解析按钮 */}
+        {/* Import/解析按钮 */}
         <div className="space-y-2">
-          {/* 完整剧本导入按钮（不需要AI，用规则解析） */}
+          {/* 完整剧本Import按钮（不需要AI，用规则解析） */}
           {mode === "import" && onImportFullScript && (
             <Button
               onClick={handleImportFullScript}
@@ -829,18 +835,18 @@ export function ScriptInput({
               {isImporting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  导入中...
+                  Importing...
                 </>
               ) : (
                 <>
                   <FileText className="h-4 w-4 mr-2" />
-                  导入完整剧本
+                  Import Full Script
                 </>
               )}
             </Button>
           )}
           
-          {/* AI校准按钮 - 导入成功且有缺失标题时显示 */}
+          {/* AI校准按钮 - ImportSuccess且有缺失标题时显示 */}
           {mode === "import" && importStatus === "ready" && (missingTitleCount ?? 0) > 0 && onCalibrate && (
             <Button
               onClick={handleCalibrate}
@@ -851,18 +857,18 @@ export function ScriptInput({
               {isCalibrating || calibrationStatus === 'calibrating' ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  AI校准中...
+                  AI Calibrating...
                 </>
               ) : (
                 <>
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  AI校准（生成{missingTitleCount}集标题）
+                  AI Calibration (Generate {missingTitleCount} episode titles)
                 </>
               )}
             </Button>
           )}
           
-          {/* 生成大纲按钮 - 导入成功后显示 */}
+          {/* 生成大纲按钮 - ImportSuccess后显示 */}
           {mode === "import" && importStatus === "ready" && onGenerateSynopses && (
             <Button
               onClick={handleGenerateSynopses}
@@ -873,21 +879,21 @@ export function ScriptInput({
               {isGeneratingSynopsis || synopsisStatus === 'generating' ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  生成大纲中...
+                  Generating synopsis...
                 </>
               ) : (
                 <>
                   <BookOpen className="h-4 w-4 mr-2" />
                   {(missingSynopsisCount ?? 0) > 0 
-                    ? `生成大纲（${missingSynopsisCount}集缺失）`
-                    : '重新生成大纲'
+                    ? `Generate Synopsis (${missingSynopsisCount} episodes missing)`
+                    : 'Regenerate Synopsis'
                   }
                 </>
               )}
             </Button>
           )}
           
-          {/* AI解析按钮 - 仅在导入模式显示 */}
+          {/* AI解析按钮 - 仅在Import模式显示 */}
           {mode === "import" && (
             <Button
               onClick={onParse}
@@ -898,19 +904,19 @@ export function ScriptInput({
               {parseStatus === "parsing" ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  解析中...
+                  Parsing...
                 </>
               ) : (
                 <>
                   <Wand2 className="h-4 w-4 mr-2" />
-                  AI解析剧本
+                  AIParse Script
                 </>
               )}
             </Button>
           )}
         </div>
 
-        {/* 解析错误 */}
+        {/* 解析Error */}
         {parseStatus === "error" && parseError && (
           <div className="flex items-start gap-2 p-2 rounded-md bg-destructive/10 border border-destructive/20">
             <AlertCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />

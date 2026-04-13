@@ -6,12 +6,12 @@
 /**
  * S级面板 — Seedance 2.0 多模态创作板块
  * 
- * 复用 director-store 的分镜数据（SplitScene[]），
- * 以「分组」为核心进行多镜头合并叙事视频生成。
+ * 复用 director-store 的Shot Count据（SplitScene[]），
+ * 以「分组」为核心进行多Shot合并叙事Video Generation。
  * 
  * 两种模式：
- * - 分镜模式：从剧本流水线导入的分镜，按组生成视频
- * - 自由模式：纯素材上传 + 提示词（后续实现）
+ * - Shot模式：从Script流水线Import的Shot，按组Generate Video
+ * - 自由模式：纯素材Upload + Prompt（后续实现）
  */
 
 import { useEffect } from "react";
@@ -46,7 +46,7 @@ export function SClassView() {
   
   const { setActiveTab } = useMediaPanelStore();
 
-  // 判断是否有分镜数据可用
+  // 判断是否Has Shot Count据可用
   const hasSplitScenes = splitScenes.length > 0;
   
   // Render empty state when no split scenes available
@@ -54,12 +54,12 @@ export function SClassView() {
     <div className="flex flex-col items-center justify-center h-full gap-4 p-6 text-center">
       <Sparkles className="h-12 w-12 text-muted-foreground/30" />
       <div>
-        <h3 className="font-medium text-sm mb-1">S级 · Seedance 2.0 多模态创作</h3>
+        <h3 className="font-medium text-sm mb-1">S-Class · Seedance 2.0 Multimodal Studio</h3>
         <p className="text-xs text-muted-foreground max-w-[280px]">
-          请在右侧「剧本结构」栏中，点击 <span className="text-green-500 font-medium">+</span> 添加分镜到本面板，系统将自动分组进行多镜头合并叙事视频生成。
+          In Script Structure right, click <span className="text-green-500 font-medium">+</span> to add shots. System will auto-group for multi-shot merged narrative video gen.
         </p>
         <p className="text-xs text-muted-foreground/60 mt-2 max-w-[280px]">
-          如右侧未显示剧本结构，请先在「剧本」面板中导入并解析剧本。
+          If script structure is not shown, please import and parse script in Script panel first.
         </p>
       </div>
       <div className="flex gap-2">
@@ -68,7 +68,7 @@ export function SClassView() {
           size="sm"
           onClick={() => setActiveTab('script')}
         >
-          前往剧本面板
+          Go to Script Panel
         </Button>
       </div>
     </div>
@@ -87,7 +87,7 @@ export function SClassView() {
           <div className="flex items-center gap-2">
             {hasSplitScenes && (
               <span className="text-xs text-muted-foreground">
-                {splitScenes.length} 个分镜
+                {splitScenes.length} Shot
               </span>
             )}
             <Button

@@ -1458,8 +1458,8 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       console.log('[SplitScenes] API Store state:', {
         providers: apiStore.providers.length,
         apiKeys: Object.keys(apiStore.apiKeys),
-        memefastKey: apiStore.apiKeys['memefast'] ? 'set' : 'not set',
-        getApiKey_memefast: apiStore.getApiKey('memefast') ? 'set' : 'not set',
+        memefastKey: apiStore.apiKeys['gemini'] ? 'set' : 'not set',
+        getApiKey_memefast: apiStore.getApiKey('gemini') ? 'set' : 'not set',
       });
     }
 
@@ -1746,7 +1746,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
 
       console.log('[SplitScenes] image_with_roles:', imageWithRoles.length, 'images', imageWithRoles.map(i => i.role));
 
-      // 调用统一视频生成 API（自动路由到正确的 MemeFast 端点）
+      // 调用统一视频生成 API（自动路由到正确的 Gemini 端点）
       const videoUrl = await callVideoGenerationApi(
         apiKey,
         fullPrompt,

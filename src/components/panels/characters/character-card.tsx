@@ -208,7 +208,7 @@ export function CharacterCard({
             <div className="flex items-center gap-1">
               <ImageIcon className="h-3 w-3 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">
-                {viewCount > 0 ? `${viewCount} 视图` : "未生成"}
+                {viewCount > 0 ? `${viewCount} 视图` : "未Generate"}
               </span>
             </div>
             <Button
@@ -221,7 +221,7 @@ export function CharacterCard({
               }}
             >
               <Shirt className="h-3 w-3" />
-              {variationCount > 0 ? `${variationCount} 变体` : "衣橱"}
+              {variationCount > 0 ? `${variationCount} 变体` : "Wardrobe"}
             </Button>
           </div>
         </div>
@@ -258,7 +258,7 @@ export function CharacterCard({
       {/* Expanded variations preview */}
       {isSelected && variationCount > 0 && (
         <div className="mt-3 pt-3 border-t">
-          <div className="text-xs text-muted-foreground mb-2">衣橱变体</div>
+          <div className="text-xs text-muted-foreground mb-2">Wardrobe变体</div>
           <div className="grid grid-cols-4 gap-2">
             {character.variations?.slice(0, 4).map((variation) => (
               <div 
@@ -306,11 +306,11 @@ export function CharacterCard({
         </ContextMenuItem>
         <ContextMenuItem onClick={handleCopyName}>
           <Copy className="h-4 w-4 mr-2" />
-          复制名称
+          CopyName
         </ContextMenuItem>
         <ContextMenuItem onClick={() => setShowWardrobe(true)}>
           <Shirt className="h-4 w-4 mr-2" />
-          管理衣橱
+          管理Wardrobe
         </ContextMenuItem>
         <ContextMenuSeparator />
         <ContextMenuItem 
@@ -318,7 +318,7 @@ export function CharacterCard({
           className="text-destructive focus:text-destructive"
         >
           <Trash2 className="h-4 w-4 mr-2" />
-          删除角色
+          Delete Character
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>

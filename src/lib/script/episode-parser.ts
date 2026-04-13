@@ -3,17 +3,17 @@
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
 /**
  * Episode Parser - 中文剧本规则解析器
- * 解析标准中文剧本格式，提取集、场景、对白、动作等结构化信息
+ * 解析Standard中文剧本格式，提取Episode、Scene、对白、动作等结构化信息
  * 
  * 支持的格式：
- * - 集标记：第X集
- * - 场景头：**1-1日 内 沪上 张家** 或 1-1 日 内 沪上 张家
+ * - Episode标记：第XEpisode
+ * - Scene头：**1-1日 内 沪上 张家** 或 1-1 日 内 沪上 张家
  * - 人物行：人物：张明、张父
  * - 字幕：【字幕：2002年夏】
  * - 动作描写：△窗外栀子花绽放...
  * - 对白：张父：（喝酒）我们明明真是太有出息了！
  * - 闪回：【闪回】...【闪回结束】
- * - 旁白/VO：【VO：...】
+ * - Narration/VO：【VO：...】
  */
 
 import type {
@@ -28,7 +28,7 @@ import type {
 } from "@/types/script";
 
 /**
- * 清理场景地点字符串，移除人物信息等无关内容
+ * 清理SceneLocation字符串，移除人物信息等None关内容
  * 如 "乡村公路/大巴车 人物：沈星晴、村民" -> "乡村公路/大巴车"
  */
 function cleanLocationString(location: string): string {
@@ -44,7 +44,7 @@ function cleanLocationString(location: string): string {
 }
 
 /**
- * 解析完整剧本文本，提取背景信息和各集内容
+ * 解析完整剧本文本，提取背景信息和各Episode内容
  */
 export function parseFullScript(fullText: string): {
   background: ProjectBackground;
@@ -54,18 +54,18 @@ export function parseFullScript(fullText: string): {
   
   // 1. 提取标题
   const titleMatch = fullText.match(/[《「]([^》」]+)[》」]/);
-  const title = titleMatch ? titleMatch[1] : '未命名剧本';
+  const title = titleMatch ? titleMatch[1] : 'Untitled剧本';
   
   // 2. 提取大纲（从"大纲："到"人物小传："之间的内容）
   // 支持 Markdown 格式：**大纲：** 或 大纲： 或 【大纲】
-  // 末尾 |$ 兜底：无人物小传/无集标记时匹配到文本末尾
-  const outlineMatch = fullText.match(/(?:\*{0,2}大纲[：:]​?\*{0,2}|【大纲】)([\s\S]*?)(?=(?:\*{0,2}人物小传[：:]|【人物|第[一二三四五六七八九十\d]+集|$))/i);
+  // 末尾 |$ 兜底：None人物小传/NoneEpisode标记时匹配到文本末尾
+  const outlineMatch = fullText.match(/(?:\*{0,2}大纲[：:]​?\*{0,2}|【大纲】)([\s\S]*?)(?=(?:\*{0,2}人物小传[：:]|【人物|第[一二三四五六七八九十\d]+Episode|$))/i);
   const outline = outlineMatch ? outlineMatch[1].trim() : '';
   
-  // 3. 提取人物小传（从"人物小传："到第一集之前的内容）
+  // 3. 提取人物小传（从"人物小传："到Episode 1之前的内容）
   // 支持 Markdown 格式：**人物小传：** 或 人物小传： 或 【人物小传】
-  // 末尾 |$ 兜底：无集标记时匹配到文本末尾
-  const characterBiosMatch = fullText.match(/(?:\*{0,2}人物小传[：:]\*{0,2}|【人物小传】)([\s\S]*?)(?=\*{0,2}第[一二三四五六七八九十\d]+集|$)/i);
+  // 末尾 |$ 兜底：NoneEpisode标记时匹配到文本末尾
+  const characterBiosMatch = fullText.match(/(?:\*{0,2}人物小传[：:]\*{0,2}|【人物小传】)([\s\S]*?)(?=\*{0,2}第[一二三四五六七八九十\d]+Episode|$)/i);
   const characterBios = characterBiosMatch ? characterBiosMatch[1].trim() : '';
   
   // 4. 提取时代背景和时间线设定
@@ -77,10 +77,10 @@ export function parseFullScript(fullText: string): {
   // 6. 提取世界观/风格设定
   const worldSetting = extractWorldSetting(outline, characterBios);
   
-  // 7. 提取主题关键词
+  // 7. 提取主题Keywords
   const themes = extractThemes(outline, characterBios);
   
-  // 8. 解析各集内容
+  // 8. 解析各Episode内容
   const episodes = parseEpisodes(fullText);
   
   return {
@@ -169,20 +169,20 @@ function extractTimelineInfo(outline: string, characterBios: string): {
     }
   }
   
-  // 4. 无显式年代关键词且无年份时，通过古风术语推断
+  // 4. None显式年代Keywords且None年份时，通过古风术语推断
   // 仅当 era 仍为默认值 '现代' 且没有年份佐证时才推断
   if (era === '现代' && !storyStartYear) {
     // 古代官职/封建制度术语（高置信度）
     const ancientInstitutionTerms = /城主|王爷|太守|县令|丞相|太子|皇帝|太后|嫔妃|将领|部将|大将军|郡守|侯爵|藩王/;
-    // 武侠/古风术语（中置信度，需多个命中）
+    // 武侠/古风术语（中置信度，需多命中）
     const ancientCultureTerms = /武功|内力|真气|剑法|刀法|门派|武林|江湖|侠客|大侠|掌门|弟子|轻功|暗器/;
-    // 古代场景术语
+    // 古代Scene术语
     const ancientSettingTerms = /城楼|客栈|驿馆|城门|官府|衙门|兵营|镖局|酒肆|茶楼|府邸|宫殿/;
     
     if (ancientInstitutionTerms.test(fullText)) {
       era = '古代';
     } else {
-      // 文化术语 + 场景术语同时出现 → 高置信度古代
+      // 文化术语 + Scene术语同时出现 → 高置信度古代
       const hasCulture = ancientCultureTerms.test(fullText);
       const hasSetting = ancientSettingTerms.test(fullText);
       if (hasCulture && hasSetting) {
@@ -204,12 +204,12 @@ function extractTimelineInfo(outline: string, characterBios: string): {
 
 /**
  * 从大纲和人物小传中检测剧本类型（genre）
- * 通用检测，不硬编码具体类型名，而是通过关键词模式匹配
+ * 通用检测，不硬编码具体类型名，而是通过Keywords模式匹配
  */
 function detectGenre(outline: string, characterBios: string): string {
   const fullText = `${outline}\n${characterBios}`;
   
-  // 类型关键词映射（按优先级排列）
+  // 类型Keywords映射（按优先级排列）
   const genrePatterns: Array<{ keywords: RegExp; genre: string }> = [
     { keywords: /武侠|江湖|门派|武功|剑|刀法|内力|武林/, genre: '武侠' },
     { keywords: /仙侠|修仙|灵气|渡劫|飞升|法宝|灵根/, genre: '仙侠' },
@@ -219,7 +219,7 @@ function detectGenre(outline: string, characterBios: string): string {
     { keywords: /恐怖|鬼|灵异|诅咒|闹鬼/, genre: '恐怖' },
     { keywords: /商战|创业|公司|股权|融资|上市|商业帝国|企业/, genre: '商战' },
     { keywords: /宫斗|后宫|嫔妃|皇上|太后|选秀/, genre: '宫斗' },
-    { keywords: /宅斗|嫡女|庶出|大宅门|内宅/, genre: '宅斗' },
+    { keywords: /宅斗|嫡Female|庶出|大宅门|内宅/, genre: '宅斗' },
     { keywords: /谍战|特工|间谍|密码|潜伏|情报/, genre: '谍战' },
     { keywords: /军旅|军队|战场|部队|军营|战争/, genre: '军旅' },
     { keywords: /刑侦|刑警|破案|嫌疑人|法医/, genre: '刑侦' },
@@ -251,7 +251,7 @@ function extractWorldSetting(outline: string, characterBios: string): string {
   // 匹配常见世界观描述模式
   const patterns = [
     /(?:世界观|世界设定|背景设定)[：:] *([^\n]{10,200})/,
-    /(?:故事发生在|故事背景[：:是]) *([^\n]{10,200})/,
+    /(?:故事Hair生在|故事背景[：:是]) *([^\n]{10,200})/,
     /(?:设定[：:]) *([^\n]{10,200})/,
   ];
   
@@ -262,17 +262,17 @@ function extractWorldSetting(outline: string, characterBios: string): string {
     }
   }
   
-  return ''; // 无世界观描述则留空
+  return ''; // None世界观描述则留空
 }
 
 /**
- * 从大纲中提取主题关键词
+ * 从大纲中提取主题Keywords
  */
 function extractThemes(outline: string, characterBios: string): string[] {
   const fullText = `${outline}\n${characterBios}`;
   const themes: string[] = [];
   
-  // 主题关键词库（通用，覆盖各类剧本）
+  // 主题Keywords库（通用，覆盖各类剧本）
   const themePatterns: Array<{ keywords: RegExp; theme: string }> = [
     { keywords: /奋斗|拼搏|逆袭|成长/, theme: '奋斗' },
     { keywords: /复仇|报仇|雪恨/, theme: '复仇' },
@@ -296,26 +296,26 @@ function extractThemes(outline: string, characterBios: string): string[] {
     }
   }
   
-  return themes.slice(0, 5); // 最多返回5个主题
+  return themes.slice(0, 5); // 最多Back5主题
 }
 
 /**
- * 解析各集剧本
+ * 解析各Episode剧本
  */
 export function parseEpisodes(text: string): EpisodeRawScript[] {
   const episodes: EpisodeRawScript[] = [];
   
-  // 匹配集标记：第X集 或 第X集：标题
-  // 支持 **第X集** 或 **第X集：标题** 格式
-  const episodeRegex = /\*{0,2}第([\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d\u5341\u767e\u5343\d]+)集[\uff1a:]?\s*([^\n\*]*?)\*{0,2}(?=\n|$)/g;
+  // 匹配Episode标记：第XEpisode 或 第XEpisode：标题
+  // 支持 **第XEpisode** 或 **第XEpisode：标题** 格式
+  const episodeRegex = /\*{0,2}第([\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d\u5341\u767e\u5343\d]+)Episode[\uff1a:]?\s*([^\n\*]*?)\*{0,2}(?=\n|$)/g;
   const matches = [...text.matchAll(episodeRegex)];
   
   if (matches.length === 0) {
-    // 如果没有找到集标记，把整个文本当作第一集
+    // 如果没有找到Episode标记，把整文本当作Episode 1
     const scenes = parseScenes(text);
     return [{
       episodeIndex: 1,
-      title: '第一集',
+      title: 'Episode 1',
       rawContent: text,
       scenes,
       shotGenerationStatus: 'idle',
@@ -327,17 +327,17 @@ export function parseEpisodes(text: string): EpisodeRawScript[] {
     const episodeIndex = chineseToNumber(match[1]);
     // 清理标题：移除前后空格和 ** 符号
     let rawTitle = match[2]?.trim().replace(/^\*+|\*+$/g, '').trim() || '';
-    // 确保标题包含集号
+    // 确保标题包含Episode号
     const episodeTitle = rawTitle 
-      ? `第${episodeIndex}集：${rawTitle}` 
-      : `第${episodeIndex}集`;
+      ? `第${episodeIndex}Episode：${rawTitle}` 
+      : `第${episodeIndex}Episode`;
     
-    // 获取本集内容（从当前集到下一集之间）
+    // 获取本Episode内容（从当前Episode到下一Episode之间）
     const startIndex = match.index! + match[0].length;
     const endIndex = i < matches.length - 1 ? matches[i + 1].index! : text.length;
     const rawContent = text.slice(startIndex, endIndex).trim();
     
-    // 解析场景
+    // 解析Scene
     const scenes = parseScenes(rawContent);
     
     // 从字幕中提取季节
@@ -357,21 +357,21 @@ export function parseEpisodes(text: string): EpisodeRawScript[] {
 }
 
 /**
- * 解析单集内的场景
+ * 解析单Episode内的Scene
  */
 export function parseScenes(episodeText: string): SceneRawContent[] {
   const scenes: SceneRawContent[] = [];
   
-  // 场景头格式匹配：
+  // Scene头格式匹配：
   // **1-1日 内 沪上 张家** 或
   // 1-1 日 内 沪上 张家 或
   // **2-3 夜 外 码头**
-  const sceneHeaderRegex = /\*{0,2}(\d+-\d+)\s*(日|夜|晨|暮|黄昏|黎明|清晨|傍晚)\s*(内|外|内\/外)\s+([^\*\n]+)\*{0,2}/g;
+  const sceneHeaderRegex = /\*{0,2}(\d+-\d+)\s*(日|夜|晨|暮|Dusk|黎明|清晨|傍晚)\s*(内|外|内\/外)\s+([^\*\n]+)\*{0,2}/g;
   const sceneMatches = [...episodeText.matchAll(sceneHeaderRegex)];
   
   if (sceneMatches.length === 0) {
-    // 没有找到标准场景头，尝试宽松的 数字-数字 格式
-    // 匹配如：1-1 规则怪谈世界，集合广场，日  或  1-2 全球同一会议直播间，日
+    // 没有找到StandardScene头，尝试宽松的 数字-数字 格式
+    // 匹配如：1-1 规则怪谈世界，Episode合广场，日  或  1-2 全球同一会议直播间，日
     const looseSceneRegex = /^\*{0,2}(\d+-\d+)\s+([^\*\n]+)\*{0,2}$/gm;
     const looseMatches = [...episodeText.matchAll(looseSceneRegex)];
     
@@ -379,10 +379,10 @@ export function parseScenes(episodeText: string): SceneRawContent[] {
       for (let i = 0; i < looseMatches.length; i++) {
         const match = looseMatches[i];
         const sceneNumber = match[1]; // 如 "1-1"
-        const rawDesc = match[2].replace(/\*{1,2}/g, '').trim(); // 如 "规则怪谈世界，集合广场，日"
+        const rawDesc = match[2].replace(/\*{1,2}/g, '').trim(); // 如 "规则怪谈世界，Episode合广场，日"
         
         // 从描述中智能提取时间（日/夜/晨/暮等），通常在末尾
-        const timeWords = ['日', '夜', '晨', '暮', '黄昏', '黎明', '清晨', '傍晚'];
+        const timeWords = ['日', '夜', '晨', '暮', 'Dusk', '黎明', '清晨', '傍晚'];
         let timeOfDay = '日'; // 默认值
         let locationDesc = rawDesc;
         
@@ -394,10 +394,10 @@ export function parseScenes(episodeText: string): SceneRawContent[] {
             locationDesc = rawDesc.replace(endPattern, '').trim();
             break;
           }
-          // 也处理整个描述就是时间词的情况
+          // 也处理整描述就是时间词的情况
           if (rawDesc === tw) {
             timeOfDay = tw;
-            locationDesc = '未知地点';
+            locationDesc = '未知Location';
             break;
           }
         }
@@ -410,15 +410,15 @@ export function parseScenes(episodeText: string): SceneRawContent[] {
           locationDesc = locationDesc.replace(interiorMatch[0], '').trim();
         }
         
-        // 将中文逗号分隔的地点拼接成可读格式
-        const location = locationDesc.replace(/[，,]/g, ' ').replace(/\s+/g, ' ').trim() || '未知地点';
+        // 将中文逗号分隔的Location拼接成可读格式
+        const location = locationDesc.replace(/[，,]/g, ' ').replace(/\s+/g, ' ').trim() || '未知Location';
         
-        // 构建标准格式的场景头，供下游代码使用
+        // 构建Standard格式的Scene头，供下游代码使用
         const sceneHeader = interior 
           ? `${sceneNumber} ${timeOfDay} ${interior} ${location}`
           : `${sceneNumber} ${timeOfDay} ${location}`;
         
-        // 获取场景内容
+        // 获取Scene内容
         const startIndex = match.index! + match[0].length;
         const endIndex = i < looseMatches.length - 1 ? looseMatches[i + 1].index! : episodeText.length;
         const content = episodeText.slice(startIndex, endIndex).trim();
@@ -454,9 +454,9 @@ export function parseScenes(episodeText: string): SceneRawContent[] {
     const sceneNumber = match[1]; // 如 "1-1"
     const timeOfDay = match[2];   // 如 "日"、"夜"
     const interior = match[3];    // 如 "内"、"外"
-    const location = match[4]?.trim() || '未知地点';
+    const location = match[4]?.trim() || '未知Location';
     
-    // 获取场景内容（从当前场景头到下一个场景头之间）
+    // 获取Scene内容（从当前Scene头到下一Scene头之间）
     const startIndex = match.index! + match[0].length;
     const endIndex = i < sceneMatches.length - 1 ? sceneMatches[i + 1].index! : episodeText.length;
     const content = episodeText.slice(startIndex, endIndex).trim();
@@ -473,7 +473,7 @@ export function parseScenes(episodeText: string): SceneRawContent[] {
     // 解析字幕
     const subtitles = parseSubtitles(content);
     
-    // 检测天气
+    // 检测Weather
     const weather = detectWeather(content, actions);
     
     scenes.push({
@@ -492,17 +492,17 @@ export function parseScenes(episodeText: string): SceneRawContent[] {
 }
 
 /**
- * 解析备用场景格式（当标准格式不匹配时）
+ * 解析备用Scene格式（当Standard格式不匹配时）
  */
 function parseAlternativeSceneFormat(text: string): SceneRawContent[] {
   const scenes: SceneRawContent[] = [];
   
   // 尝试匹配其他常见格式
-  // 格式1: 场景X 或 场景 X
-  // 格式2: [场景描述]
+  // 格式1: SceneX 或 Scene X
+  // 格式2: [Scene描述]
   // 格式3: 直接按段落分
   
-  const altRegex = /(?:场景\s*(\d+)|【场景[：:]?\s*([^\】]+)】)/g;
+  const altRegex = /(?:Scene\s*(\d+)|【Scene[：:]?\s*([^\】]+)】)/g;
   const matches = [...text.matchAll(altRegex)];
   
   if (matches.length > 0) {
@@ -522,9 +522,9 @@ function parseAlternativeSceneFormat(text: string): SceneRawContent[] {
       });
     }
   } else {
-    // 作为单一场景处理
+    // 作为单一Scene处理
     scenes.push({
-      sceneHeader: '主场景',
+      sceneHeader: '主Scene',
       characters: parseCharacters(text),
       content: text,
       dialogues: parseDialogues(text),
@@ -537,12 +537,12 @@ function parseAlternativeSceneFormat(text: string): SceneRawContent[] {
 }
 
 /**
- * 从场景内容和动作描写中检测天气
+ * 从Scene内容和动作描写中检测Weather
  */
 function detectWeather(content: string, actions: string[]): string | undefined {
   const fullText = `${content} ${actions.join(' ')}`;
   
-  // 天气关键词检测（通用，不硬编码具体场景）
+  // WeatherKeywords检测（通用，不硬编码具体Scene）
   if (/暴雨|大雨|倾盆大雨/.test(fullText)) return '暴雨';
   if (/小雨|细雨|毛毛雨|淆淆沉沉/.test(fullText)) return '小雨';
   if (/雨|淅沥|润湿/.test(fullText)) return '雨';
@@ -553,14 +553,14 @@ function detectWeather(content: string, actions: string[]): string | undefined {
   if (/狂风|阵风|暴风/.test(fullText)) return '狂风';
   if (/风|微风|清风/.test(fullText)) return '微风';
   if (/阴天|乌云|阴沉沉/.test(fullText)) return '阴';
-  if (/晴朗|艳阳|日光明媚|万里无云/.test(fullText)) return '晴';
+  if (/晴朗|艳阳|日光明媚|万里None云/.test(fullText)) return '晴';
   if (/电闪雷鸣|打雷|闪电/.test(fullText)) return '雷雨';
   
-  return undefined; // 未检测到特定天气
+  return undefined; // 未检测到特定Weather
 }
 
 /**
- * 从场景字幕中提取季节
+ * 从Scene字幕中提取季节
  */
 function extractSeasonFromScenes(scenes: SceneRawContent[]): string | undefined {
   for (const scene of scenes) {
@@ -580,7 +580,7 @@ function extractSeasonFromScenes(scenes: SceneRawContent[]): string | undefined 
 }
 
 /**
- * 解析场景中的人物
+ * 解析Scene中的人物
  */
 function parseCharacters(text: string): string[] {
   const characters: Set<string> = new Set();
@@ -595,13 +595,13 @@ function parseCharacters(text: string): string[] {
     });
   }
   
-  // 2. 从对白中提取说话人
+  // 2. 从对白中提取Speaker
   const dialogueRegex = /^([^：:（\(【\n]{1,10})[：:](?:\s*[（\(][^）\)]+[）\)])?/gm;
   const dialogueMatches = [...text.matchAll(dialogueRegex)];
   dialogueMatches.forEach(m => {
     const name = m[1].trim();
     // 过滤掉非人名的内容
-    if (name && !name.match(/^[△【字幕旁白VO场景]/)) {
+    if (name && !name.match(/^[△【字幕NarrationVOScene]/)) {
       characters.add(name);
     }
   });
@@ -615,8 +615,8 @@ function parseCharacters(text: string): string[] {
 function parseDialogues(text: string): DialogueLine[] {
   const dialogues: DialogueLine[] = [];
   
-  // 对白格式：角色名：（动作）台词
-  // 或：角色名：台词
+  // 对白格式：角色名：（动作）Dialogue
+  // 或：角色名：Dialogue
   const dialogueRegex = /^([^：:（\(【\n△]{1,10})[：:]\s*(?:[（\(]([^）\)]+)[）\)])?\s*(.+)$/gm;
   
   const matches = [...text.matchAll(dialogueRegex)];
@@ -627,7 +627,7 @@ function parseDialogues(text: string): DialogueLine[] {
     const line = match[3]?.trim();
     
     // 过滤掉非对白内容
-    if (character && line && !character.match(/^[字幕旁白场景人物]/)) {
+    if (character && line && !character.match(/^[字幕NarrationScene人物]/)) {
       dialogues.push({
         character,
         parenthetical,
@@ -713,28 +713,28 @@ function chineseToNumber(chinese: string): number {
 }
 
 /**
- * 从人物小传文本中提取角色信息
+ * 从人物小传文本中提取Character Info
  * 支持两种格式：
- * 1. 紧凑格式：角色名：年龄：XX身份：... （从 Word/微信复制的无换行文本）
- * 2. 标准格式：角色名：描述 或 角色名（年龄）：描述
+ * 1. 紧凑格式：角色名：Age：XX身份：... （从 Word/微信Copy的None换行文本）
+ * 2. Standard格式：角色名：描述 或 角色名（Age）：描述
  */
 export function parseCharacterBios(bios: string): ScriptCharacter[] {
   if (!bios || !bios.trim()) return [];
   
-  // 检测紧凑格式：角色名：年龄/年两：XX （至少2个条目才认定为紧凑格式）
-  const compactEntryRegex = /([\u4e00-\u9fa5]{2,12})[：:]\s*(?:年龄|年两)[：:]\s*(\d{1,3})/g;
+  // 检测紧凑格式：角色名：Age/年两：XX （至少2条目才认定为紧凑格式）
+  const compactEntryRegex = /([\u4e00-\u9fa5]{2,12})[：:]\s*(?:Age|年两)[：:]\s*(\d{1,3})/g;
   const compactMatches = [...bios.matchAll(compactEntryRegex)];
   
   if (compactMatches.length >= 2) {
     return parseCompactBioFormat(bios, compactMatches);
   }
   
-  // 标准格式兜底
+  // Standard格式兜底
   return parseStandardBioFormat(bios);
 }
 
 /**
- * 紧凑格式解析：角色名：年龄：XX身份：...关键行为：...
+ * 紧凑格式解析：角色名：Age：XX身份：...关键行为：...
  * 自动剥离段落标记（一、核心主角 等）提取真实角色名
  */
 function parseCompactBioFormat(bios: string, matches: RegExpMatchArray[]): ScriptCharacter[] {
@@ -746,11 +746,11 @@ function parseCompactBioFormat(bios: string, matches: RegExpMatchArray[]): Scrip
     let rawName = match[1];
     const age = match[2];
     
-    // 剥离段落关键词提取真实角色名
+    // 剥离段落Keywords提取真实角色名
     const actualName = stripSectionKeywords(rawName);
     if (!actualName || actualName.length < 2 || actualName.length > 8) continue;
     
-    // 提取描述：从年龄后到下一个角色条目之前
+    // 提取描述：从Age后到下一角色条目之前
     const descStart = match.index! + match[0].length;
     const descEnd = i < matches.length - 1 ? matches[i + 1].index! : bios.length;
     let description = bios.slice(descStart, descEnd).trim();
@@ -769,7 +769,7 @@ function parseCompactBioFormat(bios: string, matches: RegExpMatchArray[]): Scrip
     index++;
   }
   
-  console.log(`[parseCharacterBios] 紧凑格式检测到 ${characters.length} 个角色`);
+  console.log(`[parseCharacterBios] 紧凑格式检测到 ${characters.length} 角色`);
   return characters;
 }
 
@@ -780,16 +780,16 @@ function parseCompactBioFormat(bios: string, matches: RegExpMatchArray[]): Scrip
 function stripSectionKeywords(name: string): string {
   // 1. 移除开头的中文编号：一、 二. 等
   name = name.replace(/^[一二三四五六七八九十\d]+[、.]\s*/, '');
-  // 2. 移除段落类别关键词
+  // 2. 移除段落类别Keywords
   name = name.replace(
-    /^(?:核心|主要|正面|反面|反派|次要|重要|关键|群众|正派|其他)(?:势力)?(?:角色|主角|配角|人物)?/,
+    /^(?:核心|主要|正面|反面|反派|次要|重要|关键|群众|正派|其他)(?:势力)?(?:角色|主角|Supporting Character|人物)?/,
     ''
   ).trim();
   return name;
 }
 
 /**
- * 标准格式解析（原逻辑）：角色名：描述 或 角色名（年龄）：描述
+ * Standard格式解析（原逻辑）：角色名：描述 或 角色名（Age）：描述
  */
 function parseStandardBioFormat(bios: string): ScriptCharacter[] {
   const characters: ScriptCharacter[] = [];
@@ -806,7 +806,7 @@ function parseStandardBioFormat(bios: string): ScriptCharacter[] {
     // 跳过非角色内容
     if (name.length > 10 || name.match(/^[第一二三四五六七八九十\d]/)) continue;
     // 跳过属性标签和补充说明
-    if (/^(?:年龄|身份|性格|补充|注|备注|核心特质|关键行为)$/.test(name)) continue;
+    if (/^(?:Age|身份|性格|补充|注|备注|核心特质|关键行为)$/.test(name)) continue;
     
     characters.push({
       id: `char_${index}`,
@@ -826,7 +826,7 @@ function parseStandardBioFormat(bios: string): ScriptCharacter[] {
  * 从描述中提取性格特点
  */
 function extractPersonality(description: string): string {
-  // 查找性格相关关键词
+  // 查找性格相关Keywords
   const personalityKeywords = ['性格', '为人', '品性', '脾气'];
   for (const keyword of personalityKeywords) {
     const match = description.match(new RegExp(`${keyword}[^，。,\.]+`));
@@ -839,7 +839,7 @@ function extractPersonality(description: string): string {
  * 从描述中提取核心特质
  */
 function extractTraits(description: string): string {
-  // 查找特质相关关键词
+  // 查找特质相关Keywords
   const traits: string[] = [];
   const traitPatterns = [
     /聪[明慧]/, /坚[韧强]/, /勤[劳奋]/, /憨厚/, /老实/,
@@ -899,7 +899,7 @@ function isValidCharacterName(name: string): boolean {
   if (/[\*\-\+\=\>\<\|\[\]\{\}]/.test(name)) return false;
   // 跳过明显的非角色词（只过滤最明显的，其他交给AI）
   const obviousNonCharacters = [
-    'VO', '旁白', 'os', '左边', '右边', '中间', '背影', '远处',
+    'VO', 'Narration', 'os', '左边', '右边', '中间', '背影', '远处',
     '效率', '回流率', '分拣', '客户', '眼眶', '微湿', '手持', '笔挺',
     '上市文件', '眼神', '声音', '电视', '电话'
   ];
@@ -908,7 +908,7 @@ function isValidCharacterName(name: string): boolean {
 }
 
 /**
- * 处理单个角色名字并添加到集合
+ * 处理单角色名字并Add到Episode合
  */
 function processAndAddCharacter(
   rawName: string,
@@ -936,7 +936,7 @@ function processAndAddCharacter(
 }
 
 /**
- * 从所有场景中提取出场角色（补充人物小传中没有的角色）
+ * 从所有Scene中提取出场角色（补充人物小传中没有的角色）
  */
 function extractCharactersFromScenes(
   episodeScripts: EpisodeRawScript[],
@@ -946,12 +946,12 @@ function extractCharactersFromScenes(
   const newCharacters: ScriptCharacter[] = [];
   const index = { value: existingCharacters.length + 1 };
   
-  // 统计每个角色的出场次数
+  // 统计每角色的出场次数
   const appearanceCount = new Map<string, number>();
   
   for (const ep of episodeScripts) {
     for (const scene of ep.scenes) {
-      // 从场景的 characters 字段提取
+      // 从Scene的 characters 字段提取
       for (const charName of scene.characters) {
         const parts = splitMultipleCharacters(charName);
         for (const part of parts) {
@@ -962,7 +962,7 @@ function extractCharactersFromScenes(
         }
       }
       
-      // 从对白中提取说话人
+      // 从对白中提取Speaker
       for (const dialogue of scene.dialogues) {
         const parts = splitMultipleCharacters(dialogue.character);
         for (const part of parts) {
@@ -975,7 +975,7 @@ function extractCharactersFromScenes(
     }
   }
   
-  // 按出场次数排序，添加新角色
+  // 按出场次数排序，Add新角色
   const sortedNames = [...appearanceCount.entries()]
     .filter(([name]) => !existingNames.has(name))
     .sort((a, b) => b[1] - a[1]); // 按出场次数降序
@@ -985,7 +985,7 @@ function extractCharactersFromScenes(
     newCharacters.push({
       id: `char_${index.value}`,
       name,
-      role: count > 5 ? `重要配角（出场${count}次）` : `次要角色（出场${count}次）`,
+      role: count > 5 ? `重要Supporting Character（出场${count}次）` : `次要角色（出场${count}次）`,
     });
     index.value++;
   }
@@ -1000,16 +1000,16 @@ export function convertToScriptData(
   background: ProjectBackground,
   episodeScripts: EpisodeRawScript[]
 ): ScriptData {
-  // 1. 从人物小传提取主要角色
+  // 1. 从人物小传提取Main Character
   const mainCharacters = parseCharacterBios(background.characterBios);
   
-  // 2. 从场景中补充其他角色
+  // 2. 从Scene中补充其他角色
   const additionalCharacters = extractCharactersFromScenes(episodeScripts, mainCharacters);
   
   // 3. 合并角色列表（人物小传的角色排在前面）
   const characters = [...mainCharacters, ...additionalCharacters];
   
-  console.log(`[convertToScriptData] 角色统计: 人物小传 ${mainCharacters.length} 个, 场景补充 ${additionalCharacters.length} 个, 共 ${characters.length} 个`);
+  console.log(`[convertToScriptData] 角色统计: 人物小传 ${mainCharacters.length} , Scene补充 ${additionalCharacters.length} , Total ${characters.length} `);
   
   const episodes: Episode[] = [];
   const scenes: ScriptScene[] = [];
@@ -1024,17 +1024,17 @@ export function convertToScriptData(
       const sceneId = `scene_${sceneIndex}`;
       sceneIds.push(sceneId);
       
-      // 解析场景头获取时间和地点
+      // 解析Scene头获取时间和Location
       // 支持两种格式：
-      // 标准格式: "1-1 日 内 地点名" (headerParts: [number, time, interior, ...location])
-      // 宽松格式: "1-1 日 地点名" (headerParts: [number, time, ...location])
+      // Standard格式: "1-1 日 内 Location名" (headerParts: [number, time, interior, ...location])
+      // 宽松格式: "1-1 日 Location名" (headerParts: [number, time, ...location])
       const headerParts = scene.sceneHeader.split(/\s+/);
       const timeOfDay = headerParts[1] || '日';
       const hasInterior = headerParts[2] && /^(内|外|内\/外)$/.test(headerParts[2]);
       const locationStartIndex = hasInterior ? 3 : 2;
       let rawLocation = headerParts.slice(locationStartIndex).join(' ') || headerParts[headerParts.length - 1] || '未知';
       
-      // 清理 location，移除人物信息等无关内容
+      // 清理 location，移除人物信息等None关内容
       const location = cleanLocationString(rawLocation);
       
       scenes.push({
@@ -1070,7 +1070,7 @@ export function convertToScriptData(
 }
 
 /**
- * 标准化时间
+ * Standard化时间
  */
 function normalizeTime(time: string): string {
   const timeMap: Record<string, string> = {
@@ -1078,7 +1078,7 @@ function normalizeTime(time: string): string {
     '夜': 'night',
     '晨': 'dawn',
     '暮': 'dusk',
-    '黄昏': 'dusk',
+    'Dusk': 'dusk',
     '黎明': 'dawn',
     '清晨': 'dawn',
     '傍晚': 'dusk',
@@ -1087,7 +1087,7 @@ function normalizeTime(time: string): string {
 }
 
 /**
- * 检测场景氛围
+ * 检测Scene氛围
  */
 function detectAtmosphere(content: string): string {
   if (content.match(/紧张|危险|冲突|打斗|怒/)) return '紧张';
@@ -1109,9 +1109,9 @@ function extractLogline(outline: string): string {
 }
 
 /**
- * 提取集概述
+ * 提取Episode概述
  */
 function extractEpisodeDescription(content: string): string {
-  // 取前100个字符作为概述
+  // 取前100字符作为概述
   return content.replace(/\*{1,2}/g, '').slice(0, 100).trim() + '...';
 }

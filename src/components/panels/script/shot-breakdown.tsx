@@ -54,8 +54,8 @@ export function ShotBreakdown({
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <Film className="w-12 h-12 text-zinc-700 mb-4" />
-        <p className="text-sm text-zinc-500">暂无分镜</p>
-        <p className="text-xs text-zinc-600 mt-1">解析剧本后点击"生成分镜列表"</p>
+        <p className="text-sm text-zinc-500">NoneShot</p>
+        <p className="text-xs text-zinc-600 mt-1">Parse Script后点击"Generating shot List"</p>
       </div>
     );
   }
@@ -101,7 +101,7 @@ export function ShotBreakdown({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-mono text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded">
-                    场景 {groupIdx + 1}
+                    Scene {groupIdx + 1}
                   </span>
                   <span className="text-sm font-medium text-white">
                     {group.scene.name || group.scene.location}
@@ -167,7 +167,7 @@ function ShotRow({ shot, isSelected, onClick }: ShotRowProps) {
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-zinc-300">
-            镜头 {shot.index}
+            Shot {shot.index}
           </span>
           {shot.shotSize && (
             <span className="text-[10px] font-mono text-zinc-500 bg-zinc-800 px-1.5 py-0.5 rounded">
@@ -185,10 +185,10 @@ function ShotRow({ shot, isSelected, onClick }: ShotRowProps) {
         {/* Status indicators */}
         <div className="flex items-center gap-1">
           {shot.imageUrl && (
-            <span className="w-2 h-2 rounded-full bg-green-500" title="图片已生成" />
+            <span className="w-2 h-2 rounded-full bg-green-500" title="ImageGenerated" />
           )}
           {shot.videoUrl && (
-            <span className="w-2 h-2 rounded-full bg-blue-500" title="视频已生成" />
+            <span className="w-2 h-2 rounded-full bg-blue-500" title="VideoGenerated" />
           )}
         </div>
       </div>

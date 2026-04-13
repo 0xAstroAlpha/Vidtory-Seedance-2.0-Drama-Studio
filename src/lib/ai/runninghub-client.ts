@@ -3,7 +3,7 @@
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
 /**
  * RunningHub API Client
- * 视角切换功能的API客户端
+ * Viewpoint切换Feature的API客户端
  */
 
 import { retryOperation } from '@/lib/utils/retry';
@@ -14,7 +14,7 @@ const normalizeBaseUrl = (baseUrl: string) => baseUrl.replace(/\/+$/, '');
 
 export interface RunningHubSubmitParams {
   referenceImage: string;  // 原图URL或base64
-  anglePrompt: string;     // 视角提示词
+  anglePrompt: string;     // ViewpointPrompt
   apiKey: string;
   baseUrl: string;
   appId: string;
@@ -31,17 +31,17 @@ export interface RunningHubTaskResult {
 }
 
 /**
- * 提交视角切换任务
+ * SubmitViewpoint切换任务
  */
 export async function submitAngleSwitchTask(
   params: RunningHubSubmitParams
 ): Promise<string> {
   const { referenceImage, anglePrompt, apiKey, baseUrl, appId, instanceType = 'default', usePersonalQueue = false } = params;
   if (!baseUrl) {
-    throw new Error('RunningHub Base URL 未配置');
+    throw new Error('RunningHub Base URL Not Configured');
   }
   if (!appId) {
-    throw new Error('RunningHub App ID 未配置');
+    throw new Error('RunningHub App ID Not Configured');
   }
 
   console.log('[RunningHub] Submitting angle switch task:', {
@@ -92,7 +92,7 @@ export async function submitAngleSwitchTask(
 
         const error = new Error(
           response.status === 401 || response.status === 403
-            ? 'API Key 无效或已过期'
+            ? 'API Key None效或已过期'
             : response.status >= 500
               ? 'RunningHub 服务暂时不可用'
               : errorMessage
@@ -121,12 +121,12 @@ export async function submitAngleSwitchTask(
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error('提交 RunningHub 任务失败');
+    throw new Error('Submit RunningHub Task failed');
   }
 }
 
 /**
- * 查询任务状态
+ * 查询Task Status
  */
 export async function queryTaskStatus(
   taskId: string,
@@ -135,7 +135,7 @@ export async function queryTaskStatus(
 ): Promise<RunningHubTaskResult> {
   try {
     if (!baseUrl) {
-      throw new Error('RunningHub Base URL 未配置');
+      throw new Error('RunningHub Base URL Not Configured');
     }
     const response = await fetch(`${normalizeBaseUrl(baseUrl)}/query`, {
       method: 'POST',
@@ -178,7 +178,7 @@ export async function queryTaskStatus(
 }
 
 /**
- * 轮询任务直到完成
+ * 轮询任务直到Done
  */
 export async function pollTaskUntilComplete(
   taskId: string,
@@ -187,7 +187,7 @@ export async function pollTaskUntilComplete(
   onProgress?: (progress: number, status: string) => void
 ): Promise<string> {
   const maxAttempts = 120; // 最多2分钟
-  const pollInterval = 2000; // 2秒
+  const pollInterval = 2000; // 2sec
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const progress = Math.min(Math.floor((attempt / maxAttempts) * 100), 99);
@@ -221,11 +221,11 @@ export async function pollTaskUntilComplete(
     }
   }
 
-  throw new Error('视角切换超时，请重试');
+  throw new Error('Viewpoint切换超时，Please retry');
 }
 
 /**
- * 一键生成视角切换（组合函数）
+ * 一键生成Viewpoint切换（组合函数）
  */
 export async function generateAngleSwitch(params: {
   referenceImage: string;
@@ -239,7 +239,7 @@ export async function generateAngleSwitch(params: {
 }): Promise<string> {
   const { referenceImage, direction, elevation, shotSize, apiKey, baseUrl, appId, onProgress } = params;
 
-  // 生成提示词
+  // 生成Prompt
   const anglePrompt = generateAnglePrompt(direction, elevation, shotSize);
 
   console.log('[RunningHub] Starting angle switch:', {
@@ -249,7 +249,7 @@ export async function generateAngleSwitch(params: {
     prompt: anglePrompt,
   });
 
-  // 提交任务
+  // Submit任务
   onProgress?.(0, 'SUBMITTING');
   const taskId = await submitAngleSwitchTask({
     referenceImage,

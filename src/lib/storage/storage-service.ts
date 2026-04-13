@@ -165,8 +165,8 @@ class StorageService {
         this.deleteProjectTimeline({ projectId: id }),
       ]);
     } catch (err) {
-      console.warn(`[StorageService] 清理项目 ${id} 关联数据失败:`, err);
-      // 即使清理失败也继续删除项目元数据，避免阻塞用户操作
+      console.warn(`[StorageService] 清理项目 ${id} 关联数据Failed:`, err);
+      // 即使清理Failed也继续Delete项目元数据，避免阻塞用户操作
     }
     await this.projectsAdapter.remove(id);
   }
@@ -351,7 +351,7 @@ class StorageService {
 
   // Utility methods
   async clearAllData(): Promise<void> {
-    // 先获取所有项目 ID，逐个清理关联的媒体和时间线数据
+    // 先获取所有项目 ID，逐清理关联的媒体和时间线数据
     try {
       const projectIds = await this.projectsAdapter.list();
       await Promise.all(
@@ -363,7 +363,7 @@ class StorageService {
         )
       );
     } catch (err) {
-      console.warn('[StorageService] 清理关联数据失败:', err);
+      console.warn('[StorageService] 清理关联数据Failed:', err);
     }
     // 最后清除项目元数据
     await this.projectsAdapter.clear();

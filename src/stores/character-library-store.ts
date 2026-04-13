@@ -38,22 +38,22 @@ export interface CharacterView {
  * while maintaining face/body consistency via base reference
  * 
  * 支持两种用途：
- * 1. 服装/状态变体："日常装"、"战斗装"、"受伤状态"
- * 2. 年龄/阶段变体："青年版"、"中年版"、"老年版"（带episodeRange）
+ * 1. Costume/状态变体："日常装"、"战斗装"、"受伤状态"
+ * 2. Age/阶段变体："青年版"、"中年版"、"老年版"（带episodeRange）
  */
 export interface CharacterVariation {
   id: string;
   name: string;           // "日常装", "战斗装", "青年版", "中年版" etc.
   visualPrompt: string;   // Prompt describing this variation
-  visualPromptZh?: string; // 中文提示词
+  visualPromptZh?: string; // 中文Prompt
   referenceImage?: string; // Generated reference image for this variation
   clothingReferenceImages?: string[]; // User-uploaded clothing/outfit reference images (base64)
   generatedAt?: number;
   
   // === 阶段变体特有字段 ===
-  isStageVariation?: boolean;      // 是否为阶段变体（年龄/时期变化）
-  episodeRange?: [number, number]; // 适用集数范围：[起始集, 结束集]
-  ageDescription?: string;         // 该阶段年龄："25岁"、"50岁"
+  isStageVariation?: boolean;      // 是否为阶段变体（Age/时期变化）
+  episodeRange?: [number, number]; // 适用Episodes范围：[起始Episode, 结束Episode]
+  ageDescription?: string;         // 该阶段Age："25岁"、"50岁"
   stageDescription?: string;       // 阶段描述："创业初期"、"事业巅峰"
 }
 
@@ -64,9 +64,9 @@ export interface Character {
   visualTraits: string; // English visual traits for consistency
   projectId?: string;   // Associated project (optional)
   // Extended attributes (CineGen-AI inspired)
-  gender?: string;      // 性别
-  age?: string;         // 年龄/年龄段
-  personality?: string; // 性格特征
+  gender?: string;      // Gender
+  age?: string;         // Age/Age Group
+  personality?: string; // Personality Traits
   role?: string;        // 身份/背景
   traits?: string;      // 核心特质
   skills?: string;      // 技能/能力
@@ -81,14 +81,14 @@ export interface Character {
   variations: CharacterVariation[];
   thumbnailUrl?: string; // Main preview image (Base Look)
   // Enhanced fields (AniKuku inspired)
-  tags?: string[];        // 角色标签 如 #武侠 #男主 #剑客
-  notes?: string;         // 角色备注 (剧情说明)
+  tags?: string[];        // 角色标签 如 #武侠 #Male主 #剑客
+  notes?: string;         // 角色备注 (Plot说明)
   status?: 'draft' | 'linked'; // 状态: draft=草稿, linked=已关联剧本
-  linkedEpisodeId?: string;    // 关联的剧集ID
+  linkedEpisodeId?: string;    // 关联的剧EpisodeID
   
   // === 6层身份锚点（角色一致性）===
   identityAnchors?: CharacterIdentityAnchors;  // 身份锚点 - 6层特征锁定
-  negativePrompt?: CharacterNegativePrompt;    // 负面提示词
+  negativePrompt?: CharacterNegativePrompt;    // 负面Prompt
   
   createdAt: number;
   updatedAt: number;

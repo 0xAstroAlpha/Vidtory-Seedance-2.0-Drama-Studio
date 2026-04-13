@@ -140,9 +140,9 @@ export interface GenerationConfig {
   duration?: number;
   
   // Provider selection
-  imageProvider: 'memefast' | 'mock';
-  videoProvider: 'memefast' | 'mock';
-  chatProvider: 'memefast' | 'openai' | 'mock';
+  imageProvider: 'gemini' | 'custom' | 'mock';
+  videoProvider: 'gemini' | 'custom' | 'mock';
+  chatProvider: 'gemini' | 'openai' | 'custom' | 'mock';
 }
 
 // ==================== API Types ====================
@@ -150,7 +150,7 @@ export interface GenerationConfig {
 /**
  * API provider identifier
  */
-export type ProviderId = 'memefast' | 'runninghub' | 'openai' | 'custom';
+export type ProviderId = 'gemini' | 'openai' | 'custom';
 
 /**
  * Service type

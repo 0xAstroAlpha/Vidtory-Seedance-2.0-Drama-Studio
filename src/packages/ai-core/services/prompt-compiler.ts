@@ -20,24 +20,24 @@ const DEFAULT_TEMPLATES: PromptTemplateConfig = {
   sceneImage: `{{style_tokens}}, {{character_description}}, {{visual_content}}, {{camera}}, {{quality_tokens}}`,
   sceneVideo: `{{character_description}}, {{visual_content}}, {{action}}, {{camera}}`,
   negative: `blurry, low quality, watermark, text, logo, signature, bad anatomy, deformed, mutated`,
-  screenplay: `你是一个专业的视频剧本创作者。请根据以下描述创作一个短视频剧本：
+  screenplay: `你是一专业的Video剧本创作者。请根据以下描述创作一短Video剧本：
 
 描述：{{prompt}}
 
 要求：
-1. 创作 {{scene_count}} 个场景
-2. 每个场景包含：场景编号、旁白、视觉内容描述、角色动作、镜头类型、角色外观描述
+1. 创作 {{scene_count}} Scene
+2. 每Scene包含：Scene编号、Narration、视觉内容描述、角色动作、Shot类型、角色Appearance Description
 3. visualContent/action/camera/characterDescription 用英文描述
 4. narration 用中文
-5. 不要输出 mood/情绪 字段（前端不需要）
+5. 不要输出 mood/Mood 字段（前端不需要）
 
-输出格式为 JSON：
+Output Format为 JSON：
 {
-  "title": "视频标题",
+  "title": "Video标题",
   "scenes": [
     {
       "sceneId": 1,
-      "narration": "中文旁白",
+      "narration": "中文Narration",
       "visualContent": "English visual description",
       "action": "English character action",
       "camera": "Camera type in English (Close-up/Medium Shot/Wide Shot/etc.)",

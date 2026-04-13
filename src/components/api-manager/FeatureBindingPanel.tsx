@@ -5,9 +5,9 @@
 
 /**
  * Feature Binding Panel (Multi-Select Mode)
- * 品牌分类模型选择 — 仿 MemeFast pricing 页面
- * 一级：品牌 pill（带 SVG logo + 模型数）
- * 二级：模型列表（checkbox 多选）
+ * 品牌分类ModelSelect — 仿 Gemini pricing 页面
+ * 一级：品牌 pill（带 SVG logo + Model数）
+ * 二级：Model列表（checkbox 多选）
  */
 
 import { useMemo, useState } from "react";
@@ -37,7 +37,7 @@ import { getBrandIcon } from "./brand-icons";
 import { getModelDisplayName } from "@/lib/freedom/model-display-names";
 
 /**
- * 供应商选项 - 每个功能可选的平台 + 模型
+ * Provider选项 - 每Feature可选的Platform + Model
  */
 interface ProviderOption {
   providerId: string;
@@ -52,56 +52,56 @@ interface FeatureMeta {
   description: string;
   icon: ReactNode;
   requiredCapability?: ModelCapability;
-  /** 推荐模型提示（蓝色高亮） */
+  /** Recommended Model Notice (Blue Highlight) */
   recommendation?: string;
 }
 
 const FEATURE_CONFIGS: FeatureMeta[] = [
   {
     key: "script_analysis",
-    name: "剧本分析 / 对话",
-    description: "将故事文本分解为结构化剧本",
+    name: "Script Analysis / Dialogue",
+    description: "Deconstruct story text into structured script",
     icon: <FileText className="h-4 w-4" />,
     requiredCapability: "text",
   },
   {
     key: "character_generation",
-    name: "图片生成",
-    description: "生成角色和场景参考图",
+    name: "Image Generation",
+    description: "Generate character and scene reference images",
     icon: <Image className="h-4 w-4" />,
     requiredCapability: "image_generation",
-    recommendation: "💎 推荐使用 Nano Banana Pro (Gemini 3 Pro)— 画质优秀、一致性好",
+    recommendation: "💎 Recommended: Imagen 4 or Gemini 3 Pro Image Preview — excellent quality and consistency",
   },
   {
     key: "video_generation",
-    name: "视频生成",
-    description: "将图片转换为视频",
+    name: "Video Generation",
+    description: "Convert image to video",
     icon: <Video className="h-4 w-4" />,
     requiredCapability: "video_generation",
-    recommendation: "🧪 测试推荐 doubao-seedance-1-0-lite-t2v-250428 — 适合快速验证流程",
+    recommendation: "🧪 Recommended: Veo 2 or Veo 3 — high-quality video generation from Google",
   },
   {
     key: "image_understanding",
-    name: "图片理解",
-    description: "分析图片内容生成描述",
+    name: "Image Understanding",
+    description: "Analyze image content to generate descriptions",
     icon: <ScanEye className="h-4 w-4" />,
     requiredCapability: "vision",
   },
   {
     key: "freedom_image",
-    name: "自由板块-图片",
-    description: "自由板块独立的图片生成配置（未配置时回退到「图片生成」）",
+    name: "Freedom Panel - Image",
+    description: "Independent image generation configuration for freedom panel (Falls back to 'Image Generation')",
     icon: <Sparkles className="h-4 w-4" />,
     requiredCapability: "image_generation",
-    recommendation: "🎨 可独立配置自由板块使用的图片生成模型，不影响其他板块",
+    recommendation: "🎨 Independently configure image generation model for freedom panel",
   },
   {
     key: "freedom_video",
-    name: "自由板块-视频",
-    description: "自由板块独立的视频生成配置（未配置时回退到「视频生成」）",
+    name: "Freedom Panel - Video",
+    description: "Independent video generation configuration for freedom panel (Falls back to 'Video Generation')",
     icon: <Clapperboard className="h-4 w-4" />,
     requiredCapability: "video_generation",
-    recommendation: "🎬 可独立配置自由板块使用的视频生成模型，不影响其他板块",
+    recommendation: "🎬 Independently configure video generation model for freedom panel",
   },
 ];
 
@@ -119,56 +119,29 @@ function parseOptionKey(key: string): { providerIdOrPlatform: string; model: str
 }
 
 const DEFAULT_PLATFORM_CAPABILITIES: Record<string, ModelCapability[]> = {
-  memefast: ["text", "vision", "image_generation", "video_generation"],
-  // RunningHub is used for specialized tools; do not expose it as a default vision/chat provider.
-  runninghub: ["image_generation"],
+  gemini: ["text", "vision", "image_generation", "video_generation"],
 };
 
 /**
- * 模型级别能力映射
- * 精确控制每个模型在服务映射中的可选范围
- * 未列出的模型将 fallback 到平台级别能力
+ * Model级别能力映射
+ * 精确控制每Model在Service Mapping中的可选范围
+ * 未列出的Model将 fallback 到Platform级别能力
  */
 const MODEL_CAPABILITIES: Record<string, ModelCapability[]> = {
-  // ---- 对话/文本模型 ----
-  'glm-4.7': ['text', 'function_calling'],
-  'glm-4.6v': ['text', 'vision'],
-  'deepseek-v3': ['text'],
-  'deepseek-v3.2': ['text'],
-  'deepseek-r1': ['text', 'reasoning'],
-  'kimi-k2': ['text'],
-  'MiniMax-M2.1': ['text'],
-  'qwen3-max': ['text'],
-  'qwen3-max-preview': ['text'],
+  // ---- Text/Dialogue Models ----
+  'gemini-2.5-flash': ['text', 'vision'],
+  'gemini-2.5-pro': ['text', 'vision'],
   'gemini-2.0-flash': ['text'],
   'gemini-3-flash-preview': ['text'],
   'gemini-3-pro-preview': ['text'],
-  'claude-haiku-4-5-20251001': ['text', 'vision'],
 
-  // ---- 图片生成模型 ----
-  'cogview-3-plus': ['image_generation'],
-  'gemini-imagen': ['image_generation'],
+  // ---- Image Generation Models ----
+  'imagen-4': ['image_generation'],
   'gemini-3-pro-image-preview': ['image_generation'],
-  'gpt-image-1.5': ['image_generation'],
 
-  // ---- 视频生成模型 ----
-  'cogvideox': ['video_generation'],
-  'gemini-veo': ['video_generation'],
-  'doubao-seedance-1-5-pro': ['video_generation'],
-  'doubao-seedance-1-5-pro-251215': ['video_generation'],
-  'doubao-seedream-4-5-251128': ['image_generation'],
-  'veo3.1': ['video_generation'],
-  'sora-2-all': ['video_generation'],
-  'wan2.6-i2v': ['video_generation'],
-  'grok-video-3': ['video_generation'],
-  'grok-video-3-10s': ['video_generation'],
-  'grok-video-3-15s': ['video_generation'],
-
-  // ---- 图片理解/视觉模型 ----
-  'doubao-vision': ['vision'],
-
-  // ---- RunningHub 特殊模型 ----
-  '2009613632530812930': ['image_generation'],
+  // ---- Video Generation Models ----
+  'veo-2': ['video_generation'],
+  'veo-3': ['video_generation'],
 };
 
 function providerSupportsCapability(
@@ -190,51 +163,51 @@ function providerSupportsCapability(
 }
 
 /**
- * 检查特定模型是否支持所需能力
- * 优先级：硬编码映射 → 平台元数据(model_type/tags) → 模型名称推断 → 平台级别 fallback
+ * 检查特定Model是否支持所需能力
+ * 优先级：硬编码映射 → Platform元数据(model_type/tags) → Model名称推断 → Platform级别 fallback
  */
 function modelSupportsCapability(
   modelName: string,
   provider: { platform: string; capabilities?: ModelCapability[] },
   required?: ModelCapability,
-  modelType?: string,     // "文本" | "图像" | "音视频" | "检索"
-  modelTagsList?: string[] // ["对话","识图","工具"]
+  modelType?: string,     // "Text" | "Image" | "Audio/Video" | "Search"
+  modelTagsList?: string[] // ["Dialogue","Image Recognition","Tool"]
 ): boolean {
   if (!required) return true;
 
-  // 1. 硬编码映射（精确控制少量预设模型）
+  // 1. 硬编码映射（精确控制少量预设Model）
   const modelCaps = MODEL_CAPABILITIES[modelName];
   if (modelCaps) {
     return modelCaps.includes(required);
   }
 
-  // 2. 平台元数据（来自 /api/pricing_new 的 model_type + tags）
+  // 2. Platform元数据（来自 /api/pricing_new 的 model_type + tags）
   if (modelType) {
     switch (required) {
       case 'text':
-        return modelType === '文本';
+        return modelType === 'Text';
       case 'image_generation':
-        return modelType === '图像';
+        return modelType === 'Image';
       case 'video_generation':
-        // 音视频类中只筛选带“视频”标签的（排除纯音频/TTS/音乐）
-        return modelType === '音视频' && (modelTagsList?.some(t => t.includes('视频')) ?? false);
+        // Audio/Video类中只筛选带“Video”标签的（排除纯Audio/TTS/音乐）
+        return modelType === 'Audio/Video' && (modelTagsList?.some(t => t.includes('Video')) ?? false);
       case 'vision':
-        // 识图能力跨 model_type，只看 tags 是否含“识图”或“多模态”
-        return modelTagsList?.some(t => t.includes('识图') || t.includes('多模态')) ?? false;
+        // Image Recognition能力跨 model_type，只看 tags 是否含“Image Recognition”或“Multimodal”
+        return modelTagsList?.some(t => t.includes('Image Recognition') || t.includes('Multimodal')) ?? false;
       case 'embedding':
-        return modelType === '检索';
+        return modelType === 'Search';
       default:
         break;
     }
   }
 
-  // 3. 模型名称模式推断（非 MemeFast 的其他供应商）
+  // 3. Model名称模式推断（非 Gemini 的其他Provider）
   const inferred = classifyModelByName(modelName);
   if (inferred.length > 0) {
     return inferred.includes(required);
   }
 
-  // 4. 平台级别 fallback
+  // 4. Platform级别 fallback
   return providerSupportsCapability(provider, required);
 }
 
@@ -280,7 +253,7 @@ export function FeatureBindingPanel() {
           .filter((m) => m.length > 0);
 
         for (const model of models) {
-          // 使用平台元数据 (model_type/tags) 进行精确分类
+          // 使用Platform元数据 (model_type/tags) 进行精确分类
           const mType = modelTypes[model];
           const mTags = modelTags[model];
           if (!modelSupportsCapability(model, provider, feature.requiredCapability, mType, mTags)) continue;
@@ -308,13 +281,13 @@ export function FeatureBindingPanel() {
     return map;
   }, [providers, configuredProviderIds, modelTypes, modelTags]);
 
-  // 计算已配置的功能数（至少有一个有效绑定）
+  // 计算Configured的Feature数（至少有一有效Binding）
   const configuredCount = useMemo(() => {
     return FEATURE_CONFIGS.filter((feature) => {
       const bindings = getFeatureBindings(feature.key);
       if (bindings.length === 0) return false;
       
-      // 检查是否至少有一个有效的绑定
+      // 检查是否至少有一有效的Binding
       const options = optionsByFeature[feature.key] || [];
       return bindings.some(binding => {
         const parsed = parseOptionKey(binding);
@@ -325,7 +298,7 @@ export function FeatureBindingPanel() {
     }).length;
   }, [optionsByFeature, configuredProviderIds, getFeatureBindings]);
 
-  // 切换单个模型的选中状态
+  // 切换单Model的选中状态
   const handleToggleBinding = (feature: FeatureMeta, optionKey: string) => {
     const parsed = parseOptionKey(optionKey);
     if (!parsed) return;
@@ -359,7 +332,7 @@ export function FeatureBindingPanel() {
         brandMap.get(brandId)!.push(opt);
       }
 
-      // 排序：模型数多的品牌在前
+      // 排序：Model数多的品牌在前
       const sorted = [...brandMap.entries()]
         .map(([brandId, options]) => ({ brandId, options }))
         .sort((a, b) => b.options.length - a.options.length);
@@ -370,16 +343,16 @@ export function FeatureBindingPanel() {
     return result;
   }, [optionsByFeature]);
 
-  // 每个 feature 选中的品牌过滤器
+  // 每 feature 选中的品牌过滤器
   const [selectedBrand, setSelectedBrand] = useState<Record<string, string | null>>({});
-  // 每个 feature 的搜索关键词
+  // 每 feature 的SearchKeywords
   const [searchQuery, setSearchQuery] = useState<Record<string, string>>({});
 
-  // MemeFast 供应商 ID 集合（用于分组提示）
-  const memefastProviderIds = useMemo(() => {
+  // Gemini Provider ID Episode合（用于分组Notice）
+  const geminiProviderIds = useMemo(() => {
     const ids = new Set<string>();
     for (const p of providers) {
-      if (p.platform === 'memefast') ids.add(p.id);
+      if (p.platform === 'gemini') ids.add(p.id);
     }
     return ids;
   }, [providers]);
@@ -389,10 +362,10 @@ export function FeatureBindingPanel() {
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-foreground flex items-center gap-2">
           <Link2 className="h-4 w-4" />
-          服务映射
+          Service Mapping
         </h3>
         <span className="text-xs text-muted-foreground">
-          已配置: {configuredCount}/{FEATURE_CONFIGS.length}
+          Configured: {configuredCount}/{FEATURE_CONFIGS.length}
         </span>
       </div>
 
@@ -421,7 +394,7 @@ export function FeatureBindingPanel() {
             setFeatureBindings(feature.key, null);
           };
           
-          // 检查有效/失效绑定（失效=模型被过滤、下线，或平台未配置）
+          // 检查有效/失效Binding（失效=Model被过滤、下线，或PlatformNot Configured）
           const validBindings: string[] = [];
           const invalidBindings: string[] = [];
           for (const binding of currentBindings) {
@@ -478,17 +451,17 @@ export function FeatureBindingPanel() {
                       )}
                       {validBindings.length > 0 && (
                         <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded">
-                          {validBindings.length} 个模型
+                          {validBindings.length} Model
                         </span>
                       )}
                       {isFreedomFeature && (
                         <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
-                          可用 {selectableOptionKeys.length}
+                          Available {selectableOptionKeys.length}
                         </span>
                       )}
                       {isFreedomFeature && invalidBindings.length > 0 && (
                         <span className="text-xs bg-amber-500/15 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 rounded">
-                          暂不可用 {invalidBindings.length}
+                          Unavailable {invalidBindings.length}
                         </span>
                       )}
                     </div>
@@ -513,15 +486,15 @@ export function FeatureBindingPanel() {
                 <div className="px-4 pb-4 pt-0 border-t border-border/50">
                   {options.length === 0 ? (
                     <p className="text-xs text-muted-foreground py-2">
-                      暂无可选模型（请先在 API 服务商里配置模型列表）
+                      No selectable models (Configure model list in API Providers first)
                     </p>
                   ) : (
                     <div className="space-y-3 pt-3">
                       <p className="text-xs text-muted-foreground">
-                        可多选，请求将按轮询分配到各模型（间隔 3 秒）
+                        Multi-select allowed, round-robin allocation (3s interval)
                       </p>
 
-                      {/* 推荐模型提示 */}
+                      {/* RecommendedModelNotice */}
                       {feature.recommendation && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-md bg-red-500/10 border border-red-500/30">
                           <span className="text-sm font-bold text-red-600 dark:text-red-400 leading-relaxed">
@@ -530,15 +503,15 @@ export function FeatureBindingPanel() {
                         </div>
                       )}
 
-                      {/* MemeFast 分组提示横幅 */}
+                      {/* Gemini Group Notice Banner */}
                       {(() => {
                         const groups = new Set<string>();
                         for (const binding of currentBindings) {
                           const parsed = parseOptionKey(binding);
                           if (!parsed) continue;
-                          const isMemefast = memefastProviderIds.has(parsed.providerIdOrPlatform)
-                            || parsed.providerIdOrPlatform === 'memefast';
-                          if (!isMemefast) continue;
+                          const isGemini = geminiProviderIds.has(parsed.providerIdOrPlatform)
+                            || parsed.providerIdOrPlatform === 'gemini';
+                          if (!isGemini) continue;
                           const mg = modelEnableGroups[parsed.model];
                           if (mg) for (const g of mg) groups.add(g);
                         }
@@ -547,7 +520,7 @@ export function FeatureBindingPanel() {
                         return (
                           <div className="flex flex-col gap-1.5 px-3 py-2.5 rounded-md bg-blue-500/10 border border-blue-500/30">
                             <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                              已选的 MemeFast 模型支持以下分组：
+                              Selected Gemini models support groups:
                             </span>
                             <div className="flex flex-wrap gap-1.5">
                               {sortedGroups.map(g => (
@@ -557,18 +530,18 @@ export function FeatureBindingPanel() {
                               ))}
                             </div>
                             <span className="text-[11px] text-blue-600/80 dark:text-blue-400/80">
-                              建议在 memefast.top 后台为以上分组都添加 Key，Key 越多可用性越高。
+                              Add keys for all groups in ai.google.dev backend.
                             </span>
                           </div>
                         );
                       })()}
                       {isFreedomFeature && invalidBindings.length > 0 && (
                         <p className="text-[11px] text-amber-700 dark:text-amber-300">
-                          检测到暂不可用绑定：系统不会自动清理，模型恢复后会自动继续可用。
+                          Unavailable bindings detected: will automatically recover.
                         </p>
                       )}
 
-                      {/* 自由板块一键全选（勾选=全选；取消=全部不选） */}
+                      {/* Freedom panel one-click select all */}
                       {isFreedomFeature && (
                         <div className="flex items-center justify-between rounded-md border border-border/60 bg-muted/30 px-3 py-2">
                           <label className="flex items-center gap-2 text-xs font-medium text-foreground">
@@ -577,7 +550,7 @@ export function FeatureBindingPanel() {
                               onCheckedChange={handleToggleSelectAll}
                               disabled={selectableOptionKeys.length === 0}
                             />
-                            全选模型（取消即全部不选）
+                            Select all models
                           </label>
                           <span className="text-[11px] text-muted-foreground">
                             {selectedSelectableCount}/{selectableOptionKeys.length}
@@ -590,7 +563,7 @@ export function FeatureBindingPanel() {
                         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                         <input
                           type="text"
-                          placeholder="搜索模型名称..."
+                          placeholder="Search model names..."
                           value={searchQuery[feature.key] || ''}
                           onChange={(e) => setSearchQuery(prev => ({ ...prev, [feature.key]: e.target.value }))}
                           className="w-full pl-8 pr-3 py-1.5 text-xs rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary/50"
@@ -603,7 +576,7 @@ export function FeatureBindingPanel() {
                         const activeBrand = selectedBrand[feature.key] || null;
                         const query = (searchQuery[feature.key] || '').toLowerCase();
 
-                        // 过滤后的模型列表
+                        // 过滤后的Model列表
                         const filteredOptions = options.filter(o => {
                           if (query && !o.model.toLowerCase().includes(query) && !getModelDisplayName(o.model).toLowerCase().includes(query)) return false;
                           if (activeBrand && extractBrandFromModel(o.model) !== activeBrand) return false;
@@ -613,7 +586,7 @@ export function FeatureBindingPanel() {
                         return (
                           <>
                             <div className="flex flex-wrap gap-1.5">
-                              {/* 全部品牌 */}
+                              {/* All Brands */}
                               <button
                                 type="button"
                                 onClick={() => setSelectedBrand(prev => ({ ...prev, [feature.key]: null }))}
@@ -624,7 +597,7 @@ export function FeatureBindingPanel() {
                                     : "bg-muted/30 border-border hover:bg-accent/50 text-muted-foreground"
                                 )}
                               >
-                                全部品牌
+                                All Brands
                                 <span className={cn(
                                   "text-[10px] px-1 py-0.5 rounded-full min-w-[18px] text-center",
                                   !activeBrand ? "bg-primary/20" : "bg-muted"
@@ -668,7 +641,7 @@ export function FeatureBindingPanel() {
                             <div className="space-y-1 max-h-[280px] overflow-y-auto">
                               {filteredOptions.length === 0 ? (
                                 <p className="text-xs text-muted-foreground py-2 text-center">
-                                  无匹配模型
+                                  No matched models
                                 </p>
                               ) : (
                                 filteredOptions.map((option) => {
@@ -724,10 +697,10 @@ export function FeatureBindingPanel() {
           <AlertCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
           <div className="text-xs">
             <p className="font-medium text-destructive">
-              部分服务未配置
+              Some services not configured
             </p>
             <p className="text-muted-foreground mt-1">
-              请在上方为每个功能选择「供应商/模型」，并确保对应供应商已填写 API Key。
+              Please select 'Provider/Model' for each feature above.
             </p>
           </div>
         </div>
@@ -736,12 +709,12 @@ export function FeatureBindingPanel() {
       {/* Help text */}
       <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg space-y-2">
         <p>
-          <strong>💡 多模型轮询：</strong>
-          每个功能可选择多个模型，请求将按顺序分配到各模型（每次间隔 3 秒），避免单一 API 限流。
+          <strong>💡 Multi-Model Round-Robin: </strong>
+          Select multiple models per feature to avoid rate limits.
         </p>
         <p>
-          <strong>📌 说明：</strong>
-          可选项来自「API 服务商」里配置的模型列表，点击展开后可多选。
+          <strong>📌 Note: </strong>
+          Options come from 'API Provider', expand to multi-select.
         </p>
       </div>
     </div>

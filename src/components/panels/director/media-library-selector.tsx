@@ -4,8 +4,8 @@
 "use client";
 
 /**
- * 素材库选择器组件 (Media Library Selector)
- * 从素材库中选择图片应用到分镜首帧/尾帧
+ * Media LibrarySelect器组件 (Media Library Selector)
+ * From Media Library中Select image to apply toShotFirst Frame/Tail Frame
  */
 
 import React, { useState, useMemo } from "react";
@@ -54,21 +54,21 @@ export function MediaLibrarySelector({
     return mediaFiles.filter((m) => m.projectId === activeProjectId);
   }, [mediaFiles, resourceSharing.shareMedia, activeProjectId]);
   
-  // 只获取图片类型的媒体文件（非临时）
+  // 只获取Image类型的Media File（非临时）
   const imageFiles = useMemo(() => 
     visibleMedia.filter(f => f.type === 'image' && !f.ephemeral),
     [visibleMedia]
   );
   
-  // 根据选中的文件夹筛选图片
+  // 根据选中的Folder筛选Image
   const filteredImages = useMemo(() => {
     if (selectedFolderId === null) {
-      return imageFiles; // 显示所有
+      return imageFiles; // Show all
     }
     return imageFiles.filter(f => f.folderId === selectedFolderId);
   }, [imageFiles, selectedFolderId]);
   
-  // 处理选择图片
+  // 处理SelectImage
   const handleSelectImage = (imageUrl: string) => {
     onSelect(imageUrl);
     setIsOpen(false);
@@ -86,27 +86,27 @@ export function MediaLibrarySelector({
         >
           <ImageIcon className="h-3 w-3" />
           <span className="max-w-[80px] truncate">
-            {isEndFrame ? '从素材库' : '从素材库'}
+            {isEndFrame ? 'From Media Library' : 'From Media Library'}
           </span>
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-[480px] p-3" align="start">
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium">
-            选择图片应用到{isEndFrame ? '尾帧' : '首帧'}
+            Select image to apply to{isEndFrame ? 'Tail Frame' : 'First Frame'}
           </p>
           <span className="text-xs text-muted-foreground">
-            共 {filteredImages.length} 张图片
+            Total {filteredImages.length} images
           </span>
         </div>
         
         {imageFiles.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-8">
-            素材库中没有图片，请先添加图片或生成四宫格
+            No images in Media Library, please add images or generate 4-grid
           </p>
         ) : (
           <div className="space-y-3">
-            {/* 文件夹筛选 */}
+            {/* Folder筛选 */}
             {visibleFolders.length > 0 && (
               <div className="flex items-center gap-2 flex-wrap">
                 <button
@@ -118,7 +118,7 @@ export function MediaLibrarySelector({
                       : "bg-muted hover:bg-muted/80 text-muted-foreground"
                   )}
                 >
-                  全部
+                  All
                 </button>
                 {visibleFolders.map((folder) => (
                   <button
@@ -138,11 +138,11 @@ export function MediaLibrarySelector({
               </div>
             )}
             
-            {/* 图片网格 */}
+            {/* Image Grid */}
             <div className="max-h-[300px] overflow-y-auto">
               {filteredImages.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  该文件夹中没有图片
+                  该Folder中没Has Image
                 </p>
               ) : (
                 <div className="grid grid-cols-4 gap-2">
@@ -161,17 +161,17 @@ export function MediaLibrarySelector({
                           alt={img.name}
                           className="w-full h-full object-cover"
                         />
-                        {/* 悬停遮罩 */}
+                        {/* Hover Mask */}
                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <Check className="h-6 w-6 text-white" />
                         </div>
-                        {/* 文件名 */}
+                        {/* Filename */}
                         <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-1 py-0.5">
                           <span className="text-[9px] text-white truncate block">
                             {img.name}
                           </span>
                         </div>
-                        {/* AI 标记 */}
+                        {/* AI Marker */}
                         {img.source === 'ai-image' && (
                           <span className="absolute top-1 left-1 text-[8px] bg-primary text-white px-1 rounded">
                             AI

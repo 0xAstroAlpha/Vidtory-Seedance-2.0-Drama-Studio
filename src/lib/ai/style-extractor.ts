@@ -72,7 +72,7 @@ async function resolveImageUrl(src: string): Promise<string> {
 }
 
 function extractErrorMessage(status: number, errorText: string): string {
-  let message = `API 请求失败: ${status}`;
+  let message = `API 请求Failed: ${status}`;
 
   try {
     const errorJson = JSON.parse(errorText);
@@ -84,7 +84,7 @@ function extractErrorMessage(status: number, errorText: string): string {
   }
 
   if (status === 401 || status === 403) {
-    return 'API Key 无效或已过期，请检查“图片理解”服务的 Key 配置';
+    return 'API Key None效或已过期，请检查“Image理解”服务的 Key 配置';
   }
 
   if (status >= 500) {
@@ -117,13 +117,13 @@ export async function extractStyleTokens(
 ): Promise<StyleExtractionResult> {
   const config = getFeatureConfig('image_understanding');
   if (!config) {
-    throw new Error('请先在设置中为“图片理解”功能绑定 API 提供商');
+    throw new Error('Please first在设置中为“Image理解”Feature Binding API 提供商');
   }
 
   const baseUrl = config.baseUrl?.replace(/\/+$/, '');
   const model = config.model || config.models?.[0];
   if (!baseUrl || !model) {
-    throw new Error('图片理解服务缺少 Base URL 或模型配置');
+    throw new Error('Image理解服务缺少 Base URL 或Model配置');
   }
 
   const contentParts: Array<{ type: string; text?: string; image_url?: { url: string } }> = [];
@@ -203,7 +203,7 @@ export async function extractStyleTokens(
     parsed = JSON.parse(cleanContent);
   } catch {
     console.error('[StyleExtractor] Failed to parse JSON:', content);
-    throw new Error('AI 返回的格式无法解析');
+    throw new Error('AI Back的格式None法解析');
   }
 
   const result: StyleExtractionResult = {

@@ -353,7 +353,7 @@ export class AIWorkerBridge {
         { type: metadata.mimeType || 'video/mp4' }
       );
       
-      // 2. Add to media store in AI视频 system folder
+      // 2. Add to media store in AIVideo system folder
       const videoFolderId = useMediaStore.getState().getOrCreateCategoryFolder('ai-video');
       const mediaFile = await useMediaStore.getState().addMediaFile(projectId, {
         name: file.name,

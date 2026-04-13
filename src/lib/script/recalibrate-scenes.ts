@@ -4,9 +4,9 @@
 /**
  * 风格切换重新校准服务
  * 
- * 当用户在导演/S级面板切换视觉风格时，将现有 SplitScene[] 重新送入
- * 5阶段校准流程（calibrateShotsMultiStage），用新风格重写提示词和拍摄参数，
- * 同时保留已生成的图片/视频 URL 不变。
+ * 当用户在导演/S级面板切换Visual Style时，将现有 SplitScene[] 重新送入
+ * 5阶段校准流程（calibrateShotsMultiStage），用新风格重写Prompt和拍摄参数，
+ * 同时保留Generated的Image/Video URL 不变。
  */
 
 import type { SplitScene } from '@/stores/director-store';
@@ -33,7 +33,7 @@ function toShotInputData(scenes: SplitScene[]): ShotInputData[] {
       sceneAtmosphere: '',
       sceneTime: 'day',
       sceneWeather: '',
-      // 这些字段无法从 SplitScene 获取，传空串（Stage 3 仅作参考）
+      // 这些字段None法从 SplitScene 获取，传空串（Stage 3 仅作参考）
       architectureStyle: '',
       colorPalette: '',
       eraDetails: '',
@@ -56,9 +56,9 @@ function buildGlobalContext(scriptProjectId?: string): GlobalContext {
   const project = projectId ? store.projects[projectId] : null;
   
   if (!project) {
-    // 兜底：返回最小化的 context
+    // 兜底：Back最小化的 context
     return {
-      title: '未命名项目',
+      title: 'Untitled项目',
       outline: '',
       characterBios: '',
       episodeTitle: '',
@@ -66,12 +66,12 @@ function buildGlobalContext(scriptProjectId?: string): GlobalContext {
   }
 
   const background = project.projectBackground;
-  const episodeScript = project.episodeRawScripts[0]; // 默认取第一集
+  const episodeScript = project.episodeRawScripts[0]; // 默认取Episode 1
   const scriptData = project.scriptData;
   const episode = scriptData?.episodes?.[0];
 
   return {
-    title: background?.title || scriptData?.title || '未命名剧本',
+    title: background?.title || scriptData?.title || 'Untitled剧本',
     genre: background?.genre || '',
     era: background?.era || '',
     outline: background?.outline || '',
@@ -90,7 +90,7 @@ function buildGlobalContext(scriptProjectId?: string): GlobalContext {
 
 /**
  * 将校准结果写回 SplitScene（对齐 full-script-service.ts:1265-1305 的映射）
- * 保留已生成的图片/视频 URL 不变
+ * 保留Generated的Image/Video URL 不变
  */
 function applyCalibrationToScene(
   scene: SplitScene,
@@ -105,7 +105,7 @@ function applyCalibrationToScene(
     duration: calibration.duration || scene.duration,
     emotionTags: calibration.emotionTags || scene.emotionTags,
     ambientSound: calibration.ambientSound || scene.ambientSound,
-    // 提示词
+    // Prompt
     imagePrompt: calibration.imagePrompt || scene.imagePrompt,
     imagePromptZh: calibration.imagePromptZh || scene.imagePromptZh,
     videoPrompt: calibration.videoPrompt || scene.videoPrompt,
@@ -147,14 +147,14 @@ export interface RecalibrationResult {
 }
 
 /**
- * 用新风格重新校准所有分镜
+ * 用新风格重新校准所有Shot
  * 
- * @param newStyleId 新的视觉风格 ID
- * @param splitScenes 当前分镜列表
+ * @param newStyleId 新的Visual Style ID
+ * @param splitScenes 当前Shot List
  * @param scriptProjectId 可选的 script-store projectId（默认用活跃项目）
- * @param onProgress 进度回调
+ * @param onProgress Progress回调
  * @returns 校准后的 SplitScene[]（调用方负责写入 store）
- * @throws 校准失败时抛出异常（调用方负责捕获并保持原状态不变）
+ * @throws 校准Failed时抛出异常（调用方负责捕获并保持原状态不变）
  */
 export async function recalibrateSplitScenes(
   newStyleId: string,
@@ -180,7 +180,7 @@ export async function recalibrateSplitScenes(
     styleId: newStyleId,
   };
 
-  onProgress?.(0, totalScenes, '正在用新风格校准分镜...');
+  onProgress?.(0, totalScenes, '正在用新风格校准Shot...');
 
   const calibrations = await calibrateShotsMultiStage(
     shotInputs,
@@ -202,7 +202,7 @@ export async function recalibrateSplitScenes(
     return scene;
   });
 
-  onProgress?.(calibratedCount, totalScenes, `已校准 ${calibratedCount}/${totalScenes} 个分镜`);
+  onProgress?.(calibratedCount, totalScenes, `Calibrated ${calibratedCount}/${totalScenes} Shot`);
 
   return {
     scenes: updatedScenes,

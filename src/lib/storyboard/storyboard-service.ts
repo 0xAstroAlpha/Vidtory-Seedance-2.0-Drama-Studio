@@ -5,7 +5,7 @@
  * Storyboard Generation Service
  * 
  * Handles the generation of storyboard contact sheet images using AI image APIs.
- * For Electron desktop app: directly calls external APIs (MemeFast)
+ * For Electron desktop app: directly calls external APIs (Gemini)
  */
 
 import { buildStoryboardPrompt, getDefaultNegativePrompt, type StoryboardPromptConfig, type CharacterInfo } from './prompt-builder';
@@ -127,9 +127,9 @@ async function submitImageGenTask(
 
         const error = new Error(
           response.status === 401 || response.status === 403
-            ? 'API Key 无效或已过期，请检查配置'
+            ? 'API Key None效或已过期，请检查配置'
             : response.status >= 500
-              ? '图片生成服务暂时不可用，请稍后再试'
+              ? 'Image Generation服务暂时不可用，请稍后再试'
               : errorMessage
         ) as Error & { status?: number };
         error.status = response.status;
@@ -178,7 +178,7 @@ async function submitImageGenTask(
       }
       throw error;
     }
-    throw new Error('调用图片生成 API 时发生未知错误');
+    throw new Error('调用Image Generation API 时Hair生未知Error');
   }
 }
 
@@ -374,7 +374,7 @@ export async function generateStoryboardImage(
     styleTokens = [],
     characterDescriptions = [],
     apiKey,
-    provider = 'memefast',
+    provider = 'gemini',
     mockMode = false,
   } = config;
 
@@ -591,7 +591,7 @@ async function submitVideoGenTask(
       }
 
       if (response.status === 401 || response.status === 403) {
-        throw new Error('API Key 无效或已过期，请检查配置');
+        throw new Error('API Key None效或已过期，请检查配置');
       }
 
       const error = new Error(errorMessage) as Error & { status?: number };
@@ -672,7 +672,7 @@ export async function generateSceneVideos(
   const {
     aspectRatio,
     apiKey,
-    provider = 'memefast',
+    provider = 'gemini',
     model,
     baseUrl,
     mockMode = false,

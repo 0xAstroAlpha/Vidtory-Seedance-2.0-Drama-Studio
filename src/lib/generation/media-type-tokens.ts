@@ -4,14 +4,14 @@
 /**
  * Media-Type Tokens — 摄影参数 × 媒介类型翻译层
  *
- * 核心职责：根据视觉风格的 mediaType，将物理摄影 promptToken 翻译为
+ * 核心职责：根据Visual Style的 mediaType，将物理摄影 promptToken 翻译为
  * 该媒介能驾驭的等效表达。
  *
  * 翻译策略：
  * - cinematic  → 直通，保留全部物理摄影词汇
  * - animation  → 虚拟摄像机语义适配（轨道→视差平移、景深→层次模糊）
- * - stop-motion → 微缩实拍约束（轨道→微型滑轨、景深→微距镜头）
- * - graphic    → 跳过物理参数，灯光→色彩/情绪/节奏描述
+ * - stop-motion → 微缩实拍约束（轨道→微型滑轨、景深→微距Shot）
+ * - graphic    → 跳过物理参数，灯光→色彩/Mood/节奏描述
  */
 
 import type { MediaType } from '@/lib/constants/visual-styles';
@@ -46,7 +46,7 @@ export type CinematographyField =
 type FieldOverrides = Record<string, string>;
 
 /**
- * 'skip' 表示该字段在该媒介下整体跳过（返回空字符串）
+ * 'skip' 表示该字段在该媒介下整体跳过（Back空字符串）
  */
 type FieldStrategy = FieldOverrides | 'skip';
 
@@ -132,7 +132,7 @@ const GRAPHIC_TABLE: MediaTranslationTable = {
   cameraAngle:             'skip',
   focalLength:             'skip',
   photographyTechnique:    'skip',
-  // 灯光风格 → 转译为色彩/情绪
+  // 灯光风格 → 转译为色彩/Mood
   lightingStyle: {
     'high-key':    'bright palette, open composition,',
     'low-key':     'dark tones, heavy contrast areas,',
@@ -176,7 +176,7 @@ const TRANSLATION_TABLES: Partial<Record<MediaType, MediaTranslationTable>> = {
 /**
  * 将摄影参数 token 翻译为当前媒介类型的等效表达。
  *
- * @param mediaType   - 当前视觉风格的媒介类型
+ * @param mediaType   - 当前Visual Style的媒介类型
  * @param field       - 摄影参数维度
  * @param presetId    - 预设 ID（如 'dolly', 'shallow'）
  * @param originalToken - 原始 promptToken（来自预设数据）
@@ -196,7 +196,7 @@ export function translateToken(
 
   const strategy = table[field];
 
-  // 该字段无特殊处理 → 沿用原始 token
+  // 该字段None特殊处理 → 沿用原始 token
   if (strategy === undefined) return originalToken;
 
   // 整体跳过
@@ -208,7 +208,7 @@ export function translateToken(
 }
 
 /**
- * 判断某个字段在当前媒介下是否被跳过（UI 可用此决定是否显示灰色）
+ * 判断某字段在当前媒介下是否被跳过（UI 可用此决定是否显示灰色）
  */
 export function isFieldSkipped(mediaType: MediaType, field: CinematographyField): boolean {
   if (mediaType === 'cinematic') return false;

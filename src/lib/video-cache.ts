@@ -30,7 +30,7 @@ export class VideoCache {
   private sinks = new Map<string, VideoSinkData>();
   private initPromises = new Map<string, Promise<void>>();
   
-  // 关闭 VideoSample 资源
+  // Close VideoSample 资源
   private closeSample(sample: VideoSample | null): void {
     if (!sample) return;
     try {
@@ -40,7 +40,7 @@ export class VideoCache {
 
   private closeFrame(frame: CachedFrame | null): void {
     if (!frame) return;
-    // 关闭内部的 VideoSample
+    // Close内部的 VideoSample
     this.closeSample(frame.sample);
   }
 
@@ -60,7 +60,7 @@ export class VideoCache {
   
   // 从 VideoSample 渲染到 canvas
   private renderSampleToCanvas(sample: VideoSample, sinkData: VideoSinkData): CachedFrame {
-    // 获取或创建 canvas
+    // 获取或Create canvas
     let canvas = sinkData.canvasPool.pop();
     if (!canvas) {
       canvas = document.createElement("canvas");
@@ -128,7 +128,7 @@ export class VideoCache {
 
         if (done || !sample) break;
         
-        // 渲染 sample 到 canvas 并创建 CachedFrame
+        // 渲染 sample 到 canvas 并Create CachedFrame
         const frame = this.renderSampleToCanvas(sample, sinkData);
         this.replaceCurrentFrame(sinkData, frame);
         sinkData.lastTime = frame.timestamp;

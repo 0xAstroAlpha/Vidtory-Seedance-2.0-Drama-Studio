@@ -3,7 +3,7 @@
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
 /**
  * Angle Switch Components
- * 视角切换相关组件导出
+ * Viewpoint切换相关组件Export
  */
 
 export { AngleSwitchDialog } from './AngleSwitchDialog';

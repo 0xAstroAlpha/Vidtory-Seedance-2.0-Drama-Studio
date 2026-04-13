@@ -4,33 +4,33 @@
 /**
  * Model Capability Registry — AI 调度中心核心组件 1
  *
- * 职责：根据模型名称查询 contextWindow 和 maxOutput 限制。
+ * 职责：根据Model名称查询 contextWindow 和 maxOutput 限制。
  * 三层查找（优先级递减）：
- *   1. 持久化缓存（从 API 错误中自动学到的真实限制）
- *   2. 静态注册表（官方文档验证过的已知模型）
+ *   1. 持久化缓存（从 API Error中自动学到的真实限制）
+ *   2. 静态注册表（官方文档验证过的已知Model）
  *   3. _default 保守默认值
  *
  * 设计原则：
- *   - 按模型名查表，不按 URL — memefast 代理的模型和直连一样
- *   - prefix 匹配按长度降序 — 避免短前缀误匹配更具体的模型
- *   - 仅覆盖 text/chat 模型 — 图像/视频/音频不走 callChatAPI
- *   - 保守默认值 — 未知模型宁可多分批也不撞限制
+ *   - 按Model名查表，不按 URL — memefast 代理的Model和直连一样
+ *   - prefix 匹配按长度降序 — 避免短前缀误匹配更具体的Model
+ *   - 仅覆盖 text/chat Model — 图像/Video/Audio不走 callChatAPI
+ *   - 保守默认值 — 未知Model宁可多分批也不撞限制
  */
 
 // ==================== Types ====================
 
 export interface ModelLimits {
-  /** 模型最大输入上下文窗口（tokens） */
+  /** Model最大输入上下文窗口（tokens） */
   contextWindow: number;
-  /** 模型最大输出 token 数（max_tokens 参数上限） */
+  /** Model最大输出 token 数（max_tokens 参数上限） */
   maxOutput: number;
 }
 
-/** 从 API 400 错误中发现的模型限制（持久化到 localStorage） */
+/** 从 API 400 Error中Hair现的Model限制（持久化到 localStorage） */
 export interface DiscoveredModelLimits {
   maxOutput?: number;
   contextWindow?: number;
-  /** 发现时间戳 */
+  /** Hair现时间戳 */
   discoveredAt: number;
 }
 
@@ -45,12 +45,12 @@ export interface DiscoveredModelLimits {
  *   - Gemini: https://ai.google.dev/gemini-api/docs/models + OCI docs (2.5 = 1M ctx / 65K output)
  *   - 其他: 保守值，标注"保守"
  *
- * ⚠️ memefast 上的同名模型使用相同限制。新增模型应查阅官方文档后添加，不可靠猜测。
+ * ⚠️ memefast 上的同名Model使用相同限制。新增Model应查阅官方文档后Add，不可靠猜测。
  */
 const STATIC_REGISTRY: Record<string, ModelLimits> = {
   // ==================== DeepSeek 系列 ====================
   // DeepSeek-V3.2: 128K context limit
-  // memefast 模型名: deepseek-v3, deepseek-v3.2, deepseek-r1
+  // memefast Model名: deepseek-v3, deepseek-v3.2, deepseek-r1
   'deepseek-v3':            { contextWindow: 128000,   maxOutput: 8192   },
   'deepseek-v3.2':          { contextWindow: 128000,   maxOutput: 8192   },
   'deepseek-chat':          { contextWindow: 128000,   maxOutput: 8192   },
@@ -69,7 +69,7 @@ const STATIC_REGISTRY: Record<string, ModelLimits> = {
   'gemini-3-pro-preview':   { contextWindow: 1048576,  maxOutput: 65536  },
   'gemini-2.0-flash':       { contextWindow: 1048576,  maxOutput: 8192   },
 
-  // ==================== 其他模型（保守值） ====================
+  // ==================== 其他Model（保守值） ====================
   'kimi-k2':                { contextWindow: 128000,   maxOutput: 8192   },
   'qwen3-max':              { contextWindow: 128000,   maxOutput: 8192   },
   'qwen3-max-preview':      { contextWindow: 128000,   maxOutput: 8192   },
@@ -115,7 +115,7 @@ export function injectDiscoveryCache(
 // ==================== Core Lookup ====================
 
 /**
- * 查询模型的 contextWindow 和 maxOutput 限制
+ * 查询Model的 contextWindow 和 maxOutput 限制
  *
  * 三层查找：
  *   1. 持久化缓存（Error-driven Discovery 学到的真实限制）
@@ -125,7 +125,7 @@ export function injectDiscoveryCache(
 export function getModelLimits(modelName: string): ModelLimits {
   const m = modelName.toLowerCase();
 
-  // Layer 1: 持久化缓存（最准确，从 API 错误中学到的真实值）
+  // Layer 1: 持久化缓存（最准确，从 API Error中学到的真实值）
   if (_getDiscoveredLimits) {
     const discovered = _getDiscoveredLimits(m);
     if (discovered) {
@@ -164,16 +164,16 @@ function lookupStatic(modelNameLower: string): ModelLimits {
 // ==================== Error-driven Discovery ====================
 
 /**
- * 从 API 400 错误消息中解析模型限制
+ * 从 API 400 Error消息中解析Model限制
  *
- * 覆盖主流 API 的错误格式：
+ * 覆盖主流 API 的Error格式：
  *   - DeepSeek: "Invalid max_tokens value, the valid range of max_tokens is [1, 8192]"
  *   - OpenAI:   "maximum context length is 128000 tokens ... you requested 150000 tokens"
  *   - 智谱:     "max_tokens must be less than or equal to 8192"
  *   - 通用:     "max_tokens ... 8192" 等各种变体
  *
  * @returns 解析出的限制（可能只有 maxOutput 或 contextWindow 或两者都有），
- *          如果正则未匹配到任何数值则返回 null（优雅降级，不会死循环）
+ *          如果正则未匹配到任何数值则Back null（优雅降级，不会死循环）
  */
 export function parseModelLimitsFromError(errorText: string): Partial<DiscoveredModelLimits> | null {
   const result: Partial<DiscoveredModelLimits> = {};
@@ -229,8 +229,8 @@ export function parseModelLimitsFromError(errorText: string): Partial<Discovered
 }
 
 /**
- * 将发现的限制写入持久化缓存
- * @returns true 如果成功写入，false 如果缓存未注入
+ * 将Hair现的限制写入持久化缓存
+ * @returns true 如果Success写入，false 如果缓存未注入
  */
 export function cacheDiscoveredLimits(
   modelName: string,
@@ -267,7 +267,7 @@ export function estimateTokens(text: string): number {
  *
  * @param text 原始文本
  * @param maxLength 最大字符数
- * @param hint 截断时追加的提示后缀（帮助 AI 理解信息不完整，减少幻觉）
+ * @param hint 截断时追加的Notice后缀（Help AI 理解信息不完整，减少幻觉）
  */
 export function safeTruncate(
   text: string,

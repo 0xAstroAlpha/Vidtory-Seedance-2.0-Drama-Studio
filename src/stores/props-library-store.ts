@@ -4,7 +4,7 @@
 
 /**
  * PropsLibraryStore - 道具库状态管理
- * 支持自定义目录分类，持久化到 localStorage
+ * 支持Custom目录分类，持久化到 localStorage
  */
 
 import { create } from 'zustand';
@@ -13,14 +13,14 @@ import { persist } from 'zustand/middleware';
 // 道具项
 export interface PropItem {
   id: string;
-  name: string;           // 道具名称（可编辑）
+  name: string;           // 道具名称（可Edit）
   imageUrl: string;       // local-image://props/... 或远程URL
-  prompt: string;         // 生成时的提示词（供参考）
+  prompt: string;         // 生成时的Prompt（供参考）
   folderId: string | null; // 所属目录，null = 根目录
   createdAt: number;
 }
 
-// 自定义目录
+// Custom目录
 export interface PropFolder {
   id: string;
   name: string;           // 目录名称
@@ -45,7 +45,7 @@ interface PropsLibraryActions {
   // 目录操作
   addFolder: (name: string, parentId?: string | null) => PropFolder;
   renameFolder: (id: string, name: string) => void;
-  deleteFolder: (id: string) => void; // 删除时子道具移至根目录
+  deleteFolder: (id: string) => void; // Delete时子道具移至根目录
 
   // UI 状态
   setSelectedFolderId: (folderId: string | null | 'all') => void;

@@ -4,8 +4,8 @@
 "use client";
 
 /**
- * 场景库选择器组件 (Scene Library Selector)
- * 支持三层选择：父场景 → 视角变体 → 四视图子场景
+ * Scene LibrarySelect器组件 (Scene Library Selector)
+ * 支持三层Select：父Scene → Viewpoint变体 → 4-Viewschild scenes
  */
 
 import React, { useState, useMemo } from "react";
@@ -26,7 +26,7 @@ interface SceneLibrarySelectorProps {
   sceneId: number;
   selectedSceneLibraryId?: string;
   selectedViewpointId?: string;
-  selectedSubViewId?: string;  // 四视图子场景 ID
+  selectedSubViewId?: string;  // 4-Viewschild scenes ID
   isEndFrame?: boolean;
   onChange: (
     sceneLibraryId: string | undefined, 
@@ -37,7 +37,7 @@ interface SceneLibrarySelectorProps {
   disabled?: boolean;
 }
 
-/** 解析 local-image:// 缩略图 */
+/** Extract local-image:// thumbnail */
 function ResolvedImg({ src, alt, className }: { src: string; alt: string; className?: string }) {
   const resolved = useResolvedImageUrl(src);
   return <img src={resolved || ''} alt={alt} className={className} />;
@@ -65,25 +65,25 @@ export function SceneLibrarySelector({
     return libraryScenes.filter((s) => s.projectId === activeProjectId);
   }, [libraryScenes, resourceSharing.shareScenes, activeProjectId]);
   
-  // 获取所有父场景（非视角变体）
+  // 获取所Has 父Scene（非Viewpoint变体）
   const parentScenes = useMemo(() => 
     visibleScenes.filter(s => !s.isViewpointVariant && !s.parentSceneId),
     [visibleScenes]
   );
   
-  // 根据选中的场景获取视角变体（第一层子场景）
+  // 根据选中的Scene获取Viewpoint变体（第一层child scenes）
   const viewpointScenes = useMemo(() => {
     if (!selectedSceneLibraryId) return [];
     return visibleScenes.filter(s => s.parentSceneId === selectedSceneLibraryId);
   }, [visibleScenes, selectedSceneLibraryId]);
   
-  // 根据选中的视角获取四视图子场景（第二层子场景）
+  // 根据选中的Viewpoint获取4-Viewschild scenes（第二层child scenes）
   const subViewScenes = useMemo(() => {
     if (!selectedViewpointId) return [];
     return visibleScenes.filter(s => s.parentSceneId === selectedViewpointId);
   }, [visibleScenes, selectedViewpointId]);
   
-  // 获取当前选中的场景信息
+  // 获取当前选中的Scene Info
   const selectedScene = useMemo(() => {
     if (!selectedSceneLibraryId) return null;
     return visibleScenes.find(s => s.id === selectedSceneLibraryId) || null;
@@ -99,23 +99,23 @@ export function SceneLibrarySelector({
     return visibleScenes.find(s => s.id === selectedSubViewId) || null;
   }, [visibleScenes, selectedSubViewId]);
   
-  // 选择场景
+  // SelectScene
   const handleSelectScene = (sceneLibId: string) => {
     const scene = visibleScenes.find(s => s.id === sceneLibId);
     if (!scene) {
       onChange(undefined, undefined, undefined, undefined);
       return;
     }
-    // 选中场景，清空视角和四视图
+    // 选中Scene，ClearViewpoint和4-Views
     const refImage = scene.referenceImage || scene.referenceImageBase64;
     onChange(sceneLibId, undefined, refImage, undefined);
   };
   
-  // 选择视角
+  // SelectViewpoint
   const handleSelectViewpoint = (viewpointId: string) => {
     const viewpoint = visibleScenes.find(s => s.id === viewpointId);
     if (!viewpoint) {
-      // 清空视角，使用父场景的参考图
+      // ClearViewpoint，使用父Scene的Reference Image
       const parentRefImage = selectedScene?.referenceImage || selectedScene?.referenceImageBase64;
       onChange(selectedSceneLibraryId, undefined, parentRefImage, undefined);
       return;
@@ -124,11 +124,11 @@ export function SceneLibrarySelector({
     onChange(selectedSceneLibraryId, viewpointId, refImage, undefined);
   };
   
-  // 选择四视图子场景
+  // Select4-Viewschild scenes
   const handleSelectSubView = (subViewId: string) => {
     const subView = visibleScenes.find(s => s.id === subViewId);
     if (!subView) {
-      // 清空四视图，使用视角的参考图
+      // Clear4-Views，使用Viewpoint的Reference Image
       const viewpointRefImage = selectedViewpoint?.referenceImage || selectedViewpoint?.referenceImageBase64;
       onChange(selectedSceneLibraryId, selectedViewpointId, viewpointRefImage, undefined);
       return;
@@ -137,7 +137,7 @@ export function SceneLibrarySelector({
     onChange(selectedSceneLibraryId, selectedViewpointId, refImage, subViewId);
   };
   
-  // 清空选择
+  // Clear Selection
   const handleClear = () => {
     onChange(undefined, undefined, undefined, undefined);
     setIsOpen(false);
@@ -145,7 +145,7 @@ export function SceneLibrarySelector({
   
   // 显示文本
   const displayText = useMemo(() => {
-    if (!selectedScene) return isEndFrame ? '尾帧场景' : '场景参考';
+    if (!selectedScene) return isEndFrame ? 'Tail Frame Scene' : 'Scene Reference';
     if (selectedSubView) {
       return `${selectedScene.name}-${selectedViewpoint?.viewpointName || selectedViewpoint?.name}-${selectedSubView.viewpointName || selectedSubView.name}`;
     }
@@ -153,10 +153,10 @@ export function SceneLibrarySelector({
     return selectedScene.name;
   }, [selectedScene, selectedViewpoint, selectedSubView, isEndFrame]);
   
-  // 是否有选中
+  // 是否Has 选中
   const hasSelection = !!selectedSceneLibraryId;
   
-  // 预览参考图（提取到组件级别以便使用 hook）
+  // PreviewReference Image（提取到组件级别以便使用 hook）
   const previewRefImage = selectedSubView?.referenceImage || selectedSubView?.referenceImageBase64
     || selectedViewpoint?.referenceImage || selectedViewpoint?.referenceImageBase64
     || selectedScene?.referenceImage || (selectedScene as any)?.contactSheetImage || selectedScene?.referenceImageBase64
@@ -182,29 +182,29 @@ export function SceneLibrarySelector({
       <PopoverContent className="w-[720px] p-3" align="start">
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium">
-            {isEndFrame ? '选择尾帧场景参考' : '选择场景参考'}
+            {isEndFrame ? 'SelectTail Frame Scene Reference' : 'SelectScene Reference'}
           </p>
           {hasSelection && (
             <button
               onClick={handleClear}
               className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground hover:bg-muted/80"
             >
-              清空选择
+              Clear Selection
             </button>
           )}
         </div>
         
         {parentScenes.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-8">
-            场景库为空，请先创建场景
+            Scene Library为空，Please firstCreateScene
           </p>
         ) : (
           <div className="flex gap-3">
-            {/* 左侧：场景/视角/四视图选择列 */}
+            {/* Left: Scene/Viewpoint/4-views select columns */}
             <div className="flex gap-3 flex-1">
-              {/* 场景选择 - 第一列 */}
+              {/* Scene Select - First Col */}
               <div className="w-[160px] shrink-0">
-                <Label className="text-xs text-muted-foreground mb-2 block">场景</Label>
+                <Label className="text-xs text-muted-foreground mb-2 block">Scene</Label>
                 <div className="max-h-[300px] overflow-y-auto space-y-1 pr-1">
                   {parentScenes.map((s) => {
                     const isSelected = selectedSceneLibraryId === s.id;
@@ -229,7 +229,7 @@ export function SceneLibrarySelector({
                         <div className="flex-1 min-w-0">
                           <span className="text-xs truncate block">{s.name}</span>
                           {hasViewpoints && (
-                            <span className="text-[10px] text-muted-foreground">有视角</span>
+                            <span className="text-[10px] text-muted-foreground">Has Viewpoint</span>
                           )}
                         </div>
                         {isSelected && <Check className="h-3 w-3 text-primary shrink-0" />}
@@ -239,10 +239,10 @@ export function SceneLibrarySelector({
                 </div>
               </div>
               
-              {/* 视角选择 - 第二列（如果有） */}
+              {/* ViewpointSelect - 第二列（如果Has ） */}
               {selectedSceneLibraryId && viewpointScenes.length > 0 && (
                 <div className="w-[140px] shrink-0 border-l pl-3">
-                  <Label className="text-xs text-muted-foreground mb-2 block">视角</Label>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Viewpoint</Label>
                   <div className="max-h-[300px] overflow-y-auto space-y-1 pr-1">
                     <button
                       onClick={() => handleSelectViewpoint('')}
@@ -254,7 +254,7 @@ export function SceneLibrarySelector({
                       <div className="w-8 h-8 rounded bg-muted flex items-center justify-center shrink-0">
                         <MapPin className="h-3 w-3" />
                       </div>
-                      <span className="text-xs">不指定</span>
+                      <span className="text-xs">不指Stop</span>
                       {!selectedViewpointId && <Check className="h-3 w-3 text-primary" />}
                     </button>
                     {viewpointScenes.map((v) => {
@@ -280,7 +280,7 @@ export function SceneLibrarySelector({
                           <div className="flex-1 min-w-0">
                             <span className="text-xs truncate block">{v.viewpointName || v.name}</span>
                             {hasSubViews && (
-                              <span className="text-[10px] text-muted-foreground">有四视图</span>
+                              <span className="text-[10px] text-muted-foreground">Has 4-Views</span>
                             )}
                           </div>
                           {isSelected && <Check className="h-3 w-3 text-primary shrink-0" />}
@@ -291,10 +291,10 @@ export function SceneLibrarySelector({
                 </div>
               )}
               
-              {/* 四视图子场景选择 - 第三列（如果有） */}
+              {/* 4-Viewschild scenesSelect - 第三列（如果Has ） */}
               {selectedViewpointId && subViewScenes.length > 0 && (
                 <div className="w-[120px] shrink-0 border-l pl-3">
-                  <Label className="text-xs text-muted-foreground mb-2 block">四视图</Label>
+                  <Label className="text-xs text-muted-foreground mb-2 block">4-Views</Label>
                   <div className="max-h-[300px] overflow-y-auto space-y-1 pr-1">
                     <button
                       onClick={() => handleSelectSubView('')}
@@ -306,7 +306,7 @@ export function SceneLibrarySelector({
                       <div className="w-8 h-8 rounded bg-muted flex items-center justify-center shrink-0">
                         <Layers className="h-3 w-3" />
                       </div>
-                      <span className="text-xs">不指定</span>
+                      <span className="text-xs">不指Stop</span>
                       {!selectedSubViewId && <Check className="h-3 w-3 text-primary" />}
                     </button>
                     {subViewScenes.map((sv) => {
@@ -338,19 +338,19 @@ export function SceneLibrarySelector({
               )}
             </div>
             
-            {/* 右侧：参考图预览 */}
+            {/* Right: Reference Image Preview */}
             <div className="w-[240px] shrink-0 border-l pl-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">参考图预览</Label>
+              <Label className="text-xs text-muted-foreground mb-2 block">Reference Image Preview</Label>
               {previewRefImage ? (
                 <div className="w-full rounded-lg bg-muted flex items-center justify-center min-h-[120px] max-h-[240px] overflow-hidden">
-                  <ResolvedImg src={previewRefImage} alt="参考图" className="max-w-full max-h-[240px] rounded-lg object-contain" />
+                  <ResolvedImg src={previewRefImage} alt="Reference Image" className="max-w-full max-h-[240px] rounded-lg object-contain" />
                 </div>
               ) : (
                 <div className="w-full aspect-video rounded-lg bg-muted flex items-center justify-center">
-                  <span className="text-sm text-muted-foreground">请选择场景</span>
+                  <span className="text-sm text-muted-foreground">Please selectScene</span>
                 </div>
               )}
-              {/* 选中路径显示 */}
+              {/* Selected path display */}
               {hasSelection && (
                 <div className="mt-2 text-xs text-muted-foreground">
                   <span className="text-foreground">{selectedScene?.name}</span>

@@ -125,7 +125,7 @@ export function GenerationProgress() {
             return;
           }
 
-          onSceneFailed(event.sceneId, '视频生成完成但未返回 mediaId');
+          onSceneFailed(event.sceneId, 'Video generation completed but no mediaId returned');
         });
         workerBridge.on('ALL_SCENES_COMPLETED', () => {
           onAllCompleted();
@@ -140,7 +140,7 @@ export function GenerationProgress() {
       // Spread apiKeys to avoid zustand proxy serialization issues
       const apiKeysCopy = { ...apiKeys };
       console.log('[GenerationProgress] apiKeys from store:', apiKeysCopy);
-      console.log('[GenerationProgress] apiKeys.memefast:', apiKeysCopy?.memefast ? 'SET' : 'NOT SET');
+      console.log('[GenerationProgress] apiKeys.gemini:', apiKeysCopy?.gemini ? 'SET' : 'NOT SET');
       
       const execConfig = {
         ...config,
@@ -198,9 +198,9 @@ export function GenerationProgress() {
     <div className="border-t p-4 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="font-medium text-sm">生成进度</h3>
+        <h3 className="font-medium text-sm">Generation Progress</h3>
         <span className="text-sm text-muted-foreground">
-          {overallProgress.completed} / {overallProgress.total} 场景
+          {overallProgress.completed} / {overallProgress.total} Scenes
         </span>
       </div>
 
@@ -221,25 +221,25 @@ export function GenerationProgress() {
           {statusCounts.completed > 0 && (
             <span className="flex items-center gap-1 text-green-500">
               <CheckCircle2 className="h-3 w-3" />
-              {statusCounts.completed} 完成
+              {statusCounts.completed} Done
             </span>
           )}
           {statusCounts.generating > 0 && (
             <span className="flex items-center gap-1 text-primary">
               <Loader2 className="h-3 w-3 animate-spin" />
-              {statusCounts.generating} 生成中
+              {statusCounts.generating} Generating...
             </span>
           )}
           {statusCounts.pending > 0 && (
             <span className="flex items-center gap-1 text-muted-foreground">
               <Clock className="h-3 w-3" />
-              {statusCounts.pending} 等待
+              {statusCounts.pending} Pending
             </span>
           )}
           {statusCounts.failed > 0 && (
             <span className="flex items-center gap-1 text-destructive">
               <AlertCircle className="h-3 w-3" />
-              {statusCounts.failed} 失败
+              {statusCounts.failed} Failed
             </span>
           )}
         </div>
@@ -248,7 +248,7 @@ export function GenerationProgress() {
       {/* Estimated time */}
       {isGenerating && !isComplete && (
         <p className="text-xs text-muted-foreground text-center">
-          预计剩余时间: {estimateRemainingTime(overallProgress.total - overallProgress.completed)}
+          Estimated time remaining: {estimateRemainingTime(overallProgress.total - overallProgress.completed)}
         </p>
       )}
     </div>
@@ -260,10 +260,10 @@ function estimateRemainingTime(pendingScenes: number): string {
   // Rough estimate: ~2 min per scene (image + video generation)
   const minutes = pendingScenes * 2;
   
-  if (minutes < 1) return "不到 1 分钟";
-  if (minutes < 60) return `约 ${minutes} 分钟`;
+  if (minutes < 1) return "Less than 1 minute";
+  if (minutes < 60) return `About ${minutes} minutes`;
   
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
-  return `约 ${hours} 小时 ${remainingMinutes} 分钟`;
+  return `About ${hours} hour(s) ${remainingMinutes} minutes`;
 }

@@ -22,7 +22,7 @@ export function TabBar() {
       <div className="flex flex-col w-14 bg-panel border-r border-border py-2">
         <div className="p-2">
           <div className="w-8 h-8 bg-primary text-primary-foreground flex items-center justify-center mx-auto rounded">
-            <span className="text-sm font-bold">M</span>
+            <span className="text-sm font-bold">V</span>
           </div>
         </div>
         {/* Dashboard nav */}
@@ -40,10 +40,10 @@ export function TabBar() {
                   )}
                 >
                   <LayoutDashboard className="h-5 w-5 mb-0.5" />
-                  <span className="text-[9px]">项目</span>
+                  <span className="text-[9px]">Projects</span>
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right">项目仪表盘</TooltipContent>
+              <TooltipContent side="right">Project Dashboard</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </nav>
@@ -59,10 +59,10 @@ export function TabBar() {
                   className="w-full flex flex-col items-center py-2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <HelpCircle className="h-4 w-4" />
-                  <span className="text-[8px]">帮助</span>
+                  <span className="text-[8px]">Help</span>
                 </a>
               </TooltipTrigger>
-              <TooltipContent side="right">使用帮助</TooltipContent>
+              <TooltipContent side="right">User Guide</TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <TooltipProvider delayDuration={300}>
@@ -76,10 +76,10 @@ export function TabBar() {
                   )}
                 >
                   <Settings className="h-4 w-4" />
-                  <span className="text-[8px]">设置</span>
+                  <span className="text-[8px]">Settings</span>
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right">系统设置</TooltipContent>
+              <TooltipContent side="right">System Settings</TooltipContent>
             </Tooltip>
           </TooltipProvider>
           {/* Theme Toggle */}
@@ -91,11 +91,11 @@ export function TabBar() {
                   className="w-full flex flex-col items-center py-2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                  <span className="text-[8px]">{theme === "dark" ? "浅色" : "深色"}</span>
+                  <span className="text-[8px]">{theme === "dark" ? "Light" : "Dark"}</span>
                 </button>
               </TooltipTrigger>
               <TooltipContent side="right">
-                {theme === "dark" ? "切换到浅色模式" : "切换到深色模式"}
+                {theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -110,7 +110,7 @@ export function TabBar() {
       {/* Logo + Back */}
       <div className="p-2 border-b border-border">
         <div className="w-8 h-8 bg-primary text-primary-foreground flex items-center justify-center mx-auto rounded mb-1">
-          <span className="text-sm font-bold">M</span>
+          <span className="text-sm font-bold">V</span>
         </div>
         <TooltipProvider delayDuration={300}>
           <Tooltip>
@@ -122,7 +122,7 @@ export function TabBar() {
                 <ChevronLeft className="h-4 w-4" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="right">返回项目列表</TooltipContent>
+            <TooltipContent side="right">Back to Project List</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </div>
@@ -171,10 +171,10 @@ export function TabBar() {
                 className="w-full flex flex-col items-center py-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <HelpCircle className="h-4 w-4" />
-                <span className="text-[8px]">帮助</span>
+                <span className="text-[8px]">Help</span>
               </a>
             </TooltipTrigger>
-            <TooltipContent side="right">使用帮助</TooltipContent>
+            <TooltipContent side="right">User Guide</TooltipContent>
           </Tooltip>
         </TooltipProvider>
         {bottomNavItems.map((item) => {
@@ -210,11 +210,11 @@ export function TabBar() {
                 className="w-full flex flex-col items-center py-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                <span className="text-[8px]">{theme === "dark" ? "浅色" : "深色"}</span>
+                <span className="text-[8px]">{theme === "dark" ? "Light" : "Dark"}</span>
               </button>
             </TooltipTrigger>
             <TooltipContent side="right">
-              {theme === "dark" ? "切换到浅色模式" : "切换到深色模式"}
+              {theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

@@ -4,8 +4,8 @@
 "use client";
 
 /**
- * 景别选择器组件 (Shot Size Selector)
- * 用于选择镜头的景别类型：远景、中景、近景、特写等
+ * 景别Select器组件 (Shot Size Selector)
+ * 用于SelectShot的景别类型：Long Shot、Medium Shot、Close Shot、Close-up等
  */
 
 import {
@@ -40,12 +40,12 @@ export function ShotSizeSelector({
       <SelectTrigger className={`h-7 text-xs ${className || ""}`}>
         <div className="flex items-center gap-1.5">
           <Camera className="h-3 w-3 text-muted-foreground" />
-          <SelectValue placeholder="景别" />
+          <SelectValue placeholder="Shot Size" />
         </div>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="none">
-          <span className="text-muted-foreground">未设置</span>
+          <span className="text-muted-foreground">Not Set</span>
         </SelectItem>
         {SHOT_SIZE_PRESETS.map((preset) => (
           <SelectItem key={preset.id} value={preset.id}>

@@ -1,8 +1,8 @@
 {
   "name": "moyin-creator",
-  "productName": "魔因漫创",
+  "productName": "Vidtory Drama Studio",
   "version": "0.2.3",
-  "description": "AI 驱动的动漫/短剧分镜创作工具",
+  "description": "AI-powered storyboard and short film creation tool",
   "author": "MemeCalculate",
   "license": "AGPL-3.0-or-later",
   "repository": {
@@ -22,7 +22,9 @@
   "type": "module",
   "scripts": {
     "dev": "electron-vite dev",
+    "dev:web": "vite --config vite.web.config.ts",
     "build": "npm run build:desktop",
+    "build:web": "vite build --config vite.web.config.ts",
     "prebuild": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/prebuild-cleanup.ps1",
     "build:desktop": "node ./scripts/build-desktop.mjs",
     "build:win": "node ./scripts/build-desktop.mjs --win",

@@ -27,32 +27,32 @@ export interface SceneFolder {
 
 export interface Scene {
   id: string;
-  name: string;           // 场景名称
-  location: string;       // 地点描述
-  time: string;           // 时间设定 (白天/夜晚/黄昏等)
+  name: string;           // Scene名称
+  location: string;       // Location描述
+  time: string;           // 时间设定 (Daytime/Night/Dusk等)
   atmosphere: string;     // 氛围描述 (紧张/温馨/神秘等)
   projectId?: string;     // Associated project (optional)
-  visualPrompt?: string;  // 完整的视觉提示词
-  referenceImage?: string; // 生成的场景概念图 URL
+  visualPrompt?: string;  // 完整的视觉Prompt
+  referenceImage?: string; // 生成的Scene概念图 URL
   referenceImageBase64?: string; // Base64 for persistence
   styleId?: string;       // Visual style preset ID
   folderId?: string | null; // Folder ID for organization
   // Enhanced fields (inspired by AniKuku)
   tags?: string[];        // 环境标签 如 #木柱 #窗棱 #古建筑
-  notes?: string;         // 地点备注 (剧情说明，与location分开)
+  notes?: string;         // Location备注 (Plot说明，与location分开)
   status?: 'draft' | 'linked'; // 状态: draft=草稿, linked=已关联剧本
-  linkedEpisodeId?: string;    // 关联的剧集ID
+  linkedEpisodeId?: string;    // 关联的剧EpisodeID
   createdAt: number;
   updatedAt: number;
   
-  // === 视角变体支持 ===
-  parentSceneId?: string;     // 父场景 ID（如果是视角变体）
-  viewpointId?: string;       // 视角 ID（如 'dining', 'sofa' 等）
-  viewpointName?: string;     // 视角名称（如 '餐桌区', '沙发区' 等）
-  shotIds?: string[];         // 关联的分镜 ID 列表
-  isViewpointVariant?: boolean; // 是否是视角变体
+  // === Viewpoint变体支持 ===
+  parentSceneId?: string;     // 父Scene ID（如果是Viewpoint变体）
+  viewpointId?: string;       // Viewpoint ID（如 'dining', 'sofa' 等）
+  viewpointName?: string;     // Viewpoint名称（如 '餐桌区', '沙Hair区' 等）
+  shotIds?: string[];         // 关联的Shot ID 列表
+  isViewpointVariant?: boolean; // 是否是Viewpoint变体
   
-  // === 专业场景设计字段 ===
+  // === 专业Scene设计字段 ===
   architectureStyle?: string;  // 建筑风格
   colorPalette?: string;       // 色彩基调
   eraDetails?: string;         // 时代特征
@@ -80,7 +80,7 @@ interface SceneState {
   generatingSceneId: string | null;
   generationPrefs: SceneGenerationPrefs;
   generationPrefsByProject: Record<string, SceneGenerationPrefs>;
-  // 联合图自动生成任务跟踪 (parentSceneId → 状态)
+  // 联合图Auto Generate任务跟踪 (parentSceneId → 状态)
   contactSheetTasks: Record<string, { status: 'generating' | 'splitting' | 'saving' | 'done' | 'error'; progress: number; message?: string }>;
 }
 
@@ -528,10 +528,10 @@ export const useSceneCount = (): number => {
 // ==================== Preset Time Options ====================
 
 export const TIME_PRESETS = [
-  { id: 'day', label: '白天', prompt: 'daytime, bright sunlight' },
-  { id: 'night', label: '夜晚', prompt: 'nighttime, moonlight, stars' },
+  { id: 'day', label: 'Daytime', prompt: 'daytime, bright sunlight' },
+  { id: 'night', label: 'Night', prompt: 'nighttime, moonlight, stars' },
   { id: 'dawn', label: '黎明', prompt: 'dawn, early morning light, soft orange glow' },
-  { id: 'dusk', label: '黄昏', prompt: 'dusk, golden hour, sunset colors' },
+  { id: 'dusk', label: 'Dusk', prompt: 'dusk, golden hour, sunset colors' },
   { id: 'overcast', label: '阴天', prompt: 'overcast sky, soft diffused light' },
   { id: 'storm', label: '暴风雨', prompt: 'stormy weather, dark clouds, dramatic lighting' },
 ] as const;

@@ -2,16 +2,16 @@
 // Licensed under AGPL-3.0-or-later. See LICENSE for details.
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
 /**
- * Prompt Builder — 统一视频提示词组装模块
+ * Prompt Builder — 统一VideoPrompt组装模块
  *
  * 核心原则：整合为语义层次，避免碎片化堆叠导致信号稀释
- * Layer 1: 镜头设计 (Camera) - 最高优先级
+ * Layer 1: Shot设计 (Camera) - 最高优先级
  * Layer 1.5: 灯光设计 (Lighting)
  * Layer 2: 内容焦点 (Subject) - 次高优先级
  * Layer 3: 氛围修饰 (Mood) - 辅助
- * Layer 4: 场景音频 (Setting & Audio)
- * Layer 5: 视觉风格 (Style)
- * Base: 用户提示词
+ * Layer 4: SceneAudio (Setting & Audio)
+ * Layer 5: Visual Style (Style)
+ * Base: 用户Prompt
  *
  * 摄影风格档案回退规则：逐镜字段为空时使用项目级摄影档案默认值
  */
@@ -43,7 +43,7 @@ import { translateToken, type CinematographyField } from '@/lib/generation/media
 // ==================== 辅助函数 ====================
 
 /**
- * 根据情绪标签构建氛围描述文本
+ * 根据Mood标签构建氛围描述文本
  */
 export function buildEmotionDescription(emotionTags: EmotionTag[]): string {
   if (!emotionTags || emotionTags.length === 0) return '';
@@ -88,12 +88,12 @@ function findPresetToken<T extends { id: string; promptToken: string }>(
   return translated || undefined; // 空字符串 → undefined（跳过）
 }
 
-// ==================== 视频 Prompt 构建配置 ====================
+// ==================== Video Prompt 构建配置 ====================
 
 export interface VideoPromptConfig {
-  /** 视觉风格 tokens */
+  /** Visual Style tokens */
   styleTokens?: string[];
-  /** 画面比例 (仅作为上下文参考) */
+  /** Aspect Ratio (仅作为上下文参考) */
   aspectRatio?: '16:9' | '9:16';
   /** 媒介类型 — 控制摄影参数翻译策略 */
   mediaType?: MediaType;
@@ -102,9 +102,9 @@ export interface VideoPromptConfig {
 // ==================== 核心函数 ====================
 
 /**
- * 构建视频生成的完整 prompt
+ * 构建Video Generation的完整 prompt
  *
- * @param scene - 分镜数据 (SplitScene)
+ * @param scene - Shot数据 (SplitScene)
  * @param cinProfile - 摄影风格档案 (undefined 表示未设置)
  * @param config - 额外配置 (styleTokens 等)
  * @returns 组装好的完整 prompt 字符串
@@ -117,7 +117,7 @@ export function buildVideoPrompt(
   const promptParts: string[] = [];
   const mt = config.mediaType;
 
-  // ---------- Layer 1: 镜头设计 (Camera Design) ----------
+  // ---------- Layer 1: Shot设计 (Camera Design) ----------
   const cameraDesignParts: string[] = [];
 
   // 1.0 器材类型 —— 逐镜优先，回退摄影档案
@@ -179,7 +179,7 @@ export function buildVideoPrompt(
     if (token) cameraDesignParts.push(token);
   }
 
-  // 1.7 镜头焦距 —— 逐镜优先，回退摄影档案
+  // 1.7 Shot焦距 —— 逐镜优先，回退摄影档案
   const effectiveFL = scene.focalLength || cinProfile?.defaultFocalLength;
   if (effectiveFL) {
     const flToken = findPresetToken(FOCAL_LENGTH_PRESETS, effectiveFL, mt, 'focalLength');
@@ -291,7 +291,7 @@ export function buildVideoPrompt(
     }
   }
 
-  // ---------- Layer 4: 场景与音频 (Setting & Audio) ----------
+  // ---------- Layer 4: Scene与Audio (Setting & Audio) ----------
   if (scene.sceneName || scene.sceneLocation) {
     const sceneInfo = [scene.sceneName, scene.sceneLocation].filter(Boolean).join(' - ');
     promptParts.push(`Setting: ${sceneInfo}`);
@@ -303,31 +303,31 @@ export function buildVideoPrompt(
   } else {
     promptParts.push('Dialogue: 禁止对白');
   }
-  // 环境音：有内容且开启时包含，否则明确禁止
+  // Ambient Sound：有内容且开启时包含，否则明确禁止
   if (scene.audioAmbientEnabled !== false && scene.ambientSound?.trim()) {
     promptParts.push(`Ambient: ${scene.ambientSound.trim()}`);
   } else {
-    promptParts.push('Ambient: 禁止环境音');
+    promptParts.push('Ambient: 禁止Ambient Sound');
   }
-  // 音效：有内容且开启时包含，否则明确禁止
+  // Sound Effect：有内容且开启时包含，否则明确禁止
   if (scene.audioSfxEnabled !== false && scene.soundEffectText?.trim()) {
     promptParts.push(`SFX: ${scene.soundEffectText.trim()}`);
   } else {
-    promptParts.push('SFX: 禁止音效');
+    promptParts.push('SFX: 禁止Sound Effect');
   }
-  // 背景音乐：有内容且开启时包含，否则明确禁止
+  // Background Music：有内容且开启时包含，否则明确禁止
   if (scene.audioBgmEnabled === true && scene.backgroundMusic?.trim()) {
     promptParts.push(`Music: ${scene.backgroundMusic.trim()}`);
   } else {
-    promptParts.push('Music: 禁止背景音乐');
+    promptParts.push('Music: 禁止Background Music');
   }
 
-  // ---------- Layer 5: 视觉风格 (Style) ----------
+  // ---------- Layer 5: Visual Style (Style) ----------
   if (config.styleTokens && config.styleTokens.length > 0) {
     promptParts.push(`Style: ${config.styleTokens.join(', ')}`);
   }
 
-  // ---------- Base Prompt: 用户视频提示词 ----------
+  // ---------- Base Prompt: 用户VideoPrompt ----------
   const basePrompt = scene.videoPromptZh || scene.videoPrompt || '';
   if (basePrompt.trim()) {
     promptParts.push(basePrompt.trim());

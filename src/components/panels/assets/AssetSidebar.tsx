@@ -5,7 +5,7 @@
 
 /**
  * AssetSidebar - 资产面板左侧导航树
- * 可插拔设计，后续可扩展素材库、作品库等子模块
+ * 可插拔设计，后续可扩展Media Library、作品库等子模块
  */
 
 import { cn } from "@/lib/utils";
@@ -39,19 +39,19 @@ interface NavModule {
 const NAV_MODULES: NavModule[] = [
   {
     id: "styles",
-    label: "风格库",
+    label: "Style Library",
     icon: Palette,
     children: [
-      { id: "style-default", label: "默认风格", icon: Layers },
-      { id: "style-custom", label: "我的风格", icon: UserCircle },
+      { id: "style-default", label: "Default Styles", icon: Layers },
+      { id: "style-custom", label: "My Styles", icon: UserCircle },
     ],
   },
   {
     id: "props",
-    label: "道具库",
+    label: "Props Library",
     icon: Box,
     children: [
-      { id: "props-library", label: "我的道具", icon: Box },
+      { id: "props-library", label: "My Props", icon: Box },
     ],
   },
 ];
@@ -76,7 +76,7 @@ export function AssetSidebar({ activeSection, onSectionChange }: AssetSidebarPro
       <div className="px-3 py-3 border-b border-border shrink-0">
         <div className="flex items-center gap-2">
           <FolderOpen className="w-4 h-4 text-primary" />
-          <span className="text-sm font-semibold">个人资产库</span>
+          <span className="text-sm font-semibold">Personal Assets</span>
         </div>
       </div>
 

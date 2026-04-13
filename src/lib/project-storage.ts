@@ -61,7 +61,7 @@ function getAllProjectIds(): string[] {
 export function createProjectScopedStorage(storeName: string): StateStorage {
   return {
     getItem: async (name: string): Promise<string | null> => {
-      // 等待 project-store 完成 rehydration，确保拿到正确的 activeProjectId
+      // 等待 project-store Done rehydration，确保拿到正确的 activeProjectId
       // 否则启动时可能读到默认值 "default-project"，导致读错文件
       if (!useProjectStore.persist.hasHydrated()) {
         await new Promise<void>((resolve) => {
@@ -174,7 +174,7 @@ export function createSplitStorage<T = any>(
 ): StateStorage {
   return {
     getItem: async (name: string): Promise<string | null> => {
-      // 等待 project-store 完成 rehydration
+      // 等待 project-store Done rehydration
       if (!useProjectStore.persist.hasHydrated()) {
         await new Promise<void>((resolve) => {
           const unsub = useProjectStore.persist.onFinishHydration(() => {

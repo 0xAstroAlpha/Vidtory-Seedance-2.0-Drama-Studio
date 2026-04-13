@@ -38,7 +38,7 @@ export interface ScriptCalibrationState {
   calibrationDialogOpen: boolean;
   pendingCalibrationCharacters: ScriptCharacter[] | null;
   pendingFilteredCharacters: FilteredCharacterRecord[];
-  // 面板切换后需恢复的导入/大纲生成状态
+  // 面板切换后需恢复的Import/大纲生成状态
   importStatus: ScriptImportStatus;
   synopsisStatus: ScriptSynopsisStatus;
 }
@@ -580,13 +580,13 @@ export const useScriptStore = create<ScriptStore>()(
           const newEpisode: Episode = {
             id: newEpisodeId,
             index: newIndex,
-            title: title || `第${newIndex}集`,
+            title: title || `第${newIndex}Episode`,
             description: synopsis || '',
             sceneIds: [],
           };
           const newRawScript: EpisodeRawScript = {
             episodeIndex: newIndex,
-            title: title || `第${newIndex}集`,
+            title: title || `第${newIndex}Episode`,
             synopsis: synopsis || '',
             keyEvents: [],
             rawContent: '',
@@ -624,7 +624,7 @@ export const useScriptStore = create<ScriptStore>()(
           const reindexedRaw = newRawScripts.map((e, i) => ({
             ...e,
             episodeIndex: i + 1,
-            title: e.title.replace(/^第\d+集/, `第${i + 1}集`),
+            title: e.title.replace(/^第\d+Episode/, `第${i + 1}Episode`),
           }));
           return {
             projects: {
